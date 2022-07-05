@@ -1,9 +1,10 @@
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass
 class CrytoBotError(Exception):
-    status_code: int
-    error: str
-    message: Optional[str]
+    code: int
+    name: str
+
+    def __str__(self):
+        return f"code={self.code}, name={self.name}"

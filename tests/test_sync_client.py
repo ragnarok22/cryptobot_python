@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 """Tests for `cryptobot` package."""
-import logging
 import os
 import unittest
 
@@ -25,4 +24,6 @@ class TestCryptoBotSyncClient(unittest.TestCase):
         """Retreating app information"""
         api_token = os.getenv('API_TOKEN')
         client = CryptoBotClient(api_token, is_mainnet=False)
-        logging.info(client.get_me())
+        info = client.get_me()
+        self.assertEqual(info.app_id, 5496)
+        self.assertEqual(info.name, 'Connecton Test')

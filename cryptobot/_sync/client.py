@@ -1,5 +1,8 @@
 import httpx
 
+from cryptobot.errors import CrytoBotError
+from cryptobot.models import App
+
 
 class CryptoBotClient:
     """Crypto Bot Client"""
@@ -16,7 +19,12 @@ class CryptoBotClient:
             }
         )
 
-    def get_me(self):
+    def get_me(self) -> App:
         """Get basic information about an app"""
         response = self.__http_client.get("/getMe")
-        return response.json()
+        if response.status_code == 200:
+            info = response.json()['result']
+            return App(**info)
+        else:
+            data = response.json()['error']
+            raise CrytoBotError(**data)

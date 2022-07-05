@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 from cryptobot import CryptoBotClient
 from cryptobot.errors import CryptoBotError
-from cryptobot.models import Asset
+from cryptobot.models import Asset, ButtonName
 
 load_dotenv()
 
@@ -46,6 +46,19 @@ class TestCryptoBotSyncClient(unittest.TestCase):
         self.assertEqual(invoice.amount, '0.01')
         self.assertEqual(invoice.allow_comments, True)
         self.assertEqual(invoice.allow_anonymous, True)
+        self.assertEqual(f'https://t.me/CryptoTestnetBot?start={invoice.hash}', invoice.pay_url)
+
+    def test_create_invoice_with_params(self):
+        """Create a new invoice"""
+        invoice = self.client.create_invoice(Asset.TON, 0.01, description='Test', hidden_message='Test',
+                                             paid_btn_name=ButtonName.viewItem,
+                                             paid_btn_url='https://reinierhernandez.com', payload='Test',
+                                             allow_comments=False, allow_anonymous=False, expires_in=1)
+        self.assertEqual(invoice.status, 'active')
+        self.assertEqual(invoice.asset, 'TON')
+        self.assertEqual(invoice.amount, '0.01')
+        self.assertEqual(invoice.allow_comments, False)
+        self.assertEqual(invoice.allow_anonymous, False)
         self.assertEqual(f'https://t.me/CryptoTestnetBot?start={invoice.hash}', invoice.pay_url)
 
     def test_create_invoice_error(self):

@@ -1,7 +1,7 @@
 import httpx
 
 from ..errors import CryptoBotError
-from ..models import App, Asset, Invoice
+from ..models import App, Asset, ButtonName, Invoice
 
 
 class CryptoBotClient:
@@ -40,7 +40,7 @@ class CryptoBotClient:
             raise CryptoBotError.from_json(data)
 
     def create_invoice(self, asset: Asset, amount: float, description: str = None, hidden_message: str = None,
-                       paid_btn_name: str = None, paid_btn_url: str = None, payload: str = None,
+                       paid_btn_name: ButtonName = None, paid_btn_url: str = None, payload: str = None,
                        allow_comments: bool = None, allow_anonymous: bool = None, expires_in: int = None) -> Invoice:
         """Create a new invoice"""
         data = {
@@ -48,7 +48,6 @@ class CryptoBotClient:
             "amount": str(amount),
             "description": description,
             "hidden_message": hidden_message,
-            "paid_btn_name": paid_btn_name,
             "paid_btn_url": paid_btn_url,
             "payload": payload,
             "allow_comments": allow_comments,
@@ -61,4 +60,7 @@ class CryptoBotClient:
         for key, value in dict(data).items():
             if value is None:
                 del data[key]
+
+        if paid_btn_name:
+            data['paid_btn_name'] = paid_btn_name.name
         return self.__create_invoice(**data)

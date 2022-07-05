@@ -19,7 +19,7 @@ class TestCryptoBotSyncClient(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures, if any."""
         api_token = os.getenv('API_TOKEN')
-        self.client = CryptoBotClient(api_token, is_mainnet=False)
+        self.client = CryptoBotClient(api_token)
 
     def tearDown(self) -> None:
         """Tear down test fixtures, if any."""
@@ -65,3 +65,10 @@ class TestCryptoBotSyncClient(unittest.TestCase):
         """Create a new invoice"""
         with self.assertRaises(CryptoBotError):
             self.client.create_invoice(Asset.TON, 0.0001)
+
+    def test_transfer(self):
+        """Transfer"""
+        transfer = self.client.transfer(699381957, Asset.TON, 0.01, 'Test')
+        self.assertEqual(transfer.status, 'active')
+        self.assertEqual(transfer.asset, 'TON')
+        self.assertEqual(transfer.amount, '0.01')

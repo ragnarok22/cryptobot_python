@@ -1,14 +1,12 @@
 #!/usr/bin/env python
 
-"""Tests for `cryptobot_python` package."""
-
+"""Tests for `cryptobot` package."""
 
 import unittest
 
 
-
-class TestCryptobot_python(unittest.TestCase):
-    """Tests for `cryptobot_python` package."""
+class TestCryptobot(unittest.TestCase):
+    """Tests for `cryptobot package."""
 
     def setUp(self):
         """Set up test fixtures, if any."""

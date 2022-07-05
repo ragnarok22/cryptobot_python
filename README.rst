@@ -6,6 +6,10 @@ CryptoBot Python
 .. image:: https://img.shields.io/pypi/v/cryptobot_python.svg
         :target: https://pypi.python.org/pypi/cryptobot_python
 
+.. image:: https://github.com/ragnarok22/cryptobot_python/actions/workflows/python-tests.yml/badge.svg
+    :target: https://github.com/ragnarok22/cryptobot_python/actions/workflows/python-tests.yml
+    :alt: Python tests
+
 .. image:: https://results.pre-commit.ci/badge/github/ragnarok22/cryptobot_python/main.svg
    :target: https://results.pre-commit.ci/latest/github/ragnarok22/cryptobot_python/main
    :alt: pre-commit.ci status

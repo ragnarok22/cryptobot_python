@@ -1,7 +1,7 @@
 import httpx
 
-from cryptobot.errors import CrytoBotError
-from cryptobot.models import App
+from ..errors import CryptoBotError
+from ..models import App, Asset, Invoice
 
 
 class CryptoBotClient:
@@ -27,4 +27,38 @@ class CryptoBotClient:
             return App(**info)
         else:
             data = response.json()['error']
-            raise CrytoBotError(**data)
+            raise CryptoBotError(**data)
+
+    def __create_invoice(self, **kwargs) -> Invoice:
+        """Create a new invoice"""
+        response = self.__http_client.post("/createInvoice", json=kwargs)
+        if response.status_code == 200:
+            info = response.json()['result']
+            return Invoice(**info)
+        else:
+            data = response.json()['error']
+            raise CryptoBotError.from_json(data)
+
+    def create_invoice(self, asset: Asset, amount: float, description: str = None, hidden_message: str = None,
+                       paid_btn_name: str = None, paid_btn_url: str = None, payload: str = None,
+                       allow_comments: bool = None, allow_anonymous: bool = None, expires_in: int = None) -> Invoice:
+        """Create a new invoice"""
+        data = {
+            "asset": asset.name,
+            "amount": str(amount),
+            "description": description,
+            "hidden_message": hidden_message,
+            "paid_btn_name": paid_btn_name,
+            "paid_btn_url": paid_btn_url,
+            "payload": payload,
+            "allow_comments": allow_comments,
+            "allow_anonymous": allow_anonymous,
+            "expires_in": expires_in
+        }
+        # TODO: Check the minimum amount
+
+        # remove None values
+        for key, value in dict(data).items():
+            if value is None:
+                del data[key]
+        return self.__create_invoice(**data)

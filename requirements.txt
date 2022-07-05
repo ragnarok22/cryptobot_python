@@ -9,3 +9,4 @@ Sphinx~=5.0.2
 twine~=4.0.1
 httpx~=0.23.0
 python-dotenv~=0.20.0
+pytest~=7.1.2

@@ -14,9 +14,6 @@ CryptoBot Python
    :target: https://results.pre-commit.ci/latest/github/ragnarok22/cryptobot_python/main
    :alt: pre-commit.ci status
 
-.. image:: https://img.shields.io/travis/ragnarok22/cryptobot_python.svg
-        :target: https://travis-ci.com/ragnarok22/cryptobot_python
-
 .. image:: https://readthedocs.org/projects/cryptobot-python/badge/?version=latest
         :target: https://cryptobot-python.readthedocs.io/en/latest/?version=latest
         :alt: Documentation Status

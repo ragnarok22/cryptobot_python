@@ -12,7 +12,7 @@ To install CryptoBot Python, run this command in your terminal:
 
 .. code-block:: console
 
-    $ pip install cryptobot_python
+    $ pip install cryptobot
 
 This is the preferred method to install CryptoBot Python, as it will always install the most recent stable release.
 

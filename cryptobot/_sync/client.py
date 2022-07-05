@@ -1,7 +1,7 @@
 import httpx
 
 from ..errors import CryptoBotError
-from ..models import App, Asset, ButtonName, Invoice, Transfer
+from ..models import App, Asset, ButtonName, Invoice, Status, Transfer
 
 
 class CryptoBotClient:
@@ -80,6 +80,30 @@ class CryptoBotClient:
         if response.status_code == 200:
             info = response.json()['result']
             return Transfer(**info)
+        else:
+            data = response.json()['error']
+            raise CryptoBotError.from_json(data)
+
+    def get_invoices(self, asset: Asset = None, invoice_ids: str = None, status: Status = None, offset: int = 0,
+                     count: int = 100) -> list:
+        """Get a list of invoices"""
+        data = {
+        }
+        if asset:
+            data['asset'] = asset.name
+        if invoice_ids:
+            data['invoice_ids'] = invoice_ids
+        if status:
+            data['status'] = status.name
+        if offset:
+            data['offset'] = offset
+        if count:
+            data['count'] = count
+
+        response = self.__http_client.get("/getInvoices", params=data)
+        if response.status_code == 200:
+            info = response.json()['result']
+            return [Invoice(**i) for i in info['items']]
         else:
             data = response.json()['error']
             raise CryptoBotError.from_json(data)

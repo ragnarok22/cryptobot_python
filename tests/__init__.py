@@ -1,1 +1,1 @@
-"""Unit test package for cryptobot_python."""
+"""Unit test package for cryptobot."""

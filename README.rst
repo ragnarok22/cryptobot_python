@@ -4,7 +4,7 @@ CryptoBot Python
 
 
 .. image:: https://img.shields.io/pypi/v/cryptobot_python.svg
-        :target: https://pypi.python.org/pypi/cryptobot_python
+        :target: https://pypi.python.org/pypi/cryptobot
 
 .. image:: https://github.com/ragnarok22/cryptobot_python/actions/workflows/python-tests.yml/badge.svg
     :target: https://github.com/ragnarok22/cryptobot_python/actions/workflows/python-tests.yml

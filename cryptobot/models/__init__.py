@@ -67,3 +67,10 @@ class Transfer:
     status: Status
     completed_at: str
     comment: str = None
+
+
+@dataclass
+class Balance:
+    """Balance"""
+    currency_code: str
+    available: str

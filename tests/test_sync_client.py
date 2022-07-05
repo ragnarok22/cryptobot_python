@@ -79,6 +79,10 @@ class TestCryptoBotSyncClient(unittest.TestCase):
         self.assertEqual(invoices[0].status, 'expired')
         self.assertEqual(invoices[0].asset, 'TON')
         self.assertEqual(invoices[0].amount, '0.01')
-        self.assertEqual(invoices[0].allow_comments, True)
-        self.assertEqual(invoices[0].allow_anonymous, True)
         self.assertEqual(f'https://t.me/CryptoTestnetBot?start={invoices[0].hash}', invoices[0].pay_url)
+
+    def test_get_balances(self):
+        """Get balance"""
+        balances = self.client.get_balances()
+        self.assertEqual(len(balances), 7)  # 7 assets
+        self.assertEqual(balances[0].available, '0')

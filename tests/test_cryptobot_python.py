@@ -5,7 +5,6 @@
 
 import unittest
 
-from cryptobot_python import cryptobot_python
 
 
 class TestCryptobot_python(unittest.TestCase):

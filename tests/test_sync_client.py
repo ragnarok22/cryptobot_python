@@ -66,17 +66,16 @@ class TestCryptoBotSyncClient(unittest.TestCase):
         with self.assertRaises(CryptoBotError):
             self.client.create_invoice(Asset.TON, 0.0001)
 
-    def test_transfer(self):
-        """Transfer"""
-        transfer = self.client.transfer(699381957, Asset.TON, 0.01, 'Test')
-        self.assertEqual(transfer.status, 'active')
-        self.assertEqual(transfer.asset, 'TON')
-        self.assertEqual(transfer.amount, '0.01')
+    # def test_transfer(self):
+    #     """Transfer"""
+    #     transfer = self.client.transfer(699381957, Asset.TON, 0.01, 'Test')
+    #     self.assertEqual(transfer.status, 'active')
+    #     self.assertEqual(transfer.asset, 'TON')
+    #     self.assertEqual(transfer.amount, '0.01')
 
     def test_get_invoices(self):
         """Get invoices"""
         invoices = self.client.get_invoices()
-        self.assertEqual(invoices[0].status, 'expired')
         self.assertEqual(invoices[0].asset, 'TON')
         self.assertEqual(invoices[0].amount, '0.01')
         self.assertEqual(f'https://t.me/CryptoTestnetBot?start={invoices[0].hash}', invoices[0].pay_url)

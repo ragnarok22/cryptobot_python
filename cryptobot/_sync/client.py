@@ -1,7 +1,7 @@
 import httpx
 
 from ..errors import CryptoBotError
-from ..models import App, Asset, ButtonName, Invoice
+from ..models import App, Asset, ButtonName, Invoice, Transfer
 
 
 class CryptoBotClient:
@@ -64,3 +64,22 @@ class CryptoBotClient:
         if paid_btn_name:
             data['paid_btn_name'] = paid_btn_name.name
         return self.__create_invoice(**data)
+
+    def transfer(self, user_id: int, asset: Asset, amount: float, spend_id: str, comment: str = None,
+                 disable_send_notification: bool = False) -> Transfer:
+        """Send coins from your app's balance to a user"""
+        data = {
+            "user_id": user_id,
+            "asset": asset.name,
+            "amount": str(amount),
+            "spend_id": spend_id,
+            "comment": comment,
+            "disable_send_notification": disable_send_notification
+        }
+        response = self.__http_client.post("/transfer", json=data)
+        if response.status_code == 200:
+            info = response.json()['result']
+            return Transfer(**info)
+        else:
+            data = response.json()['error']
+            raise CryptoBotError.from_json(data)

@@ -53,3 +53,17 @@ class Invoice:
     payload: str = None
     paid_btn_name: ButtonName = None
     paid_btn_url: str = None
+
+
+@dataclass
+class Transfer:
+    """Transfer
+    docs: https://telegra.ph/Crypto-Pay-API-11-25#Transfer
+    """
+    transfer_id: int
+    user_id: int
+    asset: Asset
+    amount: str
+    status: Status
+    completed_at: str
+    comment: str = None

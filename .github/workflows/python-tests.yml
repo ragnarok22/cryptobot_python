@@ -13,7 +13,7 @@ jobs:
     build:
 
         env:
-            API_TOKEN: ${{ API_TOKEN }}
+            API_TOKEN: ${{ secrets.API_TOKEN }}
 
         runs-on: ubuntu-latest
         strategy:

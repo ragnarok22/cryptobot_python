@@ -8,6 +8,7 @@ from ..models import (
     Asset,
     Balance,
     ButtonName,
+    Currency,
     ExchangeRate,
     Invoice,
     Status,
@@ -135,6 +136,16 @@ class CryptoBotClient:
         if response.status_code == 200:
             info = response.json()['result']
             return [ExchangeRate(**i) for i in info]
+        else:
+            data = response.json()['error']
+            raise CryptoBotError.from_json(data)
+
+    def get_currencies(self) -> List[Currency]:
+        """Get the currencies"""
+        response = self.__http_client.get("/getCurrencies")
+        if response.status_code == 200:
+            info = response.json()['result']
+            return [Currency(**i) for i in info]
         else:
             data = response.json()['error']
             raise CryptoBotError.from_json(data)

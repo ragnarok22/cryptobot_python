@@ -83,3 +83,14 @@ class ExchangeRate:
     source: Asset
     target: str
     rate: str
+
+
+@dataclass
+class Currency:
+    is_blockchain: bool
+    is_stablecoin: bool
+    is_fiat: bool
+    name: str
+    code: str
+    decimals: int
+    url: str = None

@@ -91,3 +91,9 @@ class TestCryptoBotSyncClient(unittest.TestCase):
         """Get exchange rates"""
         rates = self.client.get_exchange_rates()
         self.assertEqual(len(rates), 42)  # 7 assets and 6 exchange rates
+
+    def test_get_currencies(self):
+        """Get currencies"""
+        currencies = self.client.get_currencies()
+        self.assertIsNotNone(currencies)
+        self.assertIsInstance(currencies, list)

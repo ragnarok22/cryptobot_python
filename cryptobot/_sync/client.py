@@ -3,7 +3,16 @@ from typing import List
 import httpx
 
 from ..errors import CryptoBotError
-from ..models import App, Asset, Balance, ButtonName, Invoice, Status, Transfer
+from ..models import (
+    App,
+    Asset,
+    Balance,
+    ButtonName,
+    ExchangeRate,
+    Invoice,
+    Status,
+    Transfer,
+)
 
 
 class CryptoBotClient:
@@ -116,6 +125,16 @@ class CryptoBotClient:
         if response.status_code == 200:
             info = response.json()['result']
             return [Balance(**i) for i in info]
+        else:
+            data = response.json()['error']
+            raise CryptoBotError.from_json(data)
+
+    def get_exchange_rates(self) -> List[ExchangeRate]:
+        """Get the exchange rates"""
+        response = self.__http_client.get("/getExchangeRates")
+        if response.status_code == 200:
+            info = response.json()['result']
+            return [ExchangeRate(**i) for i in info]
         else:
             data = response.json()['error']
             raise CryptoBotError.from_json(data)

@@ -74,3 +74,12 @@ class Balance:
     """Balance"""
     currency_code: str
     available: str
+
+
+@dataclass
+class ExchangeRate:
+    """ExchangeRate"""
+    is_valid: bool
+    source: Asset
+    target: str
+    rate: str

@@ -4,6 +4,8 @@
 
 from setuptools import find_packages, setup
 
+from cryptobot import __author__, __email__, __version__
+
 with open('README.rst') as readme_file:
     readme = readme_file.read()
 
@@ -15,8 +17,8 @@ requirements = ["httpx"]
 test_requirements = []
 
 setup(
-    author="Reinier Hernández",
-    author_email='sasuke.reinier@gmail.com',
+    author=__author__,
+    author_email=__email__,
     python_requires='>=3.7',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
@@ -39,6 +41,6 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/ragnarok22/cryptobot_python',
-    version='0.1.0',
+    version=__version__,
     zip_safe=False,
 )

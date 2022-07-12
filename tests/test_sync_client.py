@@ -77,7 +77,7 @@ class TestCryptoBotSyncClient(unittest.TestCase):
         """Get invoices"""
         invoices = self.client.get_invoices()
         self.assertEqual(invoices[0].asset, 'TON')
-        self.assertEqual(invoices[0].amount, '0.01')
+        self.assertEqual(invoices[0].amount, '1')
         self.assertEqual(f'https://t.me/CryptoTestnetBot?start={invoices[0].hash}', invoices[0].pay_url)
 
     def test_get_balances(self):

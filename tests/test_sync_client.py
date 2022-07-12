@@ -40,7 +40,7 @@ class TestCryptoBotSyncClient(unittest.TestCase):
 
     def test_create_invoice(self):
         """Create a new invoice"""
-        invoice = self.client.create_invoice(Asset.TON, 0.01)
+        invoice = self.client.create_invoice(Asset.TON, 1)
         self.assertEqual(invoice.status, 'active')
         self.assertEqual(invoice.asset, 'TON')
         self.assertEqual(invoice.amount, '1')
@@ -50,7 +50,7 @@ class TestCryptoBotSyncClient(unittest.TestCase):
 
     def test_create_invoice_with_params(self):
         """Create a new invoice"""
-        invoice = self.client.create_invoice(Asset.TON, 0.01, description='Test', hidden_message='Test',
+        invoice = self.client.create_invoice(Asset.TON, 1, description='Test', hidden_message='Test',
                                              paid_btn_name=ButtonName.viewItem,
                                              paid_btn_url='https://reinierhernandez.com', payload='Test',
                                              allow_comments=False, allow_anonymous=False, expires_in=1)

@@ -33,7 +33,7 @@ class ButtonName(Enum):
 @dataclass
 class Invoice:
     """Invoice
-    docs: https://telegra.ph/Crypto-Pay-API-11-25#Invoice
+    docs: https://help.crypt.bot/crypto-pay-api#Invoice
     """
     invoice_id: int
     status: Status

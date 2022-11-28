@@ -7,7 +7,7 @@ tox~=3.27.1
 coverage~=6.5.0
 Sphinx~=5.3.0
 twine~=4.0.1
-httpx~=0.23.0
+httpx~=0.23.1
 python-dotenv~=0.21.0
 pytest~=7.2.0
 uvicorn==0.19.0

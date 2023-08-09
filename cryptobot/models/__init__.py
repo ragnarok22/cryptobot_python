@@ -16,6 +16,8 @@ class Asset(Enum):
     USDT = "USDT"
     USDC = "USDC"
     BUSD = "BUSD"
+    BNB = "BNB"
+    TRX = "TRX"
 
 
 class Status(Enum):

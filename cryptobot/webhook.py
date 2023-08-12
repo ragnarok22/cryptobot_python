@@ -1,3 +1,5 @@
+import hashlib
+import json
 import logging
 from dataclasses import dataclass
 
@@ -5,7 +7,20 @@ import uvicorn
 from colorama import Fore, Style
 from fastapi import FastAPI, Request
 
+from cryptobot.errors import CryptoBotError
+
 logger = logging.getLogger(__name__)
+
+
+def check_signature(token: str, body: dict, headers):
+    secret = hashlib.sha256(token.encode()).digest()
+    check_string = json.dumps(body)
+    hmac = hashlib.sha256(secret)
+    hmac.update(check_string.encode())
+    hmac = hmac.hexdigest()
+    print(hmac)
+    print(headers['crypto-pay-api-signature'])
+    return hmac == headers['crypto-pay-api-signature']
 
 
 @dataclass
@@ -22,8 +37,16 @@ class Listener:
         @self.app.post(self.url)
         async def listen_webhook(request: Request):
             data = await request.json()
+            print(data)
+
+            if not check_signature("49418:AAAUuM5C7EEiUbLD53oXo7coFbLmZDMHoYv", data, request.headers):
+                raise CryptoBotError(
+                    code=400,
+                    name="Invalid signature"
+                )
 
             self.callback(request.headers, data)
+            return {"message": "Thank you CryptoBot"}
 
     def listen(self):
         url = f"https://{self.host}:{self.port}{self.url}"

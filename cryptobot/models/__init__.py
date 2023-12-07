@@ -41,6 +41,7 @@ class Invoice:
     status: Status
     hash: str
     asset: Asset
+    currency_type: str
     amount: str
     pay_url: str
     description: str = None

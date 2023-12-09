@@ -37,25 +37,46 @@ class Invoice:
     """Invoice
     docs: https://help.crypt.bot/crypto-pay-api#Invoice
     """
+
     invoice_id: int
     status: Status
     hash: str
-    asset: Asset
-    currency_type: str
     amount: str
-    pay_url: str
+    asset: Asset
+
+    currency_type: str = None
     description: str = None
-    created_at: str = None
-    allow_comments: bool = True
-    allow_anonymous: bool = True
-    expiration_date: str = None
-    paid_at: str = None
-    paid_anonymously: bool = True
     comment: str = None
     hidden_message: str = None
     payload: str = None
+
+    created_at: str = None
+    expiration_date: str = None
+    paid_at: str = None
+
+    fiat: str = None
+    accepted_assets: list = None
+
+    fee_asset: str = None
+    fee_amount: str = None
+
+    paid_anonymously: bool = True
+    paid_amount: str = None
+    paid_fiat_rate: str = None
+    paid_usd_rate: str = None
+    paid_asset: str = None
     paid_btn_name: ButtonName = None
     paid_btn_url: str = None
+
+    bot_invoice_url: str = None
+
+    allow_comments: bool = True
+    allow_anonymous: bool = True
+
+    # deprecated
+    fee : str = None
+    pay_url: str = None
+    usd_rate: str = None
 
 
 @dataclass
@@ -77,12 +98,15 @@ class Balance:
     """Balance"""
     currency_code: str
     available: str
+    onhold: str
 
 
 @dataclass
 class ExchangeRate:
     """ExchangeRate"""
     is_valid: bool
+    is_crypto: bool
+    is_fiat: bool
     source: Asset
     target: str
     rate: str

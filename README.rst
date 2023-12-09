@@ -19,19 +19,22 @@ CryptoBot Python
         :alt: Documentation Status
 
 
-
-
 Non official, but friendly CryptoBot library for the Python language
 
 
 * Free software: MIT license
 * Documentation: https://cryptobot-python.readthedocs.io.
 
-
 Features
 --------
 
-* TODO
+* Get app info
+* Create invoice
+* Transfer funds
+* Get invoices
+* Get balances
+* Get exchange readthedocs
+* Get currencies
 
 Credits
 -------

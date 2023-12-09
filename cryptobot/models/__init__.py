@@ -37,7 +37,7 @@ class Invoice:
     """Invoice
     docs: https://help.crypt.bot/crypto-pay-api#Invoice
     """
-    
+
     invoice_id: int
     status: Status
     hash: str
@@ -53,10 +53,10 @@ class Invoice:
     created_at: str = None
     expiration_date: str = None
     paid_at: str = None
-    
+
     fiat: str = None
     accepted_assets: list = None
-    
+
     fee_asset: str = None
     fee_amount: str = None
 

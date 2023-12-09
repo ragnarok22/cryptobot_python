@@ -43,8 +43,8 @@ class Invoice:
     hash: str
     amount: str
     asset: Asset
-    currency_type: str
-
+    
+    currency_type: str = None
     description: str = None
     comment: str = None
     hidden_message: str = None

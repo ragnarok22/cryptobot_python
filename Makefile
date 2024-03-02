@@ -48,7 +48,7 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 lint/flake8: ## check style with flake8
-	poetry run flake8 cryptobot tests --count --max-line-length=127
+	poetry run flake8 cryptobot tests --count --show-source --max-complexity=10 --max-line-length=127 --exclude=.venv --statistics
 
 lint: lint/flake8 ## check style
 

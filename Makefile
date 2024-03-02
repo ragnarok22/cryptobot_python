@@ -48,12 +48,12 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 lint/flake8: ## check style with flake8
-	flake8 cryptobot_python tests
+	flake8 cryptobot_python tests --count --max-line-length=127
 
 lint: lint/flake8 ## check style
 
 test: ## run tests quickly with the default Python
-	python setup.py test
+	pytest
 
 test-all: ## run tests on every Python version with tox
 	tox

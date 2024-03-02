@@ -23,12 +23,17 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v5
       with:
         python-version: '3.x'
+    - uses: abatilo/setup-poetry@v2
+    - uses: actions/cache@v3
+      name: Define a cache for the virtual environment based on the dependencies lock file
+      with:
+        path: ./.venv
+        key: venv-${{ hashFiles('poetry.lock') }}
     - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip setuptools wheel build
+      run: poetry install
     - name: Build package
       run: make dist && make release
     - name: Publish package

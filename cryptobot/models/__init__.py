@@ -74,7 +74,7 @@ class Invoice:
     allow_anonymous: bool = True
 
     # deprecated
-    fee : str = None
+    fee: str = None
     pay_url: str = None
     usd_rate: str = None
 

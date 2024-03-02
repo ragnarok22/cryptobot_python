@@ -3,17 +3,7 @@ from typing import List
 import httpx
 
 from ..errors import CryptoBotError
-from ..models import (
-    App,
-    Asset,
-    Balance,
-    ButtonName,
-    Currency,
-    ExchangeRate,
-    Invoice,
-    Status,
-    Transfer,
-)
+from ..models import App, Asset, Balance, ButtonName, Currency, ExchangeRate, Invoice, Status, Transfer
 
 
 class CryptoBotClient:

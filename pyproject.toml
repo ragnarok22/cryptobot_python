@@ -26,7 +26,7 @@ fastapi = "0.110.0"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = ">=6.0.0,<6.1.0"
-coverage = ">=7.2.2,<7.3.0"
+coverage = ">=7.2.2,<7.5.0"
 pytest = ">=7.2.0,<7.3.0"
 pre-commit = "^3.6.2"
 

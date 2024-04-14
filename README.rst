@@ -17,6 +17,8 @@ CryptoBot Python
 .. image:: https://readthedocs.org/projects/cryptobot-python/badge/?version=latest
         :target: https://cryptobot-python.readthedocs.io/en/latest/?version=latest
         :alt: Documentation Status
+.. image:: https://codecov.io/gh/ragnarok22/cryptobot_python/graph/badge.svg?token=ZsuusfJ2NJ
+ :target: https://codecov.io/gh/ragnarok22/cryptobot_python
 
 
 Non official, but friendly CryptoBot library for the Python language

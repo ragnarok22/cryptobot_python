@@ -53,7 +53,8 @@ lint/flake8: ## check style with flake8
 lint: lint/flake8 ## check style
 
 test: ## run tests quickly with the default Python
-	poetry run pytest
+	poetry run coverage run -m pytest
+	poetry run coverage report -m
 
 test-all: ## run tests on every Python version with tox
 	tox

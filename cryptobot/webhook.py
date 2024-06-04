@@ -19,8 +19,8 @@ def check_signature(token: str, body: dict, headers):
     hmac.update(check_string.encode())
     hmac = hmac.hexdigest()
     print(hmac)
-    print(headers['crypto-pay-api-signature'])
-    return hmac == headers['crypto-pay-api-signature']
+    print(headers["crypto-pay-api-signature"])
+    return hmac == headers["crypto-pay-api-signature"]
 
 
 @dataclass
@@ -39,11 +39,10 @@ class Listener:
             data = await request.json()
             print(data)
 
-            if not check_signature("49418:AAAUuM5C7EEiUbLD53oXo7coFbLmZDMHoYv", data, request.headers):
-                raise CryptoBotError(
-                    code=400,
-                    name="Invalid signature"
-                )
+            if not check_signature(
+                "49418:AAAUuM5C7EEiUbLD53oXo7coFbLmZDMHoYv", data, request.headers
+            ):
+                raise CryptoBotError(code=400, name="Invalid signature")
 
             self.callback(request.headers, data)
             return {"message": "Thank you CryptoBot"}

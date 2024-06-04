@@ -84,6 +84,7 @@ class Transfer:
     """Transfer
     docs: https://telegra.ph/Crypto-Pay-API-11-25#Transfer
     """
+
     transfer_id: int
     user_id: int
     asset: Asset
@@ -96,6 +97,7 @@ class Transfer:
 @dataclass
 class Balance:
     """Balance"""
+
     currency_code: str
     available: str
     onhold: str
@@ -104,6 +106,7 @@ class Balance:
 @dataclass
 class ExchangeRate:
     """ExchangeRate"""
+
     is_valid: bool
     is_crypto: bool
     is_fiat: bool

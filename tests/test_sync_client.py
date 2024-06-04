@@ -18,7 +18,7 @@ class TestCryptoBotSyncClient(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures, if any."""
-        api_token = os.getenv('API_TOKEN')
+        api_token = os.getenv("API_TOKEN")
         self.client = CryptoBotClient(api_token, is_mainnet=False)
 
     def tearDown(self) -> None:
@@ -26,7 +26,7 @@ class TestCryptoBotSyncClient(unittest.TestCase):
 
     def test_get_me(self):
         """Retreating app information"""
-        api_token = os.getenv('API_TOKEN')
+        api_token = os.getenv("API_TOKEN")
         client = CryptoBotClient(api_token, is_mainnet=False)
         info = client.get_me()
         self.assertIsNotNone(info.app_id)
@@ -41,25 +41,37 @@ class TestCryptoBotSyncClient(unittest.TestCase):
     def test_create_invoice(self):
         """Create a new invoice"""
         invoice = self.client.create_invoice(Asset.TON, 1)
-        self.assertEqual(invoice.status, 'active')
-        self.assertEqual(invoice.asset, 'TON')
-        self.assertEqual(invoice.amount, '1')
+        self.assertEqual(invoice.status, "active")
+        self.assertEqual(invoice.asset, "TON")
+        self.assertEqual(invoice.amount, "1")
         self.assertEqual(invoice.allow_comments, True)
         self.assertEqual(invoice.allow_anonymous, True)
-        self.assertEqual(f'https://t.me/CryptoTestnetBot?start={invoice.hash}', invoice.pay_url)
+        self.assertEqual(
+            f"https://t.me/CryptoTestnetBot?start={invoice.hash}", invoice.pay_url
+        )
 
     def test_create_invoice_with_params(self):
         """Create a new invoice"""
-        invoice = self.client.create_invoice(Asset.TON, 1, description='Test', hidden_message='Test',
-                                             paid_btn_name=ButtonName.viewItem,
-                                             paid_btn_url='https://reinierhernandez.com', payload='Test',
-                                             allow_comments=False, allow_anonymous=False, expires_in=1)
-        self.assertEqual(invoice.status, 'active')
-        self.assertEqual(invoice.asset, 'TON')
-        self.assertEqual(invoice.amount, '1')
+        invoice = self.client.create_invoice(
+            Asset.TON,
+            1,
+            description="Test",
+            hidden_message="Test",
+            paid_btn_name=ButtonName.viewItem,
+            paid_btn_url="https://reinierhernandez.com",
+            payload="Test",
+            allow_comments=False,
+            allow_anonymous=False,
+            expires_in=1,
+        )
+        self.assertEqual(invoice.status, "active")
+        self.assertEqual(invoice.asset, "TON")
+        self.assertEqual(invoice.amount, "1")
         self.assertEqual(invoice.allow_comments, False)
         self.assertEqual(invoice.allow_anonymous, False)
-        self.assertEqual(f'https://t.me/CryptoTestnetBot?start={invoice.hash}', invoice.pay_url)
+        self.assertEqual(
+            f"https://t.me/CryptoTestnetBot?start={invoice.hash}", invoice.pay_url
+        )
 
     def test_create_invoice_error(self):
         """Create a new invoice"""
@@ -76,9 +88,12 @@ class TestCryptoBotSyncClient(unittest.TestCase):
     def test_get_invoices(self):
         """Get invoices"""
         invoices = self.client.get_invoices()
-        self.assertEqual(invoices[0].asset, 'TON')
-        self.assertEqual(invoices[0].amount, '1')
-        self.assertEqual(f'https://t.me/CryptoTestnetBot?start={invoices[0].hash}', invoices[0].pay_url)
+        self.assertEqual(invoices[0].asset, "TON")
+        self.assertEqual(invoices[0].amount, "1")
+        self.assertEqual(
+            f"https://t.me/CryptoTestnetBot?start={invoices[0].hash}",
+            invoices[0].pay_url,
+        )
 
     def test_get_balances(self):
         """Get balance"""

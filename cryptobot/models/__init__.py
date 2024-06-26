@@ -77,6 +77,8 @@ class Invoice:
     fee: str = None
     pay_url: str = None
     usd_rate: str = None
+    mini_app_invoice_url: str = None
+    web_app_invoice_url: str = None
 
 
 @dataclass

@@ -935,13 +935,13 @@ files = [
 
 [[package]]
 name = "pip"
-version = "24.3.1"
+version = "25.0"
 description = "The PyPA recommended tool for installing Python packages."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pip-24.3.1-py3-none-any.whl", hash = "sha256:3790624780082365f47549d032f3770eeb2b1e8bd1f7b2e02dace1afa361b4ed"},
-    {file = "pip-24.3.1.tar.gz", hash = "sha256:ebcb60557f2aefabc2e0f918751cd24ea0d56d8ec5445fe1807f1d2109660b99"},
+    {file = "pip-25.0-py3-none-any.whl", hash = "sha256:b6eb97a803356a52b2dd4bb73ba9e65b2ba16caa6bcb25a7497350a4e5859b65"},
+    {file = "pip-25.0.tar.gz", hash = "sha256:8e0a97f7b4c47ae4a494560da84775e9e2f671d415d8d828e052efefb206b30b"},
 ]
 
 [[package]]
@@ -1796,4 +1796,4 @@ test = ["big-O", "jaraco.functools", "jaraco.itertools", "jaraco.test", "more-it
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "f6b903ce2b385b408d5a7cd1a0246942df4becc3cbdacd37331e801a07876959"
+content-hash = "4c91388b562f8679daa12c5e7aea41737125cf2055533e77f79198c43ce68ee4"

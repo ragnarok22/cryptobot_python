@@ -22,7 +22,7 @@ httpx = ">=0.23.3,<0.29.0"
 python-dotenv = ">=0.21.0,<1.1.0"
 uvicorn = "0.34.0"
 colorama = "0.4.6"
-fastapi = "0.115.7"
+fastapi = "0.115.8"
 pydantic-core = "^2.28.0"
 
 [tool.poetry.group.dev.dependencies]

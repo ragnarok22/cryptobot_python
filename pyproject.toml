@@ -1,13 +1,16 @@
-[tool.poetry]
+[project]
 name = "cryptobot-python"
 version = "0.1.9"
 description = "Non official, but friendly CryptoBot library for the Python language"
-authors = ["Reinier Hernández <sasuke.reinier@gmail.com>"]
-license = "MIT"
-readme = "README.rst"
-packages = [
-    { include = "cryptobot" }
+authors = [
+    {name = "Reinier Hernández",email = "sasuke.reinier@gmail.com"}
 ]
+license = {text = "MIT"}
+readme = "README.rst"
+requires-python = ">=3.9.12"
+# packages = [
+#     { include = "cryptobot" }
+# ]
 
 [tool.poetry.dependencies]
 python = "^3.9.12"
@@ -31,6 +34,8 @@ coverage = ">=7.2.2,<7.9.0"
 pytest = ">=7.2.0,<8.4.0"
 pre-commit = ">=3.6.2,<5.0.0"
 
+[tool.poetry]
+
 [tool.coverage.run]
 omit = [
     "*/tests/*",
@@ -39,5 +44,5 @@ omit = [
 ]
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"

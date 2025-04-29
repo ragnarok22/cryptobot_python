@@ -1,29 +1,45 @@
-[tool.poetry]
+[project]
 name = "cryptobot-python"
 version = "0.1.9"
 description = "Non official, but friendly CryptoBot library for the Python language"
-authors = ["Reinier Hernández <sasuke.reinier@gmail.com>"]
-license = "MIT"
+authors = [
+    {name = "Reinier Hernández",email = "sasuke.reinier@gmail.com"}
+]
+license = {text = "MIT"}
 readme = "README.rst"
+requires-python = ">=3.9.12"
+dynamic = ["dependencies"]
+keywords = ["cryptocurrency", "cryptobot", "telegram"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
+
+[project.urls]
+homepage = "https://cryptobot-python.readthedocs.io/en/latest"
+repository = "https://github.com/ragnarok22/cryptobot_python"
+documentation = "https://cryptobot-python.readthedocs.io/en/latest"
+"Bug Tracker" = "https://github.com/ragnarok22/cryptobot_python/issues"
+
+[tool.poetry]
 packages = [
     { include = "cryptobot" }
 ]
 
-[tool.poetry.dependencies]
-python = "^3.9"
-pip = "25.1"
-bump2version = ">=1.0.1,<1.1.0"
-wheel = ">=0.38.4,<0.46.0"
-watchdog = ">=2.2.1,<6.1.0"
-tox = ">=4.16.0,<4.26.0"
-sphinx = ">=6.1.3,<7.5.0"
-twine = ">=4.0.2,<6.2.0"
-httpx = ">=0.23.3,<0.29.0"
-python-dotenv = ">=0.21.0,<1.2.0"
-uvicorn = "0.34.2"
-colorama = "0.4.6"
-fastapi = "0.115.12"
-pydantic-core = "^2.28.0"
+# [project.dependencies]
+# python = "^3.9.12"
+# pip = "25.1"
+# bump2version = ">=1.0.1,<1.1.0"
+# wheel = ">=0.38.4,<0.46.0"
+# watchdog = ">=2.2.1,<6.1.0"
+# sphinx = ">=6.1.3,<7.5.0"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = ">=6.0.0,<7.3.0"
@@ -31,13 +47,25 @@ coverage = ">=7.2.2,<7.9.0"
 pytest = ">=7.2.0,<8.4.0"
 pre-commit = ">=3.6.2,<5.0.0"
 
+
+[tool.poetry.dependencies]
+python = ">=3.9.12,<4.0"
+tox = "^4.25.0"
+twine = "^6.1.0"
+httpx = "^0.28.1"
+python-dotenv = "^1.1.0"
+uvicorn = "^0.34.2"
+colorama = "^0.4.6"
+fastapi = "^0.115.12"
+pydantic-core = "^2.34.1"
+
 [tool.coverage.run]
 omit = [
     "*/tests/*",
     "*/docs/*",
     "*/*.rst",
-    ]
+]
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"

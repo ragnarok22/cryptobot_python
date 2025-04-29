@@ -36,7 +36,7 @@ omit = [
     "*/tests/*",
     "*/docs/*",
     "*/*.rst",
-    ]
+]
 
 [build-system]
 requires = ["poetry-core"]

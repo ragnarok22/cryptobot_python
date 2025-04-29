@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cryptobot-python"
-version = "0.1.8"
+version = "0.1.9"
 description = "Non official, but friendly CryptoBot library for the Python language"
 authors = ["Reinier Hernández <sasuke.reinier@gmail.com>"]
 license = "MIT"

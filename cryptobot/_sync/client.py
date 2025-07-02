@@ -65,6 +65,7 @@ class CryptoBotClient:
         allow_comments: bool = None,
         allow_anonymous: bool = None,
         expires_in: int = None,
+        swap_to: str = None,
     ) -> Invoice:
         """Create a new invoice"""
         data = {
@@ -77,6 +78,7 @@ class CryptoBotClient:
             "allow_comments": allow_comments,
             "allow_anonymous": allow_anonymous,
             "expires_in": expires_in,
+            "swap_to": swap_to,
         }
         # TODO: Check the minimum amount
 

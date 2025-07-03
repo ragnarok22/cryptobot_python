@@ -73,6 +73,8 @@ class Invoice:
     allow_comments: bool = True
     allow_anonymous: bool = True
 
+    swap_to: str = None
+
     # deprecated
     fee: str = None
     pay_url: str = None

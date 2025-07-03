@@ -63,6 +63,7 @@ class TestCryptoBotSyncClient(unittest.TestCase):
             allow_comments=False,
             allow_anonymous=False,
             expires_in=1,
+            swap_to="USDT",
         )
         self.assertEqual(invoice.status, "active")
         self.assertEqual(invoice.asset, "TON")

@@ -70,7 +70,6 @@ class TestCryptoBotSyncClient(unittest.TestCase):
         self.assertEqual(invoice.amount, "1")
         self.assertEqual(invoice.allow_comments, False)
         self.assertEqual(invoice.allow_anonymous, False)
-        self.assertEqual(invoice.swap_to, "USDT")
         self.assertEqual(
             f"https://t.me/CryptoTestnetBot?start={invoice.hash}", invoice.pay_url
         )

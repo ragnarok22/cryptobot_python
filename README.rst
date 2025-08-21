@@ -4,7 +4,7 @@ CryptoBot Python
 
 
 .. image:: https://img.shields.io/pypi/v/cryptobot_python.svg
-        :target: https://pypi.python.org/pypi/cryptobot-python
+    :target: https://pypi.python.org/pypi/cryptobot-python
 
 .. image:: https://github.com/ragnarok22/cryptobot_python/actions/workflows/python-tests.yml/badge.svg
     :target: https://github.com/ragnarok22/cryptobot_python/actions/workflows/python-tests.yml
@@ -15,10 +15,16 @@ CryptoBot Python
    :alt: pre-commit.ci status
 
 .. image:: https://readthedocs.org/projects/cryptobot-python/badge/?version=latest
-        :target: https://cryptobot-python.readthedocs.io/en/latest/?version=latest
-        :alt: Documentation Status
+    :target: https://cryptobot-python.readthedocs.io/en/latest/?version=latest
+    :alt: Documentation Status
+
 .. image:: https://codecov.io/gh/ragnarok22/cryptobot_python/graph/badge.svg?token=ZsuusfJ2NJ
- :target: https://codecov.io/gh/ragnarok22/cryptobot_python
+    :target: https://codecov.io/gh/ragnarok22/cryptobot_python
+
+.. image:: https://deepwiki.com/badge.svg
+   :target: https://deepwiki.com/ragnarok22/cryptobot_python
+    :alt: Ask DeepWiki
+
 
 
 Non official, but friendly CryptoBot library for the Python language

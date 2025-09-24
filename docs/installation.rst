@@ -40,11 +40,19 @@ Or download the `tarball`_:
 
     $ curl -OJL https://github.com/ragnarok22/cryptobot_python/tarball/master
 
-Once you have a copy of the source, you can install it with:
+Once you have a copy of the source, you can install it with Poetry:
 
 .. code-block:: console
 
-    $ python setup.py install
+    $ cd cryptobot_python
+    $ poetry install
+
+Or with pip:
+
+.. code-block:: console
+
+    $ cd cryptobot_python
+    $ pip install .
 
 
 .. _Github repo: https://github.com/ragnarok22/cryptobot_python

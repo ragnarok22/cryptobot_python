@@ -30,9 +30,8 @@ poetry run flake8         # Direct flake8 execution
 
 ### Documentation
 ```bash
-pip install -r docs/requirements.txt                    # Install documentation dependencies first
-cd docs && python3 -msphinx -M html . _build           # Generate Sphinx HTML documentation
-cd docs && python3 -msphinx . _build/html              # Alternative: Generate HTML docs directly
+make docs                  # Generate Sphinx HTML documentation (now working)
+make servedocs            # Watch and rebuild docs on changes
 ```
 
 ### Build and Release

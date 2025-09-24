@@ -3,7 +3,7 @@
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
-SPHINXBUILD   = python -msphinx
+SPHINXBUILD   = poetry run python3 -msphinx
 SPHINXPROJ    = cryptobot_python
 SOURCEDIR     = .
 BUILDDIR      = _build

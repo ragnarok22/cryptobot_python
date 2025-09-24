@@ -2,9 +2,17 @@
 
 """Tests for data models in `cryptobot` package."""
 import pytest
+
 from cryptobot.models import (
-    App, Asset, Status, ButtonName, Invoice, Transfer,
-    Balance, ExchangeRate, Currency
+    App,
+    Asset,
+    Balance,
+    ButtonName,
+    Currency,
+    ExchangeRate,
+    Invoice,
+    Status,
+    Transfer,
 )
 
 
@@ -53,9 +61,7 @@ class TestApp:
     def test_app_creation(self):
         """Test creating App instance."""
         app = App(
-            app_id=12345,
-            name="Test App",
-            payment_processing_bot_username="TestBot"
+            app_id=12345, name="Test App", payment_processing_bot_username="TestBot"
         )
         assert app.app_id == 12345
         assert app.name == "Test App"
@@ -77,7 +83,7 @@ class TestInvoice:
             status=Status.active,
             hash="abc123",
             amount="10.50",
-            asset=Asset.USDT
+            asset=Asset.USDT,
         )
         assert invoice.invoice_id == 123
         assert invoice.status == Status.active
@@ -119,7 +125,7 @@ class TestInvoice:
             bot_invoice_url="https://t.me/bot",
             allow_comments=False,
             allow_anonymous=False,
-            swap_to="USDT"
+            swap_to="USDT",
         )
         assert invoice.description == "Test invoice"
         assert invoice.comment == "User comment"
@@ -137,7 +143,7 @@ class TestInvoice:
             asset=Asset.ETH,
             fee="0.01",
             pay_url="https://pay.example.com",
-            usd_rate="3000.00"
+            usd_rate="3000.00",
         )
         assert invoice.fee == "0.01"
         assert invoice.pay_url == "https://pay.example.com"
@@ -155,7 +161,7 @@ class TestTransfer:
             asset=Asset.TON,
             amount="10.0",
             status=Status.paid,
-            completed_at="2023-01-01T12:00:00Z"
+            completed_at="2023-01-01T12:00:00Z",
         )
         assert transfer.transfer_id == 123
         assert transfer.user_id == 456
@@ -173,7 +179,7 @@ class TestTransfer:
             amount="50.0",
             status=Status.active,
             completed_at="2023-01-02T15:30:00Z",
-            comment="Payment for services"
+            comment="Payment for services",
         )
         assert transfer.comment == "Payment for services"
 
@@ -183,22 +189,14 @@ class TestBalance:
 
     def test_balance_creation(self):
         """Test creating Balance instance."""
-        balance = Balance(
-            currency_code="BTC",
-            available="1.5",
-            onhold="0.1"
-        )
+        balance = Balance(currency_code="BTC", available="1.5", onhold="0.1")
         assert balance.currency_code == "BTC"
         assert balance.available == "1.5"
         assert balance.onhold == "0.1"
 
     def test_balance_zero_amounts(self):
         """Test Balance with zero amounts."""
-        balance = Balance(
-            currency_code="USDT",
-            available="0.0",
-            onhold="0.0"
-        )
+        balance = Balance(currency_code="USDT", available="0.0", onhold="0.0")
         assert balance.available == "0.0"
         assert balance.onhold == "0.0"
 
@@ -214,7 +212,7 @@ class TestExchangeRate:
             is_fiat=False,
             source=Asset.BTC,
             target="USD",
-            rate="50000.00"
+            rate="50000.00",
         )
         assert rate.is_valid is True
         assert rate.is_crypto is True
@@ -231,7 +229,7 @@ class TestExchangeRate:
             is_fiat=True,
             source=Asset.ETH,
             target="EUR",
-            rate="0.00"
+            rate="0.00",
         )
         assert rate.is_valid is False
 
@@ -247,7 +245,7 @@ class TestCurrency:
             is_fiat=False,
             name="Bitcoin",
             code="BTC",
-            decimals=8
+            decimals=8,
         )
         assert currency.is_blockchain is True
         assert currency.is_stablecoin is False
@@ -265,7 +263,7 @@ class TestCurrency:
             name="Tether",
             code="USDT",
             decimals=6,
-            url="https://tether.to"
+            url="https://tether.to",
         )
         assert currency.is_stablecoin is True
         assert currency.url == "https://tether.to"
@@ -278,7 +276,7 @@ class TestCurrency:
             is_fiat=True,
             name="US Dollar",
             code="USD",
-            decimals=2
+            decimals=2,
         )
         assert currency.is_fiat is True
         assert currency.decimals == 2
@@ -312,13 +310,13 @@ class TestDataclassFeatures:
             asset=Asset.ETH,
             amount="5.0",
             status=Status.paid,
-            completed_at="2023-01-01T00:00:00Z"
+            completed_at="2023-01-01T00:00:00Z",
         )
 
         # Test field access
-        assert hasattr(transfer, 'transfer_id')
-        assert hasattr(transfer, 'asset')
-        assert hasattr(transfer, 'comment')
+        assert hasattr(transfer, "transfer_id")
+        assert hasattr(transfer, "asset")
+        assert hasattr(transfer, "comment")
 
         # Test field modification
         transfer.comment = "Updated comment"

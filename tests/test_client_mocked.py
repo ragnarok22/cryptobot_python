@@ -1,13 +1,24 @@
 #!/usr/bin/env python
 
 """Tests for CryptoBotClient with mocked HTTP responses."""
-import pytest
 from unittest.mock import Mock, patch
+
 import httpx
+import pytest
 
 from cryptobot import CryptoBotClient
 from cryptobot.errors import CryptoBotError
-from cryptobot.models import Asset, Status, ButtonName, App, Invoice, Transfer, Balance, ExchangeRate, Currency
+from cryptobot.models import (
+    App,
+    Asset,
+    Balance,
+    ButtonName,
+    Currency,
+    ExchangeRate,
+    Invoice,
+    Status,
+    Transfer,
+)
 
 
 class TestCryptoBotClientInitialization:
@@ -34,18 +45,20 @@ class TestCryptoBotClientInitialization:
         """Test URL construction for mainnet."""
         client = CryptoBotClient("test_token", is_mainnet=True)
         # Access the base URL through the httpx client
-        assert "mainnet" in str(client._CryptoBotClient__http_client.base_url) or "pay.crypt.bot" in str(client._CryptoBotClient__http_client.base_url)
+        base_url = str(client._CryptoBotClient__http_client.base_url)
+        assert "pay.crypt.bot" in base_url
 
     def test_client_url_construction_testnet(self):
         """Test URL construction for testnet."""
         client = CryptoBotClient("test_token", is_mainnet=False)
-        assert "testnet" in str(client._CryptoBotClient__http_client.base_url) or "testnet-pay.crypt.bot" in str(client._CryptoBotClient__http_client.base_url)
+        base_url = str(client._CryptoBotClient__http_client.base_url)
+        assert "testnet-pay.crypt.bot" in base_url
 
 
 class TestCryptoBotClientGetMe:
     """Tests for get_me method."""
 
-    @patch('httpx.Client.get')
+    @patch("httpx.Client.get")
     def test_get_me_success(self, mock_get):
         """Test successful get_me request."""
         mock_response = Mock()
@@ -54,7 +67,7 @@ class TestCryptoBotClientGetMe:
             "result": {
                 "app_id": 12345,
                 "name": "Test App",
-                "payment_processing_bot_username": "TestBot"
+                "payment_processing_bot_username": "TestBot",
             }
         }
         mock_get.return_value = mock_response
@@ -67,16 +80,13 @@ class TestCryptoBotClientGetMe:
         assert app.name == "Test App"
         assert app.payment_processing_bot_username == "TestBot"
 
-    @patch('httpx.Client.get')
+    @patch("httpx.Client.get")
     def test_get_me_error(self, mock_get):
         """Test get_me request with error response."""
         mock_response = Mock()
         mock_response.status_code = 401
         mock_response.json.return_value = {
-            "error": {
-                "code": 401,
-                "name": "UNAUTHORIZED"
-            }
+            "error": {"code": 401, "name": "UNAUTHORIZED"}
         }
         mock_get.return_value = mock_response
 
@@ -93,7 +103,7 @@ class TestCryptoBotClientGetMe:
 class TestCryptoBotClientCreateInvoice:
     """Tests for create_invoice method."""
 
-    @patch('httpx.Client.post')
+    @patch("httpx.Client.post")
     def test_create_invoice_minimal(self, mock_post):
         """Test creating invoice with minimal parameters."""
         mock_response = Mock()
@@ -108,7 +118,7 @@ class TestCryptoBotClientCreateInvoice:
                 "currency_type": "crypto",
                 "allow_comments": True,
                 "allow_anonymous": True,
-                "paid_anonymously": True
+                "paid_anonymously": True,
             }
         }
         mock_post.return_value = mock_response
@@ -129,7 +139,7 @@ class TestCryptoBotClientCreateInvoice:
         assert call_args[1]["json"]["asset"] == "USDT"
         assert call_args[1]["json"]["amount"] == "10.5"
 
-    @patch('httpx.Client.post')
+    @patch("httpx.Client.post")
     def test_create_invoice_full_parameters(self, mock_post):
         """Test creating invoice with all parameters."""
         mock_response = Mock()
@@ -148,8 +158,7 @@ class TestCryptoBotClientCreateInvoice:
                 "payload": "custom_payload",
                 "allow_comments": False,
                 "allow_anonymous": False,
-                "expires_in": 3600,
-                "swap_to": "USDT"
+                "swap_to": "USDT",
             }
         }
         mock_post.return_value = mock_response
@@ -166,7 +175,7 @@ class TestCryptoBotClientCreateInvoice:
             allow_comments=False,
             allow_anonymous=False,
             expires_in=3600,
-            swap_to="USDT"
+            swap_to="USDT",
         )
 
         assert invoice.description == "Test invoice"
@@ -180,7 +189,7 @@ class TestCryptoBotClientCreateInvoice:
         assert json_data["paid_btn_name"] == "viewItem"
         assert json_data["expires_in"] == 3600
 
-    @patch('httpx.Client.post')
+    @patch("httpx.Client.post")
     def test_create_invoice_error(self, mock_post):
         """Test create_invoice with error response."""
         mock_response = Mock()
@@ -189,7 +198,7 @@ class TestCryptoBotClientCreateInvoice:
             "error": {
                 "code": 400,
                 "name": "BAD_REQUEST",
-                "description": "Invalid amount"
+                "description": "Invalid amount",
             }
         }
         mock_post.return_value = mock_response
@@ -207,7 +216,7 @@ class TestCryptoBotClientCreateInvoice:
 class TestCryptoBotClientTransfer:
     """Tests for transfer method."""
 
-    @patch('httpx.Client.post')
+    @patch("httpx.Client.post")
     def test_transfer_success(self, mock_post):
         """Test successful transfer."""
         mock_response = Mock()
@@ -220,7 +229,7 @@ class TestCryptoBotClientTransfer:
                 "amount": "5.0",
                 "status": "completed",
                 "completed_at": "2023-01-01T12:00:00Z",
-                "comment": "Payment for services"
+                "comment": "Payment for services",
             }
         }
         mock_post.return_value = mock_response
@@ -231,7 +240,7 @@ class TestCryptoBotClientTransfer:
             asset=Asset.TON,
             amount=5.0,
             spend_id="unique_id_123",
-            comment="Payment for services"
+            comment="Payment for services",
         )
 
         assert isinstance(transfer, Transfer)
@@ -241,7 +250,7 @@ class TestCryptoBotClientTransfer:
         assert transfer.amount == "5.0"
         assert transfer.comment == "Payment for services"
 
-    @patch('httpx.Client.post')
+    @patch("httpx.Client.post")
     def test_transfer_insufficient_funds(self, mock_post):
         """Test transfer with insufficient funds error."""
         mock_response = Mock()
@@ -250,7 +259,7 @@ class TestCryptoBotClientTransfer:
             "error": {
                 "code": 400,
                 "name": "INSUFFICIENT_FUNDS",
-                "description": "Not enough balance"
+                "description": "Not enough balance",
             }
         }
         mock_post.return_value = mock_response
@@ -259,10 +268,7 @@ class TestCryptoBotClientTransfer:
 
         with pytest.raises(CryptoBotError) as exc_info:
             client.transfer(
-                user_id=12345,
-                asset=Asset.BTC,
-                amount=100.0,
-                spend_id="test_id"
+                user_id=12345, asset=Asset.BTC, amount=100.0, spend_id="test_id"
             )
 
         error = exc_info.value
@@ -272,7 +278,7 @@ class TestCryptoBotClientTransfer:
 class TestCryptoBotClientGetInvoices:
     """Tests for get_invoices method."""
 
-    @patch('httpx.Client.get')
+    @patch("httpx.Client.get")
     def test_get_invoices_all(self, mock_get):
         """Test getting all invoices."""
         mock_response = Mock()
@@ -285,15 +291,15 @@ class TestCryptoBotClientGetInvoices:
                         "status": "paid",
                         "hash": "abc123",
                         "amount": "10.0",
-                        "asset": "USDT"
+                        "asset": "USDT",
                     },
                     {
                         "invoice_id": 456,
                         "status": "active",
                         "hash": "def456",
                         "amount": "25.0",
-                        "asset": "BTC"
-                    }
+                        "asset": "BTC",
+                    },
                 ]
             }
         }
@@ -307,7 +313,7 @@ class TestCryptoBotClientGetInvoices:
         assert invoices[0].invoice_id == 123
         assert invoices[1].invoice_id == 456
 
-    @patch('httpx.Client.get')
+    @patch("httpx.Client.get")
     def test_get_invoices_with_filters(self, mock_get):
         """Test getting invoices with filters."""
         mock_response = Mock()
@@ -320,7 +326,7 @@ class TestCryptoBotClientGetInvoices:
                         "status": "paid",
                         "hash": "ghi789",
                         "amount": "50.0",
-                        "asset": "USDT"
+                        "asset": "USDT",
                     }
                 ]
             }
@@ -329,10 +335,7 @@ class TestCryptoBotClientGetInvoices:
 
         client = CryptoBotClient("test_token")
         invoices = client.get_invoices(
-            asset=Asset.USDT,
-            status=Status.paid,
-            offset=10,
-            count=5
+            asset=Asset.USDT, status=Status.paid, offset=10, count=5
         )
 
         assert len(invoices) == 1
@@ -350,23 +353,15 @@ class TestCryptoBotClientGetInvoices:
 class TestCryptoBotClientGetBalances:
     """Tests for get_balances method."""
 
-    @patch('httpx.Client.get')
+    @patch("httpx.Client.get")
     def test_get_balances_success(self, mock_get):
         """Test successful get_balances request."""
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = {
             "result": [
-                {
-                    "currency_code": "BTC",
-                    "available": "1.5",
-                    "onhold": "0.1"
-                },
-                {
-                    "currency_code": "USDT",
-                    "available": "1000.0",
-                    "onhold": "50.0"
-                }
+                {"currency_code": "BTC", "available": "1.5", "onhold": "0.1"},
+                {"currency_code": "USDT", "available": "1000.0", "onhold": "50.0"},
             ]
         }
         mock_get.return_value = mock_response
@@ -384,7 +379,7 @@ class TestCryptoBotClientGetBalances:
 class TestCryptoBotClientGetExchangeRates:
     """Tests for get_exchange_rates method."""
 
-    @patch('httpx.Client.get')
+    @patch("httpx.Client.get")
     def test_get_exchange_rates_success(self, mock_get):
         """Test successful get_exchange_rates request."""
         mock_response = Mock()
@@ -397,7 +392,7 @@ class TestCryptoBotClientGetExchangeRates:
                     "is_fiat": False,
                     "source": "BTC",
                     "target": "USD",
-                    "rate": "50000.00"
+                    "rate": "50000.00",
                 },
                 {
                     "is_valid": True,
@@ -405,8 +400,8 @@ class TestCryptoBotClientGetExchangeRates:
                     "is_fiat": False,
                     "source": "ETH",
                     "target": "USD",
-                    "rate": "3000.00"
-                }
+                    "rate": "3000.00",
+                },
             ]
         }
         mock_get.return_value = mock_response
@@ -424,7 +419,7 @@ class TestCryptoBotClientGetExchangeRates:
 class TestCryptoBotClientGetCurrencies:
     """Tests for get_currencies method."""
 
-    @patch('httpx.Client.get')
+    @patch("httpx.Client.get")
     def test_get_currencies_success(self, mock_get):
         """Test successful get_currencies request."""
         mock_response = Mock()
@@ -437,7 +432,7 @@ class TestCryptoBotClientGetCurrencies:
                     "is_fiat": False,
                     "name": "Bitcoin",
                     "code": "BTC",
-                    "decimals": 8
+                    "decimals": 8,
                 },
                 {
                     "is_blockchain": True,
@@ -446,8 +441,8 @@ class TestCryptoBotClientGetCurrencies:
                     "name": "Tether",
                     "code": "USDT",
                     "decimals": 6,
-                    "url": "https://tether.to"
-                }
+                    "url": "https://tether.to",
+                },
             ]
         }
         mock_get.return_value = mock_response
@@ -465,7 +460,7 @@ class TestCryptoBotClientGetCurrencies:
 class TestCryptoBotClientErrorHandling:
     """Tests for error handling across all methods."""
 
-    @patch('httpx.Client.get')
+    @patch("httpx.Client.get")
     def test_network_error_handling(self, mock_get):
         """Test handling of network errors."""
         mock_get.side_effect = httpx.NetworkError("Connection failed")
@@ -475,7 +470,7 @@ class TestCryptoBotClientErrorHandling:
         with pytest.raises(httpx.NetworkError):
             client.get_me()
 
-    @patch('httpx.Client.post')
+    @patch("httpx.Client.post")
     def test_timeout_error_handling(self, mock_post):
         """Test handling of timeout errors."""
         mock_post.side_effect = httpx.TimeoutException("Request timed out")
@@ -485,7 +480,7 @@ class TestCryptoBotClientErrorHandling:
         with pytest.raises(httpx.TimeoutException):
             client.create_invoice(Asset.BTC, 1.0)
 
-    @patch('httpx.Client.get')
+    @patch("httpx.Client.get")
     def test_json_decode_error(self, mock_get):
         """Test handling of invalid JSON responses."""
         mock_response = Mock()
@@ -498,7 +493,7 @@ class TestCryptoBotClientErrorHandling:
         with pytest.raises(ValueError):
             client.get_balances()
 
-    @patch('httpx.Client.get')
+    @patch("httpx.Client.get")
     def test_unexpected_response_structure(self, mock_get):
         """Test handling of unexpected response structure."""
         mock_response = Mock()

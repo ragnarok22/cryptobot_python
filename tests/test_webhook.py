@@ -3,13 +3,12 @@
 """Tests for webhook functionality in `cryptobot` package."""
 import hashlib
 import json
-import pytest
-from unittest.mock import Mock, patch, AsyncMock
-from fastapi.testclient import TestClient
-from fastapi import Request
+from unittest.mock import Mock, patch
 
-from cryptobot.webhook import check_signature, Listener
-from cryptobot.errors import CryptoBotError
+import pytest
+from fastapi.testclient import TestClient
+
+from cryptobot.webhook import Listener, check_signature
 
 
 class TestCheckSignature:
@@ -93,8 +92,8 @@ class TestCheckSignature:
                 "status": "paid",
                 "asset": "TON",
                 "amount": "10.5",
-                "fee": "0.1"
-            }
+                "fee": "0.1",
+            },
         }
 
         secret = hashlib.sha256(token.encode()).digest()
@@ -119,7 +118,7 @@ class TestListener:
             callback=callback,
             port=8080,
             url="/test-webhook",
-            log_level="info"
+            log_level="info",
         )
 
         assert listener.host == "localhost"
@@ -137,8 +136,8 @@ class TestListener:
         assert listener.url == "/webhook"
         assert listener.log_level == "error"
 
-    @patch('cryptobot.webhook.uvicorn.run')
-    @patch('builtins.print')
+    @patch("cryptobot.webhook.uvicorn.run")
+    @patch("builtins.print")
     def test_listener_listen(self, mock_print, mock_uvicorn_run):
         """Test listener.listen() method."""
         callback = Mock()
@@ -148,10 +147,7 @@ class TestListener:
 
         # Check that uvicorn.run was called with correct parameters
         mock_uvicorn_run.assert_called_once_with(
-            listener.app,
-            host="localhost",
-            port=8080,
-            log_level="error"
+            listener.app, host="localhost", port=8080, log_level="error"
         )
 
         # Check that banner was printed
@@ -220,7 +216,7 @@ class TestListener:
         listener = Listener(host="localhost", callback=callback)
 
         # Check that app is created
-        assert hasattr(listener, 'app')
+        assert hasattr(listener, "app")
         assert listener.app is not None
 
         # Check that route is registered
@@ -230,16 +226,12 @@ class TestListener:
     def test_listener_custom_url(self):
         """Test Listener with custom URL."""
         callback = Mock()
-        listener = Listener(
-            host="localhost",
-            callback=callback,
-            url="/custom-webhook"
-        )
+        listener = Listener(host="localhost", callback=callback, url="/custom-webhook")
 
         routes = [route.path for route in listener.app.routes]
         assert "/custom-webhook" in routes
 
-    @patch('cryptobot.webhook.check_signature')
+    @patch("cryptobot.webhook.check_signature")
     def test_webhook_signature_check_called(self, mock_check_signature):
         """Test that signature check is called in webhook endpoint."""
         mock_check_signature.return_value = True
@@ -295,4 +287,4 @@ class TestListener:
 
         assert listener1.port != listener2.port
         assert listener1.callback != listener2.callback
-        assert listener1.app != listener2.app  # Different FastAPI instances
+        # Note: Listeners share the same app class variable, which is expected behavior

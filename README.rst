@@ -70,7 +70,7 @@ Invoices, balances, currencies, and transfers are returned as dataclasses, so at
 Handling Errors
 ---------------
 
-All API failures raise :class:`cryptobot.errors.CryptoBotError`. Inspect the error for the Crypto Bot error ``code`` and ``name``:
+All API failures raise ``cryptobot.errors.CryptoBotError``. Inspect the error for the Crypto Bot error ``code`` and ``name``:
 
 .. code-block:: python
 

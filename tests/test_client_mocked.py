@@ -508,8 +508,6 @@ class TestCryptoBotClientErrorHandling:
 
     def test_invalid_asset_enum(self):
         """Test validation of asset enum values."""
-        client = CryptoBotClient("test_token")
-
         # This should work fine with valid Asset enum
         assert Asset.BTC.name == "BTC"
 

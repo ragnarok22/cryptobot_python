@@ -51,7 +51,7 @@ watchdog = ">=2.2.1,<6.1.0"
 
 [tool.poetry.dependencies]
 python = ">=3.9.12,<4.0"
-tox = "^4.30.2"
+tox = "^4.30.3"
 twine = "^6.2.0"
 httpx = "^0.28.1"
 python-dotenv = "^1.1.1"

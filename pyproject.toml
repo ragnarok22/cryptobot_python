@@ -58,7 +58,7 @@ python-dotenv = "^1.1.1"
 uvicorn = "^0.37.0"
 colorama = "^0.4.6"
 fastapi = "^0.119.0"
-pydantic-core = "^2.41.1"
+pydantic-core = "^2.41.3"
 
 [tool.coverage.run]
 omit = [

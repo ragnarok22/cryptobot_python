@@ -25,7 +25,7 @@ msgstr "Historial"
 
 #: ../../../HISTORY.md:4
 msgid "0.2.3 (2024-12-19)"
-msgstr ""
+msgstr "0.2.3 (2024-12-19)"
 
 #: ../../../HISTORY.md:6
 msgid "Build and documentation improvements"
@@ -41,7 +41,7 @@ msgstr "Dependencias y herramientas de desarrollo actualizadas"
 
 #: ../../../HISTORY.md:10
 msgid "0.2.2 (2024-10-15)"
-msgstr ""
+msgstr "0.2.2 (2024-10-15)"
 
 #: ../../../HISTORY.md:12
 msgid "Fixed swap_to parameter handling in Invoice class"
@@ -53,7 +53,7 @@ msgstr "Cobertura de pruebas mejorada para creación de facturas"
 
 #: ../../../HISTORY.md:15
 msgid "0.2.1 (2024-10-14)"
-msgstr ""
+msgstr "0.2.1 (2024-10-14)"
 
 #: ../../../HISTORY.md:17
 msgid "Added swap_to parameter to create_invoice method"
@@ -65,7 +65,7 @@ msgstr "Funcionalidad de facturas mejorada con soporte de conversión de moneda"
 
 #: ../../../HISTORY.md:20
 msgid "0.2.0 (2024-09-25)"
-msgstr ""
+msgstr "0.2.0 (2024-09-25)"
 
 #: ../../../HISTORY.md:22
 msgid "Updated Python version support (3.9.12+ to 3.13)"
@@ -89,7 +89,7 @@ msgstr "Dependencias y herramientas de desarrollo actualizadas"
 
 #: ../../../HISTORY.md:28
 msgid "0.1.9 (2024-09-20)"
-msgstr ""
+msgstr "0.1.9 (2024-09-20)"
 
 #: ../../../HISTORY.md:30
 msgid "Added .DS_Store to gitignore"
@@ -105,7 +105,7 @@ msgstr "Gestión de paquetes y proceso de compilación mejorados"
 
 #: ../../../HISTORY.md:34
 msgid "0.1.8 (2024-09-10)"
-msgstr ""
+msgstr "0.1.8 (2024-09-10)"
 
 #: ../../../HISTORY.md:36
 msgid "Updated dependencies and improved stability"
@@ -117,7 +117,7 @@ msgstr "Herramientas de desarrollo y configuración mejoradas"
 
 #: ../../../HISTORY.md:39
 msgid "0.1.7 (2024-09-05)"
-msgstr ""
+msgstr "0.1.7 (2024-09-05)"
 
 #: ../../../HISTORY.md:41
 msgid "Dependency updates including twine, fastapi, and pip"
@@ -129,7 +129,7 @@ msgstr "Proceso de compilación y lanzamiento mejorado"
 
 #: ../../../HISTORY.md:44
 msgid "0.1.6 (2024-08-30)"
-msgstr ""
+msgstr "0.1.6 (2024-08-30)"
 
 #: ../../../HISTORY.md:46
 msgid "Fixed build system with proper egg file removal"
@@ -141,7 +141,7 @@ msgstr "Dependencias actualizadas y flujo de trabajo de desarrollo mejorado"
 
 #: ../../../HISTORY.md:49
 msgid "0.1.5 (2024-07-15)"
-msgstr ""
+msgstr "0.1.5 (2024-07-15)"
 
 #: ../../../HISTORY.md:51
 msgid "Hotfix for Invoice dataclass initialization"
@@ -153,7 +153,7 @@ msgstr "Actualizaciones de dependencias y mejoras"
 
 #: ../../../HISTORY.md:54
 msgid "0.1.4 (2024-07-10)"
-msgstr ""
+msgstr "0.1.4 (2024-07-10)"
 
 #: ../../../HISTORY.md:56
 msgid "Enhanced webhook functionality and error handling"
@@ -169,7 +169,7 @@ msgstr "Documentación y guías de desarrollo actualizadas"
 
 #: ../../../HISTORY.md:60
 msgid "0.1.3 (2024-06-20)"
-msgstr ""
+msgstr "0.1.3 (2024-06-20)"
 
 #: ../../../HISTORY.md:62
 msgid "Added comprehensive test suite improvements"
@@ -181,7 +181,7 @@ msgstr "Manejo de errores y funcionalidad del cliente mejorados"
 
 #: ../../../HISTORY.md:66
 msgid "0.1.2 (2024-05-15)"
-msgstr ""
+msgstr "0.1.2 (2024-05-15)"
 
 #: ../../../HISTORY.md:68
 msgid "Added support for additional cryptocurrencies"
@@ -197,7 +197,7 @@ msgstr "Documentación y ejemplos mejorados"
 
 #: ../../../HISTORY.md:72
 msgid "0.1.1 (2023-08-09)"
-msgstr ""
+msgstr "0.1.1 (2023-08-09)"
 
 #: ../../../HISTORY.md:74
 msgid "Added `BNB` and `TRX` assets."

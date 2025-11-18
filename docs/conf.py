@@ -38,6 +38,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.intersphinx",
     "sphinx.ext.coverage",
+    "myst_parser",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -46,8 +47,10 @@ templates_path = ["_templates"]
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-# source_suffix = ['.rst', '.md']
-source_suffix = ".rst"
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".md": "markdown",
+}
 
 # The master toctree document.
 master_doc = "index"
@@ -110,6 +113,20 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
     "fastapi": ("https://fastapi.tiangolo.com/", None),
 }
+
+# -- MyST-Parser configuration --------------------------------------------
+
+# Enable Markdown extensions
+myst_enable_extensions = [
+    "colon_fence",  # ::: fenced code blocks
+    "deflist",  # Definition lists
+    "substitution",  # Variable substitutions
+    "tasklist",  # Task lists
+    "linkify",  # Auto-detect URLs
+]
+
+# Allow heading anchors to be generated
+myst_heading_anchors = 3
 
 
 # -- Options for HTML output -------------------------------------------

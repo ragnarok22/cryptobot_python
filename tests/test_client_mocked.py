@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 """Tests for CryptoBotClient with mocked HTTP responses."""
+
 from unittest.mock import Mock, patch
 
 import httpx

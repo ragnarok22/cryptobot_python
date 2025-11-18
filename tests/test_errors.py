@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 """Tests for error handling in `cryptobot` package."""
+
 import pytest
 
 from cryptobot.errors import CryptoBotError

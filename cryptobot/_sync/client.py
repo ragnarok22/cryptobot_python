@@ -40,8 +40,15 @@ class CryptoBotClient:
             info = response.json()["result"]
             return App(**info)
         else:
-            data = response.json()["error"]
-            raise CryptoBotError(**data)
+            try:
+                data = response.json()["error"]
+                raise CryptoBotError(**data)
+            except (ValueError, KeyError):
+                # Response is not JSON or doesn't have error field
+                raise CryptoBotError(
+                    code=response.status_code,
+                    name=f"HTTPError: {response.text[:100]}",
+                )
 
     def __create_invoice(self, **kwargs) -> Invoice:
         """Create a new invoice"""
@@ -50,8 +57,15 @@ class CryptoBotClient:
             info = response.json()["result"]
             return Invoice(**info)
         else:
-            data = response.json()["error"]
-            raise CryptoBotError.from_json(data)
+            try:
+                data = response.json()["error"]
+                raise CryptoBotError.from_json(data)
+            except (ValueError, KeyError):
+                # Response is not JSON or doesn't have error field
+                raise CryptoBotError(
+                    code=response.status_code,
+                    name=f"HTTPError: {response.text[:100]}",
+                )
 
     def create_invoice(
         self,
@@ -114,8 +128,15 @@ class CryptoBotClient:
             info = response.json()["result"]
             return Transfer(**info)
         else:
-            data = response.json()["error"]
-            raise CryptoBotError.from_json(data)
+            try:
+                data = response.json()["error"]
+                raise CryptoBotError.from_json(data)
+            except (ValueError, KeyError):
+                # Response is not JSON or doesn't have error field
+                raise CryptoBotError(
+                    code=response.status_code,
+                    name=f"HTTPError: {response.text[:100]}",
+                )
 
     def get_invoices(
         self,
@@ -143,8 +164,15 @@ class CryptoBotClient:
             info = response.json()["result"]
             return [Invoice(**i) for i in info["items"]]
         else:
-            data = response.json()["error"]
-            raise CryptoBotError.from_json(data)
+            try:
+                data = response.json()["error"]
+                raise CryptoBotError.from_json(data)
+            except (ValueError, KeyError):
+                # Response is not JSON or doesn't have error field
+                raise CryptoBotError(
+                    code=response.status_code,
+                    name=f"HTTPError: {response.text[:100]}",
+                )
 
     def get_balances(self) -> List[Balance]:
         """Get the balances of your app"""
@@ -153,8 +181,15 @@ class CryptoBotClient:
             info = response.json()["result"]
             return [Balance(**i) for i in info]
         else:
-            data = response.json()["error"]
-            raise CryptoBotError.from_json(data)
+            try:
+                data = response.json()["error"]
+                raise CryptoBotError.from_json(data)
+            except (ValueError, KeyError):
+                # Response is not JSON or doesn't have error field
+                raise CryptoBotError(
+                    code=response.status_code,
+                    name=f"HTTPError: {response.text[:100]}",
+                )
 
     def get_exchange_rates(self) -> List[ExchangeRate]:
         """Get the exchange rates"""
@@ -163,8 +198,15 @@ class CryptoBotClient:
             info = response.json()["result"]
             return [ExchangeRate(**i) for i in info]
         else:
-            data = response.json()["error"]
-            raise CryptoBotError.from_json(data)
+            try:
+                data = response.json()["error"]
+                raise CryptoBotError.from_json(data)
+            except (ValueError, KeyError):
+                # Response is not JSON or doesn't have error field
+                raise CryptoBotError(
+                    code=response.status_code,
+                    name=f"HTTPError: {response.text[:100]}",
+                )
 
     def get_currencies(self) -> List[Currency]:
         """Get the currencies"""
@@ -173,5 +215,12 @@ class CryptoBotClient:
             info = response.json()["result"]
             return [Currency(**i) for i in info]
         else:
-            data = response.json()["error"]
-            raise CryptoBotError.from_json(data)
+            try:
+                data = response.json()["error"]
+                raise CryptoBotError.from_json(data)
+            except (ValueError, KeyError):
+                # Response is not JSON or doesn't have error field
+                raise CryptoBotError(
+                    code=response.status_code,
+                    name=f"HTTPError: {response.text[:100]}",
+                )

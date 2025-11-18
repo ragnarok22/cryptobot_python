@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 """Tests for data models in `cryptobot` package."""
+
 import pytest
 
 from cryptobot.models import (

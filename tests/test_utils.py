@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 """Tests for utility functions in `cryptobot` package."""
+
 from dataclasses import dataclass
 from typing import Optional
 

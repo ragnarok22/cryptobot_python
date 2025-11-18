@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 """Simplified tests for webhook functionality in `cryptobot` package."""
+
 import hashlib
 import json
 from unittest.mock import Mock, patch

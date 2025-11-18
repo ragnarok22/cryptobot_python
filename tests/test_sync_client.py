@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 """Tests for `cryptobot` package."""
+
 import os
 import unittest
 

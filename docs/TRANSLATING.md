@@ -259,7 +259,7 @@ The project is configured to build multi-language documentation on Read the Docs
 
 We welcome translations! Here's how to contribute:
 
-1. Check [existing translations](locale/)
+1. Check existing translations in the `locale/` directory
 2. Create an issue announcing your translation
 3. Follow the workflow above
 4. Submit a pull request

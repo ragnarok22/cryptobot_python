@@ -30,7 +30,7 @@ CryptoBot Python could always use more documentation, whether as part of the off
 
 ### Translate Documentation
 
-Help make CryptoBot Python accessible to non-English speakers by contributing translations! See [docs/TRANSLATING.md](docs/TRANSLATING.md) for a complete guide on translating the documentation into other languages.
+Help make CryptoBot Python accessible to non-English speakers by contributing translations! See the Translation Guide in the documentation for a complete guide on translating the documentation into other languages.
 
 ### Submit Feedback
 

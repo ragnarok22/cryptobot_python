@@ -60,6 +60,7 @@ modules
 :caption: Development
 
 contributing
+TRANSLATING
 authors
 history
 ```

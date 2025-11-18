@@ -54,4 +54,3 @@ msgstr "Contenido del módulo"
 #: cryptobot:1 of
 msgid "Top-level package for CryptoBot Python."
 msgstr "Paquete de nivel superior para CryptoBot Python."
-

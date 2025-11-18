@@ -307,4 +307,3 @@ msgstr ""
 #: ../../../CONTRIBUTING.md:121
 msgid "GitHub Actions will then deploy to PyPI if tests pass."
 msgstr "GitHub Actions luego desplegará a PyPI si las pruebas pasan."
-

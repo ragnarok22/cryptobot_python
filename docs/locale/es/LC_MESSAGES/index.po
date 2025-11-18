@@ -136,4 +136,3 @@ msgstr "{ref}`modindex`"
 #, python-brace-format
 msgid "{ref}`search`"
 msgstr "{ref}`search`"
-

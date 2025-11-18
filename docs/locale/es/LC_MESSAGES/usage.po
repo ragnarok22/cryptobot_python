@@ -834,4 +834,3 @@ msgstr "**Verifique el estado de la factura** antes de procesar pedidos"
 #: ../../usage.md:404
 msgid "**Log all transactions** for audit trails and debugging"
 msgstr "**Registre todas las transacciones** para auditorías y depuración"
-

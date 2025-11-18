@@ -45,4 +45,3 @@ msgstr "docs: https://help.crypt.bot/crypto-pay-api#Invoice"
 #: cryptobot.models.Transfer:1 of
 msgid "docs: https://telegra.ph/Crypto-Pay-API-11-25#Transfer"
 msgstr "docs: https://telegra.ph/Crypto-Pay-API-11-25#Transfer"
-

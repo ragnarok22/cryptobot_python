@@ -42,4 +42,3 @@ msgstr "Carlos Lugones - [carloslugones.com](https://www.carloslugones.com)"
 #: ../../../AUTHORS.md:11
 msgid "Jose R. García - [josergarcia.dev](https://www.josergarcia.dev)"
 msgstr "Jose R. García - [josergarcia.dev](https://www.josergarcia.dev)"
-

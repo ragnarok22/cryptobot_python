@@ -22,4 +22,3 @@ msgstr ""
 #: ../../modules.rst:2
 msgid "cryptobot"
 msgstr "cryptobot"
-

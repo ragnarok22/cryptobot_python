@@ -1519,4 +1519,3 @@ msgstr "Check the [Troubleshooting Guide](troubleshooting) for common issues"
 #: ../../examples.md:724
 msgid "Review the [API Reference](modules) for complete documentation"
 msgstr "Review the [API Reference](modules) for complete documentation"
-

@@ -113,4 +113,3 @@ msgid ""
 msgstr ""
 "$ cd cryptobot_python\n"
 "$ pip install .\n"
-

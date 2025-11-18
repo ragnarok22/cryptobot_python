@@ -122,7 +122,6 @@ myst_enable_extensions = [
     "deflist",  # Definition lists
     "substitution",  # Variable substitutions
     "tasklist",  # Task lists
-    "linkify",  # Auto-detect URLs
 ]
 
 # Allow heading anchors to be generated

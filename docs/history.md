@@ -1,4 +1,2 @@
-# History
-
 ```{include} ../HISTORY.md
 ```

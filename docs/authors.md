@@ -1,4 +1,2 @@
-# Authors
-
 ```{include} ../AUTHORS.md
 ```

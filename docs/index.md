@@ -37,7 +37,6 @@ print(invoice.bot_invoice_url)
 
 installation
 usage
-readme
 ```
 
 ```{toctree}

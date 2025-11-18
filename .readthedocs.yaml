@@ -12,7 +12,7 @@ build:
     post_install:
       # Build gettext files and Spanish translations
       - cd docs && python -m sphinx -b gettext . _build/gettext
-      - sphinx-intl update -p docs/_build/gettext -l es
+      - sphinx-intl update -p docs/_build/gettext -d docs/locale -l es
       - cd docs && python -m sphinx -b html -D language=en . $READTHEDOCS_OUTPUT/html/
 
 sphinx:

@@ -7,4 +7,4 @@
 ## Contributors
 
 * Carlos Lugones - [carloslugones.com](https://www.carloslugones.com)
-* Jose R. García - [joserg.com](https://joserg.com)
+* Jose R. García - [josergarcia.dev](https://www.josergarcia.dev)

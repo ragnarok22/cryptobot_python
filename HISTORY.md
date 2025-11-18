@@ -1,5 +1,15 @@
 # History
 
+## 0.3.0 (2025-11-18)
+
+* Added Spanish documentation support with complete translations
+* Implemented internationalization (i18n) infrastructure using sphinx-intl
+* Created comprehensive translation guide (TRANSLATING.md)
+* Added new Make commands for documentation translation workflow
+* Updated Read the Docs configuration for multi-language documentation
+* Added Spanish translation of all documentation pages
+* Enhanced documentation build system with multi-language support
+
 ## 0.2.3 (2024-12-19)
 
 * Build and documentation improvements

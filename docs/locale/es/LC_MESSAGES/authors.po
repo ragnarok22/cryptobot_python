@@ -1,0 +1,45 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2022, Reinier Hernández
+# This file is distributed under the same license as the CryptoBot Python
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: CryptoBot Python 0.1.6\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-11-18 10:28-0300\n"
+"PO-Revision-Date: 2025-11-18 10:30-0300\n"
+"Last-Translator: Claude <noreply@anthropic.com>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../../AUTHORS.md:2
+msgid "Credits"
+msgstr "Créditos"
+
+#: ../../../AUTHORS.md:4
+msgid "Development Lead"
+msgstr "Líder de Desarrollo"
+
+#: ../../../AUTHORS.md:6
+msgid "Reinier Hernández - [reinierhernandez.com](https://reinierhernandez.com)"
+msgstr "Reinier Hernández - [reinierhernandez.com](https://reinierhernandez.com)"
+
+#: ../../../AUTHORS.md:8
+msgid "Contributors"
+msgstr "Contribuidores"
+
+#: ../../../AUTHORS.md:10
+msgid "Carlos Lugones - [carloslugones.com](https://www.carloslugones.com)"
+msgstr "Carlos Lugones - [carloslugones.com](https://www.carloslugones.com)"
+
+#: ../../../AUTHORS.md:11
+msgid "Jose R. García - [josergarcia.dev](https://www.josergarcia.dev)"
+msgstr "Jose R. García - [josergarcia.dev](https://www.josergarcia.dev)"
+

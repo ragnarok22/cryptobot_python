@@ -1,0 +1,1069 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2022, Reinier Hernández
+# This file is distributed under the same license as the CryptoBot Python
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: CryptoBot Python 0.1.6\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-11-18 10:28-0300\n"
+"PO-Revision-Date: 2025-11-18 10:30-0300\n"
+"Last-Translator: Claude <noreply@anthropic.com>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../troubleshooting.md:1
+msgid "Troubleshooting Guide"
+msgstr "Guía de Solución de Problemas"
+
+#: ../../troubleshooting.md:3
+msgid "This guide helps you resolve common issues when using CryptoBot Python."
+msgstr "Esta guía te ayuda a resolver problemas comunes al usar CryptoBot Python."
+
+#: ../../troubleshooting.md:5
+msgid "Authentication Issues"
+msgstr "Problemas de Autenticación"
+
+#: ../../troubleshooting.md:7
+msgid "Invalid API Token"
+msgstr "Token de API Inválido"
+
+#: ../../troubleshooting.md:9
+msgid "**Problem:** Getting authentication errors when making API calls."
+msgstr "**Problema:** Obteniendo errores de autenticación al hacer llamadas a la API."
+
+#: ../../troubleshooting.md:11
+msgid "CryptoBotError: code=401, name=\"UNAUTHORIZED\"\n"
+msgstr "CryptoBotError: code=401, name=\"UNAUTHORIZED\"\n"
+
+#: ../../troubleshooting.md:15 ../../troubleshooting.md:111
+msgid "**Solutions:**"
+msgstr "**Soluciones:**"
+
+#: ../../troubleshooting.md:17
+msgid "**Verify your token is correct:**"
+msgstr "**Verifica que tu token sea correcto:**"
+
+#: ../../troubleshooting.md:18
+#, python-brace-format
+msgid ""
+"from cryptobot import CryptoBotClient\n"
+"\n"
+"client = CryptoBotClient(\"YOUR_API_TOKEN\")\n"
+"try:\n"
+"    app = client.get_me()\n"
+"    print(f\"Connected successfully as: {app.name}\")\n"
+"except Exception as e:\n"
+"    print(f\"Authentication failed: {e}\")\n"
+msgstr ""
+
+#: ../../troubleshooting.md:29
+msgid "**Check environment variables:**"
+msgstr "**Verifica las variables de entorno:**"
+
+#: ../../troubleshooting.md:30
+msgid ""
+"import os\n"
+"\n"
+"token = os.getenv(\"CRYPTOBOT_TOKEN\")\n"
+"if not token:\n"
+"    print(\"ERROR: CRYPTOBOT_TOKEN environment variable not set\")\n"
+msgstr ""
+"import os\n"
+"\n"
+"token = os.getenv(\"CRYPTOBOT_TOKEN\")\n"
+"if not token:\n"
+"    print(\"ERROR: CRYPTOBOT_TOKEN environment variable not set\")\n"
+
+#: ../../troubleshooting.md:38
+msgid "**Verify you're using the correct token for the environment:**"
+msgstr "**Verifica que estás usando el token correcto para el entorno:**"
+
+#: ../../troubleshooting.md:39
+msgid "Mainnet tokens start with specific prefixes"
+msgstr "Los tokens de mainnet comienzan con prefijos específicos"
+
+#: ../../troubleshooting.md:40
+msgid "Testnet tokens are different from mainnet tokens"
+msgstr "Los tokens de testnet son diferentes de los tokens de mainnet"
+
+#: ../../troubleshooting.md:41
+msgid "Don't mix testnet and mainnet tokens"
+msgstr "No mezcles tokens de testnet y mainnet"
+
+#: ../../troubleshooting.md:43
+msgid "Wrong Environment (Mainnet vs Testnet)"
+msgstr "Entorno Incorrecto (Mainnet vs Testnet)"
+
+#: ../../troubleshooting.md:45
+msgid ""
+"**Problem:** API calls fail because you're using a testnet token with "
+"mainnet client or vice versa."
+msgstr ""
+"**Problema:** Las llamadas a la API fallan porque estás usando un token de testnet "
+"con un cliente de mainnet o viceversa."
+
+#: ../../troubleshooting.md:47 ../../troubleshooting.md:157
+#: ../../troubleshooting.md:190 ../../troubleshooting.md:262
+#: ../../troubleshooting.md:297 ../../troubleshooting.md:321
+#: ../../troubleshooting.md:354 ../../troubleshooting.md:429
+#: ../../troubleshooting.md:467 ../../troubleshooting.md:498
+#: ../../troubleshooting.md:538 ../../troubleshooting.md:572
+msgid "**Solution:**"
+msgstr "**Solución:**"
+
+#: ../../troubleshooting.md:49
+#, python-brace-format
+msgid ""
+"from cryptobot import CryptoBotClient\n"
+"\n"
+"# For testnet\n"
+"testnet_client = CryptoBotClient(\"YOUR_TESTNET_TOKEN\", "
+"is_mainnet=False)\n"
+"\n"
+"# For mainnet\n"
+"mainnet_client = CryptoBotClient(\"YOUR_MAINNET_TOKEN\", is_mainnet=True)"
+"\n"
+"\n"
+"# Verify environment\n"
+"try:\n"
+"    app = testnet_client.get_me()\n"
+"    print(\"Successfully connected to testnet\")\n"
+"except Exception as e:\n"
+"    print(f\"Testnet connection failed: {e}\")\n"
+msgstr ""
+
+#: ../../troubleshooting.md:66
+msgid "Invoice Issues"
+msgstr "Problemas con Facturas"
+
+#: ../../troubleshooting.md:68
+msgid "Minimum Amount Errors"
+msgstr "Errores de Cantidad Mínima"
+
+#: ../../troubleshooting.md:70
+msgid "**Problem:** Invoice creation fails with amount too small error."
+msgstr "**Problema:** La creación de facturas falla con error de cantidad muy pequeña."
+
+#: ../../troubleshooting.md:72
+msgid "CryptoBotError: code=400, name=\"AMOUNT_TOO_SMALL\"\n"
+msgstr "CryptoBotError: code=400, name=\"AMOUNT_TOO_SMALL\"\n"
+
+#: ../../troubleshooting.md:76
+msgid ""
+"**Solution:** Each cryptocurrency has a minimum amount. Check supported "
+"minimums:"
+msgstr ""
+"**Solución:** Cada criptomoneda tiene una cantidad mínima. Verifica los mínimos "
+"soportados:"
+
+#: ../../troubleshooting.md:78
+#, python-brace-format
+msgid ""
+"from cryptobot import CryptoBotClient\n"
+"from cryptobot.models import Asset\n"
+"\n"
+"client = CryptoBotClient(\"YOUR_API_TOKEN\")\n"
+"\n"
+"# Get currency information\n"
+"currencies = client.get_currencies()\n"
+"\n"
+"# Display minimum amounts (typically based on network fees)\n"
+"minimum_amounts = {\n"
+"    Asset.BTC: 0.000001,   # 1 satoshi\n"
+"    Asset.TON: 0.01,       # 0.01 TON\n"
+"    Asset.ETH: 0.000001,   # 1 gwei\n"
+"    Asset.USDT: 0.01,      # $0.01\n"
+"    Asset.USDC: 0.01,      # $0.01\n"
+"    Asset.BNB: 0.001,      # 0.001 BNB\n"
+"}\n"
+"\n"
+"# Always check minimum before creating invoice\n"
+"asset = Asset.USDT\n"
+"amount = 0.001  # Too small\n"
+"\n"
+"if amount < minimum_amounts[asset]:\n"
+"    print(f\"Amount too small. Minimum for {asset.name}: "
+"{minimum_amounts[asset]}\")\n"
+"else:\n"
+"    invoice = client.create_invoice(asset=asset, amount=amount, "
+"description=\"Test\")\n"
+msgstr ""
+
+#: ../../troubleshooting.md:107
+msgid "Invoice Expiration"
+msgstr "Expiración de Factura"
+
+#: ../../troubleshooting.md:109
+msgid "**Problem:** Invoice expires before payment is completed."
+msgstr "**Problema:** La factura expira antes de que se complete el pago."
+
+#: ../../troubleshooting.md:113
+msgid "**Set appropriate expiration time:**"
+msgstr "**Establece un tiempo de expiración apropiado:**"
+
+#: ../../troubleshooting.md:114
+msgid ""
+"# Set longer expiration (in seconds)\n"
+"invoice = client.create_invoice(\n"
+"    asset=Asset.USDT,\n"
+"    amount=10.0,\n"
+"    description=\"Test\",\n"
+"    expires_in=3600  # 1 hour instead of default\n"
+")\n"
+msgstr ""
+"# Set longer expiration (in seconds)\n"
+"invoice = client.create_invoice(\n"
+"    asset=Asset.USDT,\n"
+"    amount=10.0,\n"
+"    description=\"Test\",\n"
+"    expires_in=3600  # 1 hour instead of default\n"
+")\n"
+
+#: ../../troubleshooting.md:124
+msgid "**Check invoice status regularly:**"
+msgstr "**Verifica el estado de la factura regularmente:**"
+
+#: ../../troubleshooting.md:125
+msgid ""
+"from cryptobot.models import Status\n"
+"\n"
+"invoices = client.get_invoices(invoice_ids=str(invoice.invoice_id))\n"
+"if invoices:\n"
+"    invoice = invoices[0]\n"
+"    if invoice.status == Status.expired:\n"
+"        # Create a new invoice\n"
+"        new_invoice = client.create_invoice(\n"
+"            asset=Asset.USDT,\n"
+"            amount=10.0,\n"
+"            description=\"Replacement invoice\"\n"
+"        )\n"
+msgstr ""
+
+#: ../../troubleshooting.md:140
+msgid "**Implement invoice renewal:**"
+msgstr "**Implementa la renovación de facturas:**"
+
+#: ../../troubleshooting.md:141
+msgid ""
+"def renew_expired_invoice(client, old_invoice):\n"
+"    \"\"\"Create a new invoice with the same parameters\"\"\"\n"
+"    return client.create_invoice(\n"
+"        asset=old_invoice.asset,\n"
+"        amount=float(old_invoice.amount),\n"
+"        description=old_invoice.description,\n"
+"        payload=old_invoice.payload,\n"
+"        expires_in=3600\n"
+"    )\n"
+msgstr ""
+"def renew_expired_invoice(client, old_invoice):\n"
+"    \"\"\"Create a new invoice with the same parameters\"\"\"\n"
+"    return client.create_invoice(\n"
+"        asset=old_invoice.asset,\n"
+"        amount=float(old_invoice.amount),\n"
+"        description=old_invoice.description,\n"
+"        payload=old_invoice.payload,\n"
+"        expires_in=3600\n"
+"    )\n"
+
+#: ../../troubleshooting.md:153
+msgid "Invoice Not Found"
+msgstr "Factura No Encontrada"
+
+#: ../../troubleshooting.md:155
+msgid "**Problem:** Can't retrieve invoice after creation."
+msgstr "**Problema:** No se puede recuperar la factura después de crearla."
+
+#: ../../troubleshooting.md:159
+msgid ""
+"import time\n"
+"\n"
+"# Wait a moment after creation\n"
+"invoice = client.create_invoice(\n"
+"    asset=Asset.USDT,\n"
+"    amount=10.0,\n"
+"    description=\"Test\"\n"
+")\n"
+"\n"
+"# Give the API a moment to index the invoice\n"
+"time.sleep(1)\n"
+"\n"
+"# Retrieve invoice\n"
+"invoices = client.get_invoices(invoice_ids=str(invoice.invoice_id))\n"
+"if not invoices:\n"
+"    print(\"Invoice not found yet, trying again...\")\n"
+"    time.sleep(2)\n"
+"    invoices = client.get_invoices(invoice_ids=str(invoice.invoice_id))\n"
+msgstr ""
+
+#: ../../troubleshooting.md:180
+msgid "Transfer Issues"
+msgstr "Problemas de Transferencia"
+
+#: ../../troubleshooting.md:182
+msgid "Insufficient Balance"
+msgstr "Saldo Insuficiente"
+
+#: ../../troubleshooting.md:184
+msgid "**Problem:** Transfer fails due to insufficient funds."
+msgstr "**Problema:** La transferencia falla debido a fondos insuficientes."
+
+#: ../../troubleshooting.md:186
+msgid "CryptoBotError: code=400, name=\"INSUFFICIENT_FUNDS\"\n"
+msgstr "CryptoBotError: code=400, name=\"INSUFFICIENT_FUNDS\"\n"
+
+#: ../../troubleshooting.md:192
+#, python-brace-format
+msgid ""
+"from cryptobot.models import Asset\n"
+"from decimal import Decimal\n"
+"\n"
+"def can_transfer(client, asset, amount):\n"
+"    \"\"\"Check if transfer is possible\"\"\"\n"
+"    balances = client.get_balances()\n"
+"\n"
+"    for balance in balances:\n"
+"        if balance.currency_code == asset.name:\n"
+"            available = Decimal(balance.available)\n"
+"            required = Decimal(str(amount))\n"
+"\n"
+"            if available >= required:\n"
+"                return True, f\"Available: {available}\"\n"
+"            else:\n"
+"                return False, f\"Insufficient funds. Available: "
+"{available}, Required: {required}\"\n"
+"\n"
+"    return False, f\"Asset {asset.name} not found in balances\"\n"
+"\n"
+"# Check before transfer\n"
+"asset = Asset.USDT\n"
+"amount = 100.0\n"
+"\n"
+"can_proceed, message = can_transfer(client, asset, amount)\n"
+"if can_proceed:\n"
+"    transfer = client.transfer(\n"
+"        user_id=12345,\n"
+"        asset=asset,\n"
+"        amount=amount,\n"
+"        spend_id=\"unique_id\"\n"
+"    )\n"
+"else:\n"
+"    print(f\"Cannot transfer: {message}\")\n"
+msgstr ""
+
+#: ../../troubleshooting.md:228
+msgid "Duplicate spend_id"
+msgstr "spend_id Duplicado"
+
+#: ../../troubleshooting.md:230
+msgid "**Problem:** Transfer fails due to duplicate spend_id."
+msgstr "**Problema:** La transferencia falla debido a un spend_id duplicado."
+
+#: ../../troubleshooting.md:232
+msgid "CryptoBotError: code=400, name=\"SPEND_ID_ALREADY_USED\"\n"
+msgstr "CryptoBotError: code=400, name=\"SPEND_ID_ALREADY_USED\"\n"
+
+#: ../../troubleshooting.md:236
+msgid "**Solution:** Always use unique spend_ids:"
+msgstr "**Solución:** Siempre usa spend_ids únicos:"
+
+#: ../../troubleshooting.md:238
+#, python-brace-format, python-format
+msgid ""
+"import uuid\n"
+"from datetime import datetime\n"
+"\n"
+"def generate_unique_spend_id(user_id, purpose=\"\"):\n"
+"    \"\"\"Generate a unique spend ID\"\"\"\n"
+"    timestamp = datetime.now().strftime(\"%Y%m%d%H%M%S\")\n"
+"    unique_id = str(uuid.uuid4())[:8]\n"
+"    return f\"{purpose}_{user_id}_{timestamp}_{unique_id}\"\n"
+"\n"
+"# Usage\n"
+"spend_id = generate_unique_spend_id(12345, \"PAYOUT\")\n"
+"transfer = client.transfer(\n"
+"    user_id=12345,\n"
+"    asset=Asset.USDT,\n"
+"    amount=10.0,\n"
+"    spend_id=spend_id\n"
+")\n"
+msgstr ""
+
+#: ../../troubleshooting.md:258
+msgid "Invalid User ID"
+msgstr "ID de Usuario Inválido"
+
+#: ../../troubleshooting.md:260
+msgid "**Problem:** Transfer fails because user hasn't interacted with CryptoBot."
+msgstr "**Problema:** La transferencia falla porque el usuario no ha interactuado con CryptoBot."
+
+#: ../../troubleshooting.md:264
+#, python-brace-format
+msgid ""
+"from cryptobot.errors import CryptoBotError\n"
+"\n"
+"def safe_transfer(client, user_id, asset, amount, spend_id):\n"
+"    \"\"\"Transfer with error handling\"\"\"\n"
+"    try:\n"
+"        return client.transfer(\n"
+"            user_id=user_id,\n"
+"            asset=asset,\n"
+"            amount=amount,\n"
+"            spend_id=spend_id,\n"
+"            comment=\"Payment\"\n"
+"        )\n"
+"    except CryptoBotError as e:\n"
+"        if \"USER_NOT_FOUND\" in e.name or \"INVALID_USER\" in e.name:\n"
+"            # User hasn't started the bot\n"
+"            return {\n"
+"                \"success\": False,\n"
+"                \"error\": \"User must start @CryptoBot first\",\n"
+"                \"user_id\": user_id\n"
+"            }\n"
+"        raise\n"
+"\n"
+"# Usage\n"
+"result = safe_transfer(client, 12345, Asset.USDT, 10.0, "
+"\"unique_spend_id\")\n"
+msgstr ""
+
+#: ../../troubleshooting.md:291
+msgid "Connection Issues"
+msgstr "Problemas de Conexión"
+
+#: ../../troubleshooting.md:293
+msgid "Timeout Errors"
+msgstr "Errores de Tiempo de Espera"
+
+#: ../../troubleshooting.md:295
+msgid "**Problem:** API requests are timing out."
+msgstr "**Problema:** Las solicitudes a la API están agotando el tiempo de espera."
+
+#: ../../troubleshooting.md:299
+msgid ""
+"from cryptobot import CryptoBotClient\n"
+"import httpx\n"
+"\n"
+"# Increase timeout\n"
+"client = CryptoBotClient(\"YOUR_API_TOKEN\", timeout=60.0)\n"
+"\n"
+"# Or handle timeouts gracefully\n"
+"try:\n"
+"    invoice = client.create_invoice(\n"
+"        asset=Asset.USDT,\n"
+"        amount=10.0,\n"
+"        description=\"Test\"\n"
+"    )\n"
+"except httpx.TimeoutException:\n"
+"    print(\"Request timed out, please try again\")\n"
+msgstr ""
+"from cryptobot import CryptoBotClient\n"
+"import httpx\n"
+"\n"
+"# Increase timeout\n"
+"client = CryptoBotClient(\"YOUR_API_TOKEN\", timeout=60.0)\n"
+"\n"
+"# Or handle timeouts gracefully\n"
+"try:\n"
+"    invoice = client.create_invoice(\n"
+"        asset=Asset.USDT,\n"
+"        amount=10.0,\n"
+"        description=\"Test\"\n"
+"    )\n"
+"except httpx.TimeoutException:\n"
+"    print(\"Request timed out, please try again\")\n"
+
+#: ../../troubleshooting.md:317
+msgid "Connection Errors"
+msgstr "Errores de Conexión"
+
+#: ../../troubleshooting.md:319
+msgid "**Problem:** Can't connect to the API."
+msgstr "**Problema:** No se puede conectar a la API."
+
+#: ../../troubleshooting.md:323
+#, python-brace-format
+msgid ""
+"import httpx\n"
+"from cryptobot.errors import CryptoBotError\n"
+"\n"
+"def create_invoice_with_retry(client, max_retries=3, **kwargs):\n"
+"    \"\"\"Create invoice with retry logic\"\"\"\n"
+"    for attempt in range(max_retries):\n"
+"        try:\n"
+"            return client.create_invoice(**kwargs)\n"
+"        except httpx.ConnectError as e:\n"
+"            if attempt < max_retries - 1:\n"
+"                print(f\"Connection failed, retrying... ({attempt + "
+"1}/{max_retries})\")\n"
+"                time.sleep(2 ** attempt)  # Exponential backoff\n"
+"            else:\n"
+"                raise Exception(\"Failed to connect after multiple "
+"attempts\")\n"
+"\n"
+"# Usage\n"
+"invoice = create_invoice_with_retry(\n"
+"    client,\n"
+"    asset=Asset.USDT,\n"
+"    amount=10.0,\n"
+"    description=\"Resilient invoice\"\n"
+")\n"
+msgstr ""
+
+#: ../../troubleshooting.md:348
+msgid "Webhook Issues"
+msgstr ""
+
+#: ../../troubleshooting.md:350
+msgid "Signature Verification Fails"
+msgstr ""
+
+#: ../../troubleshooting.md:352
+msgid "**Problem:** Webhook signature verification always fails."
+msgstr ""
+
+#: ../../troubleshooting.md:356
+#, python-brace-format
+msgid ""
+"import hmac\n"
+"import hashlib\n"
+"\n"
+"def debug_webhook_signature(body: bytes, signature: str, secret: str):\n"
+"    \"\"\"Debug webhook signature verification\"\"\"\n"
+"    # Calculate expected signature\n"
+"    expected = hmac.new(\n"
+"        secret.encode(),\n"
+"        body,\n"
+"        hashlib.sha256\n"
+"    ).hexdigest()\n"
+"\n"
+"    print(f\"Received signature: {signature}\")\n"
+"    print(f\"Expected signature: {expected}\")\n"
+"    print(f\"Match: {hmac.compare_digest(signature, expected)}\")\n"
+"\n"
+"    # Check common issues\n"
+"    if not signature:\n"
+"        print(\"ERROR: No signature in headers\")\n"
+"    elif len(signature) != 64:\n"
+"        print(\"ERROR: Signature has wrong length\")\n"
+"    elif not secret:\n"
+"        print(\"ERROR: Webhook secret not configured\")\n"
+"\n"
+"    return hmac.compare_digest(signature, expected)\n"
+msgstr ""
+
+#: ../../troubleshooting.md:384
+msgid "Webhooks Not Received"
+msgstr ""
+
+#: ../../troubleshooting.md:386
+msgid "**Problem:** Webhook endpoint not receiving notifications."
+msgstr ""
+
+#: ../../troubleshooting.md:388
+msgid "**Checklist:**"
+msgstr ""
+
+#: ../../troubleshooting.md:390
+msgid "**Verify webhook URL is publicly accessible:**"
+msgstr ""
+
+#: ../../troubleshooting.md:391
+msgid "curl https://your-domain.com/webhook\n"
+msgstr ""
+
+#: ../../troubleshooting.md:395
+msgid "**Check webhook is configured in CryptoBot:**"
+msgstr ""
+
+#: ../../troubleshooting.md:396
+msgid "Go to @CryptoBot in Telegram"
+msgstr ""
+
+#: ../../troubleshooting.md:397
+msgid "Configure webhook URL"
+msgstr ""
+
+#: ../../troubleshooting.md:398
+msgid "Verify HTTPS is used (required)"
+msgstr ""
+
+#: ../../troubleshooting.md:400
+msgid "**Test webhook locally with ngrok:**"
+msgstr ""
+
+#: ../../troubleshooting.md:401
+msgid ""
+"# Install ngrok\n"
+"# Run your app\n"
+"uvicorn cryptobot.webhook:app --port 8000\n"
+"\n"
+"# In another terminal\n"
+"ngrok http 8000\n"
+"# Use the ngrok HTTPS URL as your webhook URL\n"
+msgstr ""
+
+#: ../../troubleshooting.md:411
+msgid "**Check server logs:**"
+msgstr ""
+
+#: ../../troubleshooting.md:412
+#, python-brace-format
+msgid ""
+"import logging\n"
+"\n"
+"logging.basicConfig(level=logging.DEBUG)\n"
+"\n"
+"@app.post(\"/webhook\")\n"
+"async def webhook_handler(request: Request):\n"
+"    logging.info(f\"Received webhook: {request.headers}\")\n"
+"    # ... rest of handler\n"
+msgstr ""
+
+#: ../../troubleshooting.md:423
+msgid "Data Parsing Issues"
+msgstr ""
+
+#: ../../troubleshooting.md:425
+msgid "Enum Value Errors"
+msgstr ""
+
+#: ../../troubleshooting.md:427
+msgid "**Problem:** Can't parse asset or status from string."
+msgstr ""
+
+#: ../../troubleshooting.md:431
+#, python-brace-format
+msgid ""
+"from cryptobot.models import Asset, Status\n"
+"\n"
+"def parse_asset_safely(asset_string):\n"
+"    \"\"\"Parse asset string to enum\"\"\"\n"
+"    try:\n"
+"        return Asset[asset_string.upper()]\n"
+"    except KeyError:\n"
+"        # Handle unknown asset\n"
+"        print(f\"Unknown asset: {asset_string}\")\n"
+"        return None\n"
+"\n"
+"def parse_status_safely(status_string):\n"
+"    \"\"\"Parse status string to enum\"\"\"\n"
+"    try:\n"
+"        return Status[status_string.lower()]\n"
+"    except KeyError:\n"
+"        print(f\"Unknown status: {status_string}\")\n"
+"        return None\n"
+"\n"
+"# Usage\n"
+"asset_str = \"usdt\"\n"
+"asset = parse_asset_safely(asset_str)\n"
+"\n"
+"if asset:\n"
+"    invoice = client.create_invoice(\n"
+"        asset=asset,\n"
+"        amount=10.0,\n"
+"        description=\"Test\"\n"
+"    )\n"
+msgstr ""
+
+#: ../../troubleshooting.md:463
+msgid "Decimal Precision Issues"
+msgstr ""
+
+#: ../../troubleshooting.md:465
+msgid "**Problem:** Floating point precision errors with amounts."
+msgstr ""
+
+#: ../../troubleshooting.md:469
+#, python-brace-format
+msgid ""
+"from decimal import Decimal\n"
+"\n"
+"# Use Decimal for precise calculations\n"
+"amount = Decimal(\"10.123456789\")\n"
+"\n"
+"# Convert to string for API\n"
+"invoice = client.create_invoice(\n"
+"    asset=Asset.USDT,\n"
+"    amount=float(amount),  # API accepts float\n"
+"    description=\"Precise amount\"\n"
+")\n"
+"\n"
+"# Parse amounts from API as Decimal\n"
+"if invoice.status == Status.paid:\n"
+"    paid_amount = Decimal(invoice.paid_amount)\n"
+"    print(f\"Received: {paid_amount}\")\n"
+msgstr ""
+
+#: ../../troubleshooting.md:488
+msgid "Rate Limiting"
+msgstr ""
+
+#: ../../troubleshooting.md:490
+msgid "Too Many Requests"
+msgstr ""
+
+#: ../../troubleshooting.md:492
+msgid "**Problem:** Getting rate limit errors."
+msgstr ""
+
+#: ../../troubleshooting.md:494
+msgid "CryptoBotError: code=429, name=\"TOO_MANY_REQUESTS\"\n"
+msgstr ""
+
+#: ../../troubleshooting.md:500
+#, python-brace-format
+msgid ""
+"import time\n"
+"from cryptobot.errors import CryptoBotError\n"
+"\n"
+"def api_call_with_rate_limit(func, *args, **kwargs):\n"
+"    \"\"\"Execute API call with rate limit handling\"\"\"\n"
+"    max_retries = 3\n"
+"    base_delay = 1\n"
+"\n"
+"    for attempt in range(max_retries):\n"
+"        try:\n"
+"            return func(*args, **kwargs)\n"
+"        except CryptoBotError as e:\n"
+"            if e.code == 429:  # Rate limit\n"
+"                if attempt < max_retries - 1:\n"
+"                    delay = base_delay * (2 ** attempt)\n"
+"                    print(f\"Rate limited, waiting {delay} seconds...\")\n"
+"                    time.sleep(delay)\n"
+"                else:\n"
+"                    raise\n"
+"            else:\n"
+"                raise\n"
+"\n"
+"# Usage\n"
+"invoice = api_call_with_rate_limit(\n"
+"    client.create_invoice,\n"
+"    asset=Asset.USDT,\n"
+"    amount=10.0,\n"
+"    description=\"Test\"\n"
+")\n"
+msgstr ""
+
+#: ../../troubleshooting.md:532
+msgid "Testing Issues"
+msgstr ""
+
+#: ../../troubleshooting.md:534
+msgid "Testing with Testnet"
+msgstr ""
+
+#: ../../troubleshooting.md:536
+msgid "**Problem:** Need to test without using real money."
+msgstr ""
+
+#: ../../troubleshooting.md:540
+msgid ""
+"import os\n"
+"from cryptobot import CryptoBotClient\n"
+"from cryptobot.models import Asset\n"
+"\n"
+"# Use environment variable to switch environments\n"
+"is_production = os.getenv(\"ENV\") == \"production\"\n"
+"\n"
+"if is_production:\n"
+"    client = CryptoBotClient(\n"
+"        os.getenv(\"CRYPTOBOT_MAINNET_TOKEN\"),\n"
+"        is_mainnet=True\n"
+"    )\n"
+"else:\n"
+"    # Use testnet for development\n"
+"    client = CryptoBotClient(\n"
+"        os.getenv(\"CRYPTOBOT_TESTNET_TOKEN\"),\n"
+"        is_mainnet=False\n"
+"    )\n"
+"\n"
+"# Your code works the same way\n"
+"invoice = client.create_invoice(\n"
+"    asset=Asset.USDT,\n"
+"    amount=10.0,\n"
+"    description=\"Test invoice\"\n"
+")\n"
+msgstr ""
+
+#: ../../troubleshooting.md:568
+msgid "Mocking for Unit Tests"
+msgstr ""
+
+#: ../../troubleshooting.md:570
+msgid "**Problem:** Want to run tests without API calls."
+msgstr ""
+
+#: ../../troubleshooting.md:574
+msgid ""
+"from unittest.mock import Mock, patch\n"
+"from cryptobot.models import Invoice, Asset, Status\n"
+"\n"
+"def test_invoice_processing():\n"
+"    \"\"\"Test invoice processing without API calls\"\"\"\n"
+"    # Create mock client\n"
+"    mock_client = Mock()\n"
+"\n"
+"    # Configure mock response\n"
+"    mock_invoice = Invoice(\n"
+"        invoice_id=12345,\n"
+"        status=Status.paid,\n"
+"        hash=\"test_hash\",\n"
+"        amount=\"10.0\",\n"
+"        asset=Asset.USDT,\n"
+"        bot_invoice_url=\"https://t.me/test\"\n"
+"    )\n"
+"    mock_client.create_invoice.return_value = mock_invoice\n"
+"\n"
+"    # Your code using the mock\n"
+"    invoice = mock_client.create_invoice(\n"
+"        asset=Asset.USDT,\n"
+"        amount=10.0,\n"
+"        description=\"Test\"\n"
+"    )\n"
+"\n"
+"    assert invoice.invoice_id == 12345\n"
+"    assert invoice.status == Status.paid\n"
+msgstr ""
+
+#: ../../troubleshooting.md:605
+msgid "Debugging Tips"
+msgstr ""
+
+#: ../../troubleshooting.md:607
+msgid "Enable Debug Logging"
+msgstr ""
+
+#: ../../troubleshooting.md:609
+msgid ""
+"import logging\n"
+"import httpx\n"
+"\n"
+"# Enable debug logging\n"
+"logging.basicConfig(level=logging.DEBUG)\n"
+"\n"
+"# Enable httpx debug logs\n"
+"httpx_logger = logging.getLogger(\"httpx\")\n"
+"httpx_logger.setLevel(logging.DEBUG)\n"
+"\n"
+"# Now all API calls will be logged\n"
+"client = CryptoBotClient(\"YOUR_API_TOKEN\")\n"
+"invoice = client.create_invoice(asset=Asset.USDT, amount=10.0, "
+"description=\"Debug\")\n"
+msgstr ""
+
+#: ../../troubleshooting.md:625
+msgid "Inspect API Responses"
+msgstr ""
+
+#: ../../troubleshooting.md:627
+#, python-brace-format
+msgid ""
+"import httpx\n"
+"from cryptobot import CryptoBotClient\n"
+"\n"
+"class DebugCryptoBotClient(CryptoBotClient):\n"
+"    \"\"\"Client with response debugging\"\"\"\n"
+"\n"
+"    def create_invoice(self, **kwargs):\n"
+"        \"\"\"Create invoice with response logging\"\"\"\n"
+"        print(f\"Request: {kwargs}\")\n"
+"\n"
+"        try:\n"
+"            invoice = super().create_invoice(**kwargs)\n"
+"            print(f\"Response: {invoice}\")\n"
+"            return invoice\n"
+"        except Exception as e:\n"
+"            print(f\"Error: {e}\")\n"
+"            raise\n"
+"\n"
+"# Usage\n"
+"debug_client = DebugCryptoBotClient(\"YOUR_API_TOKEN\")\n"
+"invoice = debug_client.create_invoice(\n"
+"    asset=Asset.USDT,\n"
+"    amount=10.0,\n"
+"    description=\"Debug invoice\"\n"
+")\n"
+msgstr ""
+
+#: ../../troubleshooting.md:655
+msgid "Getting Help"
+msgstr ""
+
+#: ../../troubleshooting.md:657
+msgid "If you're still experiencing issues:"
+msgstr ""
+
+#: ../../troubleshooting.md:659
+msgid "**Check the API documentation:** https://help.crypt.bot/crypto-pay-api"
+msgstr ""
+
+#: ../../troubleshooting.md:660
+msgid "**Review the examples:** See [Examples](examples.md) for working code"
+msgstr ""
+
+#: ../../troubleshooting.md:661
+msgid ""
+"**Check GitHub issues:** "
+"https://github.com/ragnarok22/cryptobot_python/issues"
+msgstr ""
+
+#: ../../troubleshooting.md:662
+msgid "**Ask in Telegram:** Join the CryptoBot support channel"
+msgstr ""
+
+#: ../../troubleshooting.md:663
+msgid "**Enable debug logging** to see detailed error messages"
+msgstr ""
+
+#: ../../troubleshooting.md:665
+msgid "Common Error Codes"
+msgstr ""
+
+#: ../../troubleshooting.md
+msgid "Code"
+msgstr ""
+
+#: ../../troubleshooting.md
+msgid "Name"
+msgstr ""
+
+#: ../../troubleshooting.md
+msgid "Description"
+msgstr ""
+
+#: ../../troubleshooting.md
+msgid "Solution"
+msgstr ""
+
+#: ../../troubleshooting.md
+msgid "400"
+msgstr ""
+
+#: ../../troubleshooting.md
+msgid "BAD_REQUEST"
+msgstr ""
+
+#: ../../troubleshooting.md
+msgid "Invalid parameters"
+msgstr ""
+
+#: ../../troubleshooting.md
+msgid "Check parameter types and values"
+msgstr ""
+
+#: ../../troubleshooting.md
+msgid "401"
+msgstr ""
+
+#: ../../troubleshooting.md
+msgid "UNAUTHORIZED"
+msgstr ""
+
+#: ../../troubleshooting.md
+msgid "Invalid API token"
+msgstr ""
+
+#: ../../troubleshooting.md
+msgid "Verify your API token"
+msgstr ""
+
+#: ../../troubleshooting.md
+msgid "404"
+msgstr ""
+
+#: ../../troubleshooting.md
+msgid "NOT_FOUND"
+msgstr ""
+
+#: ../../troubleshooting.md
+msgid "Resource not found"
+msgstr ""
+
+#: ../../troubleshooting.md
+msgid "Check invoice/transfer IDs"
+msgstr ""
+
+#: ../../troubleshooting.md
+msgid "429"
+msgstr ""
+
+#: ../../troubleshooting.md
+msgid "TOO_MANY_REQUESTS"
+msgstr ""
+
+#: ../../troubleshooting.md
+msgid "Rate limit exceeded"
+msgstr ""
+
+#: ../../troubleshooting.md
+msgid "Implement rate limiting"
+msgstr ""
+
+#: ../../troubleshooting.md
+msgid "500"
+msgstr ""
+
+#: ../../troubleshooting.md
+msgid "INTERNAL_ERROR"
+msgstr ""
+
+#: ../../troubleshooting.md
+msgid "Server error"
+msgstr ""
+
+#: ../../troubleshooting.md
+msgid "Retry with exponential backoff"
+msgstr ""
+
+#: ../../troubleshooting.md:675
+msgid "Best Practices to Avoid Issues"
+msgstr ""
+
+#: ../../troubleshooting.md:677
+msgid "**Always handle exceptions** properly"
+msgstr ""
+
+#: ../../troubleshooting.md:678
+msgid "**Use unique spend_ids** for all transfers"
+msgstr ""
+
+#: ../../troubleshooting.md:679
+msgid "**Implement retry logic** for transient failures"
+msgstr ""
+
+#: ../../troubleshooting.md:680
+msgid "**Set appropriate timeouts** based on your use case"
+msgstr ""
+
+#: ../../troubleshooting.md:681
+msgid "**Use testnet for development** and testing"
+msgstr ""
+
+#: ../../troubleshooting.md:682
+msgid "**Validate user input** before API calls"
+msgstr ""
+
+#: ../../troubleshooting.md:683
+msgid "**Log all API interactions** for debugging"
+msgstr ""
+
+#: ../../troubleshooting.md:684
+msgid "**Monitor rate limits** and implement backoff"
+msgstr ""
+
+#: ../../troubleshooting.md:685
+msgid "**Keep your library updated** to the latest version"
+msgstr ""
+
+#: ../../troubleshooting.md:686
+msgid "**Read error messages carefully** - they usually explain the issue"
+msgstr ""
+

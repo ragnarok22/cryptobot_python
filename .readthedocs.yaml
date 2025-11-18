@@ -8,6 +8,11 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.12"
+  commands:
+    # Build gettext files and Spanish translations
+    - cd docs && python -m sphinx -b gettext . _build/gettext
+    - sphinx-intl update -p docs/_build/gettext -l es
+    - cd docs && python -m sphinx -b html -D language=en . $READTHEDOCS_OUTPUT/html/
 
 sphinx:
   configuration: docs/conf.py

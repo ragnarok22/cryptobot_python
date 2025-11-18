@@ -35,7 +35,7 @@ packages = [
 ]
 
 [tool.poetry.extras]
-docs = ["sphinx", "sphinx-rtd-theme", "myst-parser"]
+docs = ["sphinx", "sphinx-rtd-theme", "myst-parser", "sphinx-intl"]
 
 [tool.poetry.group.dev.dependencies]
 flake8 = ">=6.0.0,<7.4.0"
@@ -48,6 +48,7 @@ pre-commit = ">=3.6.2,<5.0.0"
 sphinx = ">=7.1.2,<8.0.0"
 sphinx-rtd-theme = ">=1.3.0,<4.0.0"
 myst-parser = ">=2.0.0,<4.0.0"
+sphinx-intl = ">=2.1.0,<3.0.0"
 watchdog = ">=2.2.1,<6.1.0"
 
 

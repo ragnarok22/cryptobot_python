@@ -1,0 +1,837 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2022, Reinier Hernández
+# This file is distributed under the same license as the CryptoBot Python
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: CryptoBot Python 0.1.6\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-11-18 10:28-0300\n"
+"PO-Revision-Date: 2025-11-18 10:30-0300\n"
+"Last-Translator: Claude <noreply@anthropic.com>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../usage.md:1
+msgid "Usage"
+msgstr "Uso"
+
+#: ../../usage.md:3
+msgid "Quick Start"
+msgstr "Inicio Rápido"
+
+#: ../../usage.md:5
+msgid "To use CryptoBot Python in a project, first import the client and models:"
+msgstr "Para usar CryptoBot Python en un proyecto, primero importe el cliente y los modelos:"
+
+#: ../../usage.md:7
+msgid ""
+"from cryptobot import CryptoBotClient\n"
+"from cryptobot.models import Asset\n"
+msgstr ""
+"from cryptobot import CryptoBotClient\n"
+"from cryptobot.models import Asset\n"
+
+#: ../../usage.md:12
+msgid "Create a client instance with your API token:"
+msgstr "Cree una instancia del cliente con su token de API:"
+
+#: ../../usage.md:14
+msgid "client = CryptoBotClient(\"YOUR_API_TOKEN\")\n"
+msgstr "client = CryptoBotClient(\"YOUR_API_TOKEN\")\n"
+
+#: ../../usage.md:18
+msgid "Basic Operations"
+msgstr "Operaciones Básicas"
+
+#: ../../usage.md:20
+msgid "Getting App Information"
+msgstr "Obtener Información de la Aplicación"
+
+#: ../../usage.md:22
+msgid "Get basic information about your app:"
+msgstr "Obtenga información básica sobre su aplicación:"
+
+#: ../../usage.md:24
+#, python-brace-format
+msgid ""
+"app = client.get_me()\n"
+"print(f\"App ID: {app.app_id}\")\n"
+"print(f\"App Name: {app.name}\")\n"
+"print(f\"Bot Username: {app.payment_processing_bot_username}\")\n"
+msgstr ""
+"app = client.get_me()\n"
+"print(f\"App ID: {app.app_id}\")\n"
+"print(f\"App Name: {app.name}\")\n"
+"print(f\"Bot Username: {app.payment_processing_bot_username}\")\n"
+
+#: ../../usage.md:31
+msgid "Creating an Invoice"
+msgstr "Crear una Factura"
+
+#: ../../usage.md:33
+msgid "Create a simple invoice for cryptocurrency payment:"
+msgstr "Cree una factura simple para pago en criptomoneda:"
+
+#: ../../usage.md:35
+#, python-brace-format
+msgid ""
+"invoice = client.create_invoice(\n"
+"    asset=Asset.USDT,\n"
+"    amount=5.25,\n"
+"    description=\"Coffee order #42\"\n"
+")\n"
+"\n"
+"print(f\"Invoice URL: {invoice.bot_invoice_url}\")\n"
+"print(f\"Invoice ID: {invoice.invoice_id}\")\n"
+msgstr ""
+"invoice = client.create_invoice(\n"
+"    asset=Asset.USDT,\n"
+"    amount=5.25,\n"
+"    description=\"Coffee order #42\"\n"
+")\n"
+"\n"
+"print(f\"Invoice URL: {invoice.bot_invoice_url}\")\n"
+"print(f\"Invoice ID: {invoice.invoice_id}\")\n"
+
+#: ../../usage.md:46
+msgid "Creating an Invoice with Custom Options"
+msgstr "Crear una Factura con Opciones Personalizadas"
+
+#: ../../usage.md:48
+msgid "Create an invoice with additional parameters:"
+msgstr "Cree una factura con parámetros adicionales:"
+
+#: ../../usage.md:50
+msgid ""
+"invoice = client.create_invoice(\n"
+"    asset=Asset.BTC,\n"
+"    amount=0.001,\n"
+"    description=\"Premium service subscription\",\n"
+"    paid_btn_name=\"callback\",  # Button name for paid invoice\n"
+"    paid_btn_url=\"https://example.com/success\",  # URL for success "
+"callback\n"
+"    payload=\"user_123_premium\",  # Custom payload for tracking\n"
+"    allow_comments=True,  # Allow user comments\n"
+"    allow_anonymous=False,  # Require user identification\n"
+"    expires_in=3600  # Expire after 1 hour\n"
+")\n"
+msgstr ""
+"invoice = client.create_invoice(\n"
+"    asset=Asset.BTC,\n"
+"    amount=0.001,\n"
+"    description=\"Premium service subscription\",\n"
+"    paid_btn_name=\"callback\",  # Nombre del botón para factura pagada\n"
+"    paid_btn_url=\"https://example.com/success\",  # URL para callback de éxito\n"
+"    payload=\"user_123_premium\",  # Payload personalizado para seguimiento\n"
+"    allow_comments=True,  # Permitir comentarios del usuario\n"
+"    allow_anonymous=False,  # Requerir identificación del usuario\n"
+"    expires_in=3600  # Expirar después de 1 hora\n"
+")\n"
+
+#: ../../usage.md:64
+msgid "Making Transfers"
+msgstr "Realizar Transferencias"
+
+#: ../../usage.md:66
+msgid "Transfer cryptocurrency to another user:"
+msgstr "Transfiera criptomoneda a otro usuario:"
+
+#: ../../usage.md:68
+#, python-brace-format
+msgid ""
+"try:\n"
+"    transfer = client.transfer(\n"
+"        user_id=12345,\n"
+"        asset=Asset.TON,\n"
+"        amount=0.5,\n"
+"        spend_id=\"transfer_001\",  # Unique spend ID to prevent "
+"duplicates\n"
+"        comment=\"Payment for services\"\n"
+"    )\n"
+"    print(f\"Transfer completed: {transfer.transfer_id}\")\n"
+"except CryptoBotError as e:\n"
+"    print(f\"Transfer failed: {e.name} - {e.description}\")\n"
+msgstr ""
+"try:\n"
+"    transfer = client.transfer(\n"
+"        user_id=12345,\n"
+"        asset=Asset.TON,\n"
+"        amount=0.5,\n"
+"        spend_id=\"transfer_001\",  # ID único de gasto para prevenir duplicados\n"
+"        comment=\"Payment for services\"\n"
+"    )\n"
+"    print(f\"Transfer completed: {transfer.transfer_id}\")\n"
+"except CryptoBotError as e:\n"
+"    print(f\"Transfer failed: {e.name} - {e.description}\")\n"
+
+#: ../../usage.md:82
+msgid "Checking Balances"
+msgstr "Consultar Saldos"
+
+#: ../../usage.md:84
+msgid "Get your current balances:"
+msgstr "Obtenga sus saldos actuales:"
+
+#: ../../usage.md:86
+#, python-brace-format
+msgid ""
+"balances = client.get_balances()\n"
+"for balance in balances:\n"
+"    print(f\"{balance.currency_code}: {balance.available}\")\n"
+msgstr ""
+"balances = client.get_balances()\n"
+"for balance in balances:\n"
+"    print(f\"{balance.currency_code}: {balance.available}\")\n"
+
+#: ../../usage.md:92
+msgid "Getting Exchange Rates"
+msgstr "Obtener Tasas de Cambio"
+
+#: ../../usage.md:94
+msgid "Retrieve current exchange rates:"
+msgstr "Obtenga las tasas de cambio actuales:"
+
+#: ../../usage.md:96
+#, python-brace-format
+msgid ""
+"rates = client.get_exchange_rates()\n"
+"for rate in rates:\n"
+"    print(f\"1 {rate.source} = {rate.rate} {rate.target}\")\n"
+msgstr ""
+"rates = client.get_exchange_rates()\n"
+"for rate in rates:\n"
+"    print(f\"1 {rate.source} = {rate.rate} {rate.target}\")\n"
+
+#: ../../usage.md:102
+msgid "You can also filter for specific currencies:"
+msgstr "También puede filtrar por monedas específicas:"
+
+#: ../../usage.md:104
+#, python-brace-format
+msgid ""
+"# Find USD exchange rate for Bitcoin\n"
+"btc_usd_rate = next((r for r in rates if r.source.name == \"BTC\" and "
+"r.target == \"USD\"), None)\n"
+"if btc_usd_rate:\n"
+"    print(f\"1 BTC = ${btc_usd_rate.rate} USD\")\n"
+msgstr ""
+"# Encontrar la tasa de cambio USD para Bitcoin\n"
+"btc_usd_rate = next((r for r in rates if r.source.name == \"BTC\" and "
+"r.target == \"USD\"), None)\n"
+"if btc_usd_rate:\n"
+"    print(f\"1 BTC = ${btc_usd_rate.rate} USD\")\n"
+
+#: ../../usage.md:111
+msgid "Getting Supported Currencies"
+msgstr "Obtener Monedas Soportadas"
+
+#: ../../usage.md:113
+msgid "Get information about all supported currencies:"
+msgstr "Obtenga información sobre todas las monedas soportadas:"
+
+#: ../../usage.md:115
+#, python-brace-format
+msgid ""
+"currencies = client.get_currencies()\n"
+"for currency in currencies:\n"
+"    print(f\"{currency.name} ({currency.code})\")\n"
+"    print(f\"  Blockchain: {currency.is_blockchain}\")\n"
+"    print(f\"  Stablecoin: {currency.is_stablecoin}\")\n"
+"    print(f\"  Decimals: {currency.decimals}\")\n"
+"    if currency.url:\n"
+"        print(f\"  URL: {currency.url}\")\n"
+msgstr ""
+"currencies = client.get_currencies()\n"
+"for currency in currencies:\n"
+"    print(f\"{currency.name} ({currency.code})\")\n"
+"    print(f\"  Blockchain: {currency.is_blockchain}\")\n"
+"    print(f\"  Stablecoin: {currency.is_stablecoin}\")\n"
+"    print(f\"  Decimals: {currency.decimals}\")\n"
+"    if currency.url:\n"
+"        print(f\"  URL: {currency.url}\")\n"
+
+#: ../../usage.md:126
+msgid "Filter by type:"
+msgstr "Filtrar por tipo:"
+
+#: ../../usage.md:128
+msgid ""
+"# Get only blockchain currencies\n"
+"blockchain_currencies = [c for c in currencies if c.is_blockchain]\n"
+"\n"
+"# Get only stablecoins\n"
+"stablecoins = [c for c in currencies if c.is_stablecoin]\n"
+"\n"
+"# Get only fiat currencies\n"
+"fiat_currencies = [c for c in currencies if c.is_fiat]\n"
+msgstr ""
+"# Obtener solo monedas blockchain\n"
+"blockchain_currencies = [c for c in currencies if c.is_blockchain]\n"
+"\n"
+"# Obtener solo stablecoins\n"
+"stablecoins = [c for c in currencies if c.is_stablecoin]\n"
+"\n"
+"# Obtener solo monedas fiat\n"
+"fiat_currencies = [c for c in currencies if c.is_fiat]\n"
+
+#: ../../usage.md:139
+msgid "Getting Invoice Information"
+msgstr "Obtener Información de Facturas"
+
+#: ../../usage.md:141
+msgid "Retrieve information about existing invoices:"
+msgstr "Obtenga información sobre facturas existentes:"
+
+#: ../../usage.md:143
+msgid ""
+"# Get all invoices\n"
+"invoices = client.get_invoices()\n"
+"\n"
+"# Get invoices with filters\n"
+"paid_invoices = client.get_invoices(\n"
+"    asset=Asset.USDT,\n"
+"    invoice_ids=[\"INV123\", \"INV456\"],\n"
+"    status=\"paid\",\n"
+"    offset=0,\n"
+"    count=50\n"
+")\n"
+msgstr ""
+"# Obtener todas las facturas\n"
+"invoices = client.get_invoices()\n"
+"\n"
+"# Obtener facturas con filtros\n"
+"paid_invoices = client.get_invoices(\n"
+"    asset=Asset.USDT,\n"
+"    invoice_ids=[\"INV123\", \"INV456\"],\n"
+"    status=\"paid\",\n"
+"    offset=0,\n"
+"    count=50\n"
+")\n"
+
+#: ../../usage.md:157
+msgid "Environment Configuration"
+msgstr "Configuración del Entorno"
+
+#: ../../usage.md:159
+msgid "Testnet vs Mainnet"
+msgstr "Testnet vs Mainnet"
+
+#: ../../usage.md:161
+msgid "By default, the client uses the mainnet environment. To use testnet:"
+msgstr "Por defecto, el cliente usa el entorno mainnet. Para usar testnet:"
+
+#: ../../usage.md:163
+msgid "client = CryptoBotClient(\"YOUR_TESTNET_TOKEN\", testnet=True)\n"
+msgstr "client = CryptoBotClient(\"YOUR_TESTNET_TOKEN\", testnet=True)\n"
+
+#: ../../usage.md:167
+msgid "Custom Timeout"
+msgstr "Timeout Personalizado"
+
+#: ../../usage.md:169
+msgid "Configure request timeout (default is 30 seconds):"
+msgstr "Configure el timeout de solicitudes (por defecto son 30 segundos):"
+
+#: ../../usage.md:171
+msgid "client = CryptoBotClient(\"YOUR_API_TOKEN\", timeout=60)\n"
+msgstr "client = CryptoBotClient(\"YOUR_API_TOKEN\", timeout=60)\n"
+
+#: ../../usage.md:175
+msgid "Error Handling"
+msgstr "Manejo de Errores"
+
+#: ../../usage.md:177
+#, python-brace-format
+msgid "All API errors raise {class}`cryptobot.errors.CryptoBotError`:"
+msgstr "Todos los errores de la API lanzan {class}`cryptobot.errors.CryptoBotError`:"
+
+#: ../../usage.md:179
+#, python-brace-format
+msgid ""
+"from cryptobot.errors import CryptoBotError\n"
+"\n"
+"try:\n"
+"    client.transfer(user_id=12345, asset=Asset.BTC, amount=10, "
+"spend_id=\"test\")\n"
+"except CryptoBotError as exc:\n"
+"    print(f\"Error code: {exc.code}\")\n"
+"    print(f\"Error name: {exc.name}\")\n"
+"    print(f\"Description: {exc.description}\")\n"
+msgstr ""
+"from cryptobot.errors import CryptoBotError\n"
+"\n"
+"try:\n"
+"    client.transfer(user_id=12345, asset=Asset.BTC, amount=10, "
+"spend_id=\"test\")\n"
+"except CryptoBotError as exc:\n"
+"    print(f\"Error code: {exc.code}\")\n"
+"    print(f\"Error name: {exc.name}\")\n"
+"    print(f\"Description: {exc.description}\")\n"
+
+#: ../../usage.md:190
+msgid "Webhook Integration"
+msgstr "Integración de Webhook"
+
+#: ../../usage.md:192
+msgid "Using the Built-in Webhook Server"
+msgstr "Usar el Servidor Webhook Integrado"
+
+#: ../../usage.md:194
+msgid ""
+"CryptoBot Python includes a FastAPI-based webhook server for handling "
+"payment notifications:"
+msgstr ""
+"CryptoBot Python incluye un servidor webhook basado en FastAPI para manejar "
+"notificaciones de pago:"
+
+#: ../../usage.md:196
+msgid ""
+"from cryptobot.webhook import app\n"
+"import uvicorn\n"
+"\n"
+"# Run the webhook server\n"
+"uvicorn.run(app, host=\"0.0.0.0\", port=8000)\n"
+msgstr ""
+"from cryptobot.webhook import app\n"
+"import uvicorn\n"
+"\n"
+"# Ejecutar el servidor webhook\n"
+"uvicorn.run(app, host=\"0.0.0.0\", port=8000)\n"
+
+#: ../../usage.md:204
+msgid ""
+"The webhook server automatically handles signature verification and "
+"provides a colorful startup banner."
+msgstr ""
+"El servidor webhook maneja automáticamente la verificación de firma y "
+"proporciona un banner de inicio colorido."
+
+#: ../../usage.md:206
+msgid "Custom Webhook Handler"
+msgstr "Manejador de Webhook Personalizado"
+
+#: ../../usage.md:208
+msgid "You can also create your own webhook handler:"
+msgstr "También puede crear su propio manejador de webhook:"
+
+#: ../../usage.md:210
+#, python-brace-format
+msgid ""
+"from fastapi import FastAPI, Request, HTTPException\n"
+"import hmac\n"
+"import hashlib\n"
+"\n"
+"app = FastAPI()\n"
+"\n"
+"@app.post(\"/webhook\")\n"
+"async def webhook_handler(request: Request):\n"
+"    # Get the signature from headers\n"
+"    signature = request.headers.get(\"crypto-pay-api-signature\")\n"
+"\n"
+"    # Read the request body\n"
+"    body = await request.body()\n"
+"\n"
+"    # Verify signature (replace with your webhook secret)\n"
+"    secret_key = \"YOUR_WEBHOOK_SECRET\"\n"
+"    expected_signature = hmac.new(\n"
+"        secret_key.encode(), body, hashlib.sha256\n"
+"    ).hexdigest()\n"
+"\n"
+"    if not hmac.compare_digest(signature, expected_signature):\n"
+"        raise HTTPException(status_code=401, detail=\"Invalid "
+"signature\")\n"
+"\n"
+"    # Process the webhook data\n"
+"    # ...\n"
+"\n"
+"    return {\"status\": \"ok\"}\n"
+msgstr ""
+"from fastapi import FastAPI, Request, HTTPException\n"
+"import hmac\n"
+"import hashlib\n"
+"\n"
+"app = FastAPI()\n"
+"\n"
+"@app.post(\"/webhook\")\n"
+"async def webhook_handler(request: Request):\n"
+"    # Obtener la firma de los encabezados\n"
+"    signature = request.headers.get(\"crypto-pay-api-signature\")\n"
+"\n"
+"    # Leer el cuerpo de la solicitud\n"
+"    body = await request.body()\n"
+"\n"
+"    # Verificar firma (reemplazar con su secreto de webhook)\n"
+"    secret_key = \"YOUR_WEBHOOK_SECRET\"\n"
+"    expected_signature = hmac.new(\n"
+"        secret_key.encode(), body, hashlib.sha256\n"
+"    ).hexdigest()\n"
+"\n"
+"    if not hmac.compare_digest(signature, expected_signature):\n"
+"        raise HTTPException(status_code=401, detail=\"Invalid "
+"signature\")\n"
+"\n"
+"    # Procesar los datos del webhook\n"
+"    # ...\n"
+"\n"
+"    return {\"status\": \"ok\"}\n"
+
+#: ../../usage.md:240
+msgid "Available Assets"
+msgstr "Activos Disponibles"
+
+#: ../../usage.md:242
+msgid "The library supports the following cryptocurrencies:"
+msgstr "La biblioteca soporta las siguientes criptomonedas:"
+
+#: ../../usage.md:244
+msgid ""
+"from cryptobot.models import Asset\n"
+"\n"
+"# Available assets\n"
+"Asset.BTC     # Bitcoin\n"
+"Asset.TON     # Toncoin\n"
+"Asset.ETH     # Ethereum\n"
+"Asset.USDT    # Tether\n"
+"Asset.USDC    # USD Coin\n"
+"Asset.BNB     # Binance Coin\n"
+msgstr ""
+"from cryptobot.models import Asset\n"
+"\n"
+"# Activos disponibles\n"
+"Asset.BTC     # Bitcoin\n"
+"Asset.TON     # Toncoin\n"
+"Asset.ETH     # Ethereum\n"
+"Asset.USDT    # Tether\n"
+"Asset.USDC    # USD Coin\n"
+"Asset.BNB     # Binance Coin\n"
+
+#: ../../usage.md:256
+msgid "Advanced Patterns"
+msgstr "Patrones Avanzados"
+
+#: ../../usage.md:258
+msgid "Pagination with get_invoices"
+msgstr "Paginación con get_invoices"
+
+#: ../../usage.md:260
+msgid ""
+"When dealing with many invoices, use pagination to retrieve them in "
+"batches:"
+msgstr ""
+"Cuando trabaje con muchas facturas, use paginación para obtenerlas en "
+"lotes:"
+
+#: ../../usage.md:262
+#, python-brace-format
+msgid ""
+"def get_all_paid_invoices(client, asset=None):\n"
+"    \"\"\"Retrieve all paid invoices using pagination\"\"\"\n"
+"    all_invoices = []\n"
+"    offset = 0\n"
+"    batch_size = 100\n"
+"\n"
+"    while True:\n"
+"        batch = client.get_invoices(\n"
+"            asset=asset,\n"
+"            status=Status.paid,\n"
+"            offset=offset,\n"
+"            count=batch_size\n"
+"        )\n"
+"\n"
+"        if not batch:\n"
+"            break\n"
+"\n"
+"        all_invoices.extend(batch)\n"
+"        offset += batch_size\n"
+"\n"
+"        # If we got fewer than batch_size, we're done\n"
+"        if len(batch) < batch_size:\n"
+"            break\n"
+"\n"
+"    return all_invoices\n"
+"\n"
+"# Usage\n"
+"paid_invoices = get_all_paid_invoices(client, asset=Asset.USDT)\n"
+"print(f\"Total paid invoices: {len(paid_invoices)}\")\n"
+msgstr ""
+"def get_all_paid_invoices(client, asset=None):\n"
+"    \"\"\"Obtener todas las facturas pagadas usando paginación\"\"\"\n"
+"    all_invoices = []\n"
+"    offset = 0\n"
+"    batch_size = 100\n"
+"\n"
+"    while True:\n"
+"        batch = client.get_invoices(\n"
+"            asset=asset,\n"
+"            status=Status.paid,\n"
+"            offset=offset,\n"
+"            count=batch_size\n"
+"        )\n"
+"\n"
+"        if not batch:\n"
+"            break\n"
+"\n"
+"        all_invoices.extend(batch)\n"
+"        offset += batch_size\n"
+"\n"
+"        # Si obtuvimos menos de batch_size, hemos terminado\n"
+"        if len(batch) < batch_size:\n"
+"            break\n"
+"\n"
+"    return all_invoices\n"
+"\n"
+"# Uso\n"
+"paid_invoices = get_all_paid_invoices(client, asset=Asset.USDT)\n"
+"print(f\"Total paid invoices: {len(paid_invoices)}\")\n"
+
+#: ../../usage.md:294
+msgid "Invoice Status Checking"
+msgstr "Verificación de Estado de Factura"
+
+#: ../../usage.md:296
+msgid "Create a helper function to check invoice status:"
+msgstr "Cree una función auxiliar para verificar el estado de la factura:"
+
+#: ../../usage.md:298
+#, python-brace-format
+msgid ""
+"def wait_for_payment(client, invoice_id, max_attempts=60, delay=5):\n"
+"    \"\"\"Poll invoice status until paid or timeout\"\"\"\n"
+"    import time\n"
+"\n"
+"    for attempt in range(max_attempts):\n"
+"        invoices = client.get_invoices(invoice_ids=str(invoice_id))\n"
+"        if invoices and invoices[0].status == Status.paid:\n"
+"            return invoices[0]\n"
+"\n"
+"        if invoices and invoices[0].status == Status.expired:\n"
+"            raise Exception(\"Invoice expired\")\n"
+"\n"
+"        time.sleep(delay)\n"
+"\n"
+"    raise TimeoutError(\"Payment timeout\")\n"
+"\n"
+"# Usage\n"
+"invoice = client.create_invoice(asset=Asset.USDT, amount=10)\n"
+"print(f\"Waiting for payment: {invoice.bot_invoice_url}\")\n"
+"\n"
+"try:\n"
+"    paid_invoice = wait_for_payment(client, invoice.invoice_id)\n"
+"    print(f\"Payment received! Amount: {paid_invoice.paid_amount}\")\n"
+"except Exception as e:\n"
+"    print(f\"Payment failed: {e}\")\n"
+msgstr ""
+"def wait_for_payment(client, invoice_id, max_attempts=60, delay=5):\n"
+"    \"\"\"Consultar el estado de la factura hasta que se pague o expire el tiempo\"\"\"\n"
+"    import time\n"
+"\n"
+"    for attempt in range(max_attempts):\n"
+"        invoices = client.get_invoices(invoice_ids=str(invoice_id))\n"
+"        if invoices and invoices[0].status == Status.paid:\n"
+"            return invoices[0]\n"
+"\n"
+"        if invoices and invoices[0].status == Status.expired:\n"
+"            raise Exception(\"Invoice expired\")\n"
+"\n"
+"        time.sleep(delay)\n"
+"\n"
+"    raise TimeoutError(\"Payment timeout\")\n"
+"\n"
+"# Uso\n"
+"invoice = client.create_invoice(asset=Asset.USDT, amount=10)\n"
+"print(f\"Waiting for payment: {invoice.bot_invoice_url}\")\n"
+"\n"
+"try:\n"
+"    paid_invoice = wait_for_payment(client, invoice.invoice_id)\n"
+"    print(f\"Payment received! Amount: {paid_invoice.paid_amount}\")\n"
+"except Exception as e:\n"
+"    print(f\"Payment failed: {e}\")\n"
+
+#: ../../usage.md:326
+msgid "Calculating Total Revenue"
+msgstr "Calcular Ingresos Totales"
+
+#: ../../usage.md:328
+msgid "Calculate total revenue from paid invoices:"
+msgstr "Calcule los ingresos totales de facturas pagadas:"
+
+#: ../../usage.md:330
+#, python-brace-format
+msgid ""
+"from decimal import Decimal\n"
+"\n"
+"def calculate_revenue(client, asset=None):\n"
+"    \"\"\"Calculate total revenue from paid invoices\"\"\"\n"
+"    invoices = client.get_invoices(status=Status.paid, asset=asset)\n"
+"\n"
+"    revenue_by_asset = {}\n"
+"    for invoice in invoices:\n"
+"        asset_name = invoice.paid_asset or invoice.asset.name\n"
+"        amount = Decimal(invoice.paid_amount or invoice.amount)\n"
+"\n"
+"        if asset_name in revenue_by_asset:\n"
+"            revenue_by_asset[asset_name] += amount\n"
+"        else:\n"
+"            revenue_by_asset[asset_name] = amount\n"
+"\n"
+"    return revenue_by_asset\n"
+"\n"
+"# Usage\n"
+"revenue = calculate_revenue(client)\n"
+"for asset, total in revenue.items():\n"
+"    print(f\"{asset}: {total}\")\n"
+msgstr ""
+"from decimal import Decimal\n"
+"\n"
+"def calculate_revenue(client, asset=None):\n"
+"    \"\"\"Calcular los ingresos totales de facturas pagadas\"\"\"\n"
+"    invoices = client.get_invoices(status=Status.paid, asset=asset)\n"
+"\n"
+"    revenue_by_asset = {}\n"
+"    for invoice in invoices:\n"
+"        asset_name = invoice.paid_asset or invoice.asset.name\n"
+"        amount = Decimal(invoice.paid_amount or invoice.amount)\n"
+"\n"
+"        if asset_name in revenue_by_asset:\n"
+"            revenue_by_asset[asset_name] += amount\n"
+"        else:\n"
+"            revenue_by_asset[asset_name] = amount\n"
+"\n"
+"    return revenue_by_asset\n"
+"\n"
+"# Uso\n"
+"revenue = calculate_revenue(client)\n"
+"for asset, total in revenue.items():\n"
+"    print(f\"{asset}: {total}\")\n"
+
+#: ../../usage.md:355
+msgid "Multi-Currency Pricing"
+msgstr "Precios Multi-Moneda"
+
+#: ../../usage.md:357
+msgid "Create invoices that allow users to pay in different currencies:"
+msgstr "Cree facturas que permitan a los usuarios pagar en diferentes monedas:"
+
+#: ../../usage.md:359
+#, python-brace-format
+msgid ""
+"def create_flexible_invoice(client, amount_usd, description):\n"
+"    \"\"\"Create an invoice with multiple payment options\"\"\"\n"
+"    # Get exchange rates\n"
+"    rates = client.get_exchange_rates()\n"
+"\n"
+"    # Find cryptocurrencies and their rates\n"
+"    available_assets = [Asset.USDT, Asset.BTC, Asset.ETH, Asset.TON]\n"
+"\n"
+"    # Create invoice (USDT is 1:1 with USD for simplicity)\n"
+"    invoice = client.create_invoice(\n"
+"        asset=Asset.USDT,\n"
+"        amount=amount_usd,\n"
+"        description=description,\n"
+"        allow_comments=True,\n"
+"        expires_in=3600  # 1 hour\n"
+"    )\n"
+"\n"
+"    # Show equivalent amounts in other currencies\n"
+"    print(f\"Invoice created: {invoice.bot_invoice_url}\")\n"
+"    print(f\"\\nPayment options:\")\n"
+"    print(f\"  USDT: ${amount_usd}\")\n"
+"\n"
+"    for rate in rates:\n"
+"        if rate.target == \"USD\" and any(a.name == rate.source.name for "
+"a in available_assets):\n"
+"            crypto_amount = amount_usd / float(rate.rate)\n"
+"            print(f\"  {rate.source.name}: {crypto_amount:.8f}\")\n"
+"\n"
+"    return invoice\n"
+"\n"
+"# Usage\n"
+"invoice = create_flexible_invoice(client, 50.0, \"Premium subscription\")"
+"\n"
+msgstr ""
+"def create_flexible_invoice(client, amount_usd, description):\n"
+"    \"\"\"Crear una factura con múltiples opciones de pago\"\"\"\n"
+"    # Obtener tasas de cambio\n"
+"    rates = client.get_exchange_rates()\n"
+"\n"
+"    # Encontrar criptomonedas y sus tasas\n"
+"    available_assets = [Asset.USDT, Asset.BTC, Asset.ETH, Asset.TON]\n"
+"\n"
+"    # Crear factura (USDT es 1:1 con USD por simplicidad)\n"
+"    invoice = client.create_invoice(\n"
+"        asset=Asset.USDT,\n"
+"        amount=amount_usd,\n"
+"        description=description,\n"
+"        allow_comments=True,\n"
+"        expires_in=3600  # 1 hora\n"
+"    )\n"
+"\n"
+"    # Mostrar montos equivalentes en otras monedas\n"
+"    print(f\"Invoice created: {invoice.bot_invoice_url}\")\n"
+"    print(f\"\\nPayment options:\")\n"
+"    print(f\"  USDT: ${amount_usd}\")\n"
+"\n"
+"    for rate in rates:\n"
+"        if rate.target == \"USD\" and any(a.name == rate.source.name for "
+"a in available_assets):\n"
+"            crypto_amount = amount_usd / float(rate.rate)\n"
+"            print(f\"  {rate.source.name}: {crypto_amount:.8f}\")\n"
+"\n"
+"    return invoice\n"
+"\n"
+"# Uso\n"
+"invoice = create_flexible_invoice(client, 50.0, \"Premium subscription\")"
+"\n"
+
+#: ../../usage.md:393
+msgid "Best Practices"
+msgstr "Mejores Prácticas"
+
+#: ../../usage.md:395
+msgid "**Always handle exceptions** when making API calls"
+msgstr "**Siempre maneje las excepciones** al hacer llamadas a la API"
+
+#: ../../usage.md:396
+msgid "**Use unique spend_ids** for transfers to prevent duplicates"
+msgstr "**Use spend_ids únicos** para transferencias para prevenir duplicados"
+
+#: ../../usage.md:397
+msgid "**Validate user input** before creating invoices or transfers"
+msgstr "**Valide la entrada del usuario** antes de crear facturas o transferencias"
+
+#: ../../usage.md:398
+msgid "**Store API tokens securely** using environment variables"
+msgstr "**Almacene los tokens de API de forma segura** usando variables de entorno"
+
+#: ../../usage.md:399
+msgid "**Use testnet for development** and testing"
+msgstr "**Use testnet para desarrollo** y pruebas"
+
+#: ../../usage.md:400
+msgid "**Implement proper webhook signature verification** for security"
+msgstr "**Implemente la verificación adecuada de firma de webhook** por seguridad"
+
+#: ../../usage.md:401
+msgid "**Set appropriate invoice expiration times** to avoid stale invoices"
+msgstr "**Establezca tiempos de expiración de factura apropiados** para evitar facturas obsoletas"
+
+#: ../../usage.md:402
+msgid "**Use pagination** when retrieving large numbers of invoices"
+msgstr "**Use paginación** al obtener grandes cantidades de facturas"
+
+#: ../../usage.md:403
+msgid "**Check invoice status** before processing orders"
+msgstr "**Verifique el estado de la factura** antes de procesar pedidos"
+
+#: ../../usage.md:404
+msgid "**Log all transactions** for audit trails and debugging"
+msgstr "**Registre todas las transacciones** para auditorías y depuración"
+

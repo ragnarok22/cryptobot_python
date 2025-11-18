@@ -1,0 +1,213 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2022, Reinier Hernández
+# This file is distributed under the same license as the CryptoBot Python
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: CryptoBot Python 0.1.6\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-11-18 10:28-0300\n"
+"PO-Revision-Date: 2025-11-18 10:30-0300\n"
+"Last-Translator: Claude <noreply@anthropic.com>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../../HISTORY.md:2
+msgid "History"
+msgstr "Historial"
+
+#: ../../../HISTORY.md:4
+msgid "0.2.3 (2024-12-19)"
+msgstr ""
+
+#: ../../../HISTORY.md:6
+msgid "Build and documentation improvements"
+msgstr "Mejoras en la compilación y documentación"
+
+#: ../../../HISTORY.md:7
+msgid "Enhanced test coverage and error handling"
+msgstr "Cobertura de pruebas mejorada y manejo de errores"
+
+#: ../../../HISTORY.md:8 ../../../HISTORY.md:64
+msgid "Updated dependencies and development tools"
+msgstr "Dependencias y herramientas de desarrollo actualizadas"
+
+#: ../../../HISTORY.md:10
+msgid "0.2.2 (2024-10-15)"
+msgstr ""
+
+#: ../../../HISTORY.md:12
+msgid "Fixed swap_to parameter handling in Invoice class"
+msgstr "Corrección del manejo del parámetro swap_to en la clase Invoice"
+
+#: ../../../HISTORY.md:13
+msgid "Improved test coverage for invoice creation"
+msgstr "Cobertura de pruebas mejorada para creación de facturas"
+
+#: ../../../HISTORY.md:15
+msgid "0.2.1 (2024-10-14)"
+msgstr ""
+
+#: ../../../HISTORY.md:17
+msgid "Added swap_to parameter to create_invoice method"
+msgstr "Agregado parámetro swap_to al método create_invoice"
+
+#: ../../../HISTORY.md:18
+msgid "Enhanced invoice functionality with currency conversion support"
+msgstr "Funcionalidad de facturas mejorada con soporte de conversión de moneda"
+
+#: ../../../HISTORY.md:20
+msgid "0.2.0 (2024-09-25)"
+msgstr ""
+
+#: ../../../HISTORY.md:22
+msgid "Updated Python version support (3.9.12+ to 3.13)"
+msgstr "Soporte de versión de Python actualizado (3.9.12+ a 3.13)"
+
+#: ../../../HISTORY.md:23
+msgid "Upgraded Poetry dependency management"
+msgstr "Gestión de dependencias de Poetry actualizada"
+
+#: ../../../HISTORY.md:24
+msgid "Enhanced CI/CD pipeline with Python 3.13 support"
+msgstr "Pipeline CI/CD mejorado con soporte para Python 3.13"
+
+#: ../../../HISTORY.md:25
+msgid "Improved code formatting and linting configuration"
+msgstr "Configuración de formato de código y linting mejorada"
+
+#: ../../../HISTORY.md:26
+msgid "Updated development dependencies and tools"
+msgstr "Dependencias y herramientas de desarrollo actualizadas"
+
+#: ../../../HISTORY.md:28
+msgid "0.1.9 (2024-09-20)"
+msgstr ""
+
+#: ../../../HISTORY.md:30
+msgid "Added .DS_Store to gitignore"
+msgstr "Agregado .DS_Store a gitignore"
+
+#: ../../../HISTORY.md:31
+msgid "Updated dependencies including h11, pip, and pydantic-core"
+msgstr "Dependencias actualizadas incluyendo h11, pip y pydantic-core"
+
+#: ../../../HISTORY.md:32
+msgid "Improved package management and build process"
+msgstr "Gestión de paquetes y proceso de compilación mejorados"
+
+#: ../../../HISTORY.md:34
+msgid "0.1.8 (2024-09-10)"
+msgstr ""
+
+#: ../../../HISTORY.md:36
+msgid "Updated dependencies and improved stability"
+msgstr "Dependencias actualizadas y estabilidad mejorada"
+
+#: ../../../HISTORY.md:37
+msgid "Enhanced development tooling and configuration"
+msgstr "Herramientas de desarrollo y configuración mejoradas"
+
+#: ../../../HISTORY.md:39
+msgid "0.1.7 (2024-09-05)"
+msgstr ""
+
+#: ../../../HISTORY.md:41
+msgid "Dependency updates including twine, fastapi, and pip"
+msgstr "Actualizaciones de dependencias incluyendo twine, fastapi y pip"
+
+#: ../../../HISTORY.md:42
+msgid "Improved build and release process"
+msgstr "Proceso de compilación y lanzamiento mejorado"
+
+#: ../../../HISTORY.md:44
+msgid "0.1.6 (2024-08-30)"
+msgstr ""
+
+#: ../../../HISTORY.md:46
+msgid "Fixed build system with proper egg file removal"
+msgstr "Sistema de compilación corregido con eliminación adecuada de archivos egg"
+
+#: ../../../HISTORY.md:47
+msgid "Updated dependencies and improved development workflow"
+msgstr "Dependencias actualizadas y flujo de trabajo de desarrollo mejorado"
+
+#: ../../../HISTORY.md:49
+msgid "0.1.5 (2024-07-15)"
+msgstr ""
+
+#: ../../../HISTORY.md:51
+msgid "Hotfix for Invoice dataclass initialization"
+msgstr "Corrección rápida para inicialización del dataclass Invoice"
+
+#: ../../../HISTORY.md:52
+msgid "Dependency updates and improvements"
+msgstr "Actualizaciones de dependencias y mejoras"
+
+#: ../../../HISTORY.md:54
+msgid "0.1.4 (2024-07-10)"
+msgstr ""
+
+#: ../../../HISTORY.md:56
+msgid "Enhanced webhook functionality and error handling"
+msgstr "Funcionalidad de webhook mejorada y manejo de errores"
+
+#: ../../../HISTORY.md:57
+msgid "Improved test coverage and code quality"
+msgstr "Cobertura de pruebas y calidad de código mejoradas"
+
+#: ../../../HISTORY.md:58
+msgid "Updated documentation and development guidelines"
+msgstr "Documentación y guías de desarrollo actualizadas"
+
+#: ../../../HISTORY.md:60
+msgid "0.1.3 (2024-06-20)"
+msgstr ""
+
+#: ../../../HISTORY.md:62
+msgid "Added comprehensive test suite improvements"
+msgstr "Mejoras integrales agregadas a la suite de pruebas"
+
+#: ../../../HISTORY.md:63
+msgid "Enhanced error handling and client functionality"
+msgstr "Manejo de errores y funcionalidad del cliente mejorados"
+
+#: ../../../HISTORY.md:66
+msgid "0.1.2 (2024-05-15)"
+msgstr ""
+
+#: ../../../HISTORY.md:68
+msgid "Added support for additional cryptocurrencies"
+msgstr "Agregado soporte para criptomonedas adicionales"
+
+#: ../../../HISTORY.md:69
+msgid "Improved API client functionality"
+msgstr "Funcionalidad del cliente API mejorada"
+
+#: ../../../HISTORY.md:70
+msgid "Enhanced documentation and examples"
+msgstr "Documentación y ejemplos mejorados"
+
+#: ../../../HISTORY.md:72
+msgid "0.1.1 (2023-08-09)"
+msgstr ""
+
+#: ../../../HISTORY.md:74
+msgid "Added `BNB` and `TRX` assets."
+msgstr "Agregados activos `BNB` y `TRX`."
+
+#: ../../../HISTORY.md:76
+msgid "0.1.0 (2022-07-05)"
+msgstr "0.1.0 (2022-07-05)"
+
+#: ../../../HISTORY.md:78
+msgid "First release on PyPI."
+msgstr "Primer lanzamiento en PyPI."
+

@@ -1,0 +1,139 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2022, Reinier Hernández
+# This file is distributed under the same license as the CryptoBot Python
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: CryptoBot Python 0.1.6\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-11-18 10:28-0300\n"
+"PO-Revision-Date: 2025-11-18 10:30-0300\n"
+"Last-Translator: Claude <noreply@anthropic.com>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../index.md:34
+msgid "User Guide"
+msgstr "Guía del Usuario"
+
+#: ../../index.md:43
+msgid "Advanced Topics"
+msgstr "Temas Avanzados"
+
+#: ../../index.md:51
+msgid "API Reference"
+msgstr "Referencia de la API"
+
+#: ../../index.md:58
+msgid "Development"
+msgstr "Desarrollo"
+
+#: ../../index.md:1
+msgid "Welcome to CryptoBot Python's documentation!"
+msgstr "¡Bienvenido a la documentación de CryptoBot Python!"
+
+#: ../../index.md:3
+msgid ""
+"CryptoBot Python is an unofficial, but friendly Python client library for"
+" the [Crypto Bot](https://pay.crypt.bot/) API. It provides Pythonic "
+"models, sane defaults, and synchronous helpers so you can issue invoices "
+"or payouts with minimal boilerplate."
+msgstr ""
+"CryptoBot Python es una biblioteca cliente de Python no oficial, pero amigable para "
+"la API de [Crypto Bot](https://pay.crypt.bot/). Proporciona modelos Pythonicos, "
+"valores predeterminados sensatos y ayudantes síncronos para que puedas emitir facturas "
+"o pagos con un mínimo de código repetitivo."
+
+#: ../../index.md:6
+msgid "Features"
+msgstr "Características"
+
+#: ../../index.md:8
+msgid "**Lean synchronous client** powered by `httpx`"
+msgstr "**Cliente síncrono ligero** impulsado por `httpx`"
+
+#: ../../index.md:9
+msgid ""
+"**Dataclass models** for invoices, balances, currencies, and exchange "
+"rates"
+msgstr ""
+"**Modelos dataclass** para facturas, balances, monedas y tipos de cambio"
+
+#: ../../index.md:10
+msgid "**Enum-based guard rails** for assets, statuses, and button names"
+msgstr "**Protecciones basadas en Enum** para activos, estados y nombres de botones"
+
+#: ../../index.md:11
+msgid "**Optional testnet support** and configurable request timeout"
+msgstr "**Soporte opcional de testnet** y tiempo de espera de solicitud configurable"
+
+#: ../../index.md:12
+msgid "**FastAPI webhook example** to bootstrap integrations"
+msgstr "**Ejemplo de webhook FastAPI** para iniciar integraciones"
+
+#: ../../index.md:13
+msgid "**Comprehensive error handling** with custom exception classes"
+msgstr "**Manejo integral de errores** con clases de excepción personalizadas"
+
+#: ../../index.md:15
+msgid "Quick Example"
+msgstr "Ejemplo Rápido"
+
+#: ../../index.md:17
+msgid ""
+"from cryptobot import CryptoBotClient\n"
+"from cryptobot.models import Asset\n"
+"\n"
+"client = CryptoBotClient(\"YOUR_API_TOKEN\")\n"
+"\n"
+"invoice = client.create_invoice(\n"
+"    asset=Asset.USDT,\n"
+"    amount=5.25,\n"
+"    description=\"Coffee order #42\",\n"
+")\n"
+"\n"
+"print(invoice.bot_invoice_url)\n"
+msgstr ""
+"from cryptobot import CryptoBotClient\n"
+"from cryptobot.models import Asset\n"
+"\n"
+"client = CryptoBotClient(\"TU_TOKEN_API\")\n"
+"\n"
+"invoice = client.create_invoice(\n"
+"    asset=Asset.USDT,\n"
+"    amount=5.25,\n"
+"    description=\"Pedido de café #42\",\n"
+")\n"
+"\n"
+"print(invoice.bot_invoice_url)\n"
+
+#: ../../index.md:32
+msgid "Contents"
+msgstr "Contenido"
+
+#: ../../index.md:67
+msgid "Indices and Tables"
+msgstr "Índices y Tablas"
+
+#: ../../index.md:69
+#, python-brace-format
+msgid "{ref}`genindex`"
+msgstr "{ref}`genindex`"
+
+#: ../../index.md:70
+#, python-brace-format
+msgid "{ref}`modindex`"
+msgstr "{ref}`modindex`"
+
+#: ../../index.md:71
+#, python-brace-format
+msgid "{ref}`search`"
+msgstr "{ref}`search`"
+

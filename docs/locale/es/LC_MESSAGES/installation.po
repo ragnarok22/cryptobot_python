@@ -1,0 +1,116 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2022, Reinier Hernández
+# This file is distributed under the same license as the CryptoBot Python
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: CryptoBot Python 0.1.6\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-11-18 10:28-0300\n"
+"PO-Revision-Date: 2025-11-18 10:30-0300\n"
+"Last-Translator: Claude <noreply@anthropic.com>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../installation.md:1
+msgid "Installation"
+msgstr "Instalación"
+
+#: ../../installation.md:3
+msgid "Stable release"
+msgstr "Versión estable"
+
+#: ../../installation.md:5
+msgid "To install CryptoBot Python, run this command in your terminal:"
+msgstr "Para instalar CryptoBot Python, ejecuta este comando en tu terminal:"
+
+#: ../../installation.md:7
+msgid "$ pip install cryptobot-python\n"
+msgstr "$ pip install cryptobot-python\n"
+
+#: ../../installation.md:11
+msgid ""
+"This is the preferred method to install CryptoBot Python, as it will "
+"always install the most recent stable release."
+msgstr ""
+"Este es el método preferido para instalar CryptoBot Python, ya que siempre "
+"instalará la versión estable más reciente."
+
+#: ../../installation.md:13
+msgid ""
+"If you don't have [pip](https://pip.pypa.io) installed, this [Python "
+"installation guide](http://docs.python-"
+"guide.org/en/latest/starting/installation/) can guide you through the "
+"process."
+msgstr ""
+"Si no tienes [pip](https://pip.pypa.io) instalado, esta [guía de instalación de Python]"
+"(http://docs.python-guide.org/en/latest/starting/installation/) puede guiarte a través "
+"del proceso."
+
+#: ../../installation.md:15
+msgid "From sources"
+msgstr "Desde las fuentes"
+
+#: ../../installation.md:17
+msgid ""
+"The sources for CryptoBot Python can be downloaded from the [Github "
+"repo](https://github.com/ragnarok22/cryptobot_python)."
+msgstr ""
+"Las fuentes de CryptoBot Python se pueden descargar desde el [repositorio de Github]"
+"(https://github.com/ragnarok22/cryptobot_python)."
+
+#: ../../installation.md:19
+msgid "You can either clone the public repository:"
+msgstr "Puedes clonar el repositorio público:"
+
+#: ../../installation.md:21
+msgid "$ git clone git://github.com/ragnarok22/cryptobot_python\n"
+msgstr "$ git clone git://github.com/ragnarok22/cryptobot_python\n"
+
+#: ../../installation.md:25
+msgid ""
+"Or download the "
+"[tarball](https://github.com/ragnarok22/cryptobot_python/tarball/master):"
+msgstr ""
+"O descargar el "
+"[tarball](https://github.com/ragnarok22/cryptobot_python/tarball/master):"
+
+#: ../../installation.md:27
+msgid ""
+"$ curl -OJL https://github.com/ragnarok22/cryptobot_python/tarball/master"
+"\n"
+msgstr ""
+"$ curl -OJL https://github.com/ragnarok22/cryptobot_python/tarball/master"
+"\n"
+
+#: ../../installation.md:31
+msgid "Once you have a copy of the source, you can install it with Poetry:"
+msgstr "Una vez que tengas una copia de las fuentes, puedes instalarla con Poetry:"
+
+#: ../../installation.md:33
+msgid ""
+"$ cd cryptobot_python\n"
+"$ poetry install\n"
+msgstr ""
+"$ cd cryptobot_python\n"
+"$ poetry install\n"
+
+#: ../../installation.md:38
+msgid "Or with pip:"
+msgstr "O con pip:"
+
+#: ../../installation.md:40
+msgid ""
+"$ cd cryptobot_python\n"
+"$ pip install .\n"
+msgstr ""
+"$ cd cryptobot_python\n"
+"$ pip install .\n"
+

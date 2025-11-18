@@ -37,6 +37,15 @@ print(invoice.bot_invoice_url)
 
 installation
 usage
+examples
+```
+
+```{toctree}
+:maxdepth: 2
+:caption: Advanced Topics
+
+advanced
+troubleshooting
 ```
 
 ```{toctree}

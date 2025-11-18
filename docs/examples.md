@@ -719,6 +719,6 @@ for inv in test_invoices:
 
 ## Next Steps
 
-- Explore the [Advanced Topics](advanced.md) for more complex patterns
-- Check the [Troubleshooting Guide](troubleshooting.md) for common issues
-- Review the [API Reference](modules.md) for complete documentation
+- Explore the [Advanced Topics](advanced) for more complex patterns
+- Check the [Troubleshooting Guide](troubleshooting) for common issues
+- Review the [API Reference](modules) for complete documentation

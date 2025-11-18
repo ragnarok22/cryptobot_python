@@ -73,6 +73,14 @@ docs: ## generate Sphinx HTML documentation, including API docs
 	$(MAKE) -C docs html
 	$(BROWSER) docs/_build/html/index.html
 
+docs-translations: ## update translation catalogs for all languages
+	$(MAKE) -C docs gettext
+	$(MAKE) -C docs update-po LANG=es
+
+docs-es: ## build Spanish documentation
+	$(MAKE) -C docs html-lang LANG=es
+	$(BROWSER) docs/_build/html/es/index.html
+
 servedocs: docs ## compile the docs watching for changes
 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
 

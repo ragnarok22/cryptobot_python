@@ -28,6 +28,10 @@ Look through the GitHub issues for features. Anything tagged with "enhancement" 
 
 CryptoBot Python could always use more documentation, whether as part of the official CryptoBot Python docs, in docstrings, or even on the web in blog posts, articles, and such.
 
+### Translate Documentation
+
+Help make CryptoBot Python accessible to non-English speakers by contributing translations! See [docs/TRANSLATING.md](docs/TRANSLATING.md) for a complete guide on translating the documentation into other languages.
+
 ### Submit Feedback
 
 The best way to send feedback is to file an issue at <https://github.com/ragnarok22/cryptobot_python/issues>.

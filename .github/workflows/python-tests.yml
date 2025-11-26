@@ -11,9 +11,6 @@ on:
 
 jobs:
   build:
-    env:
-      API_TOKEN: ${{ secrets.API_TOKEN }}
-
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -39,6 +36,18 @@ jobs:
       - name: Test with pytest
         run: |
           make test
+        env:
+          # Ensure API_TOKEN is passed to test environment
+          API_TOKEN: ${{ secrets.API_TOKEN }}
+      - name: Check test results
+        if: always()
+        run: |
+          if [ -z "${{ secrets.API_TOKEN }}" ]; then
+            echo "⚠️ API_TOKEN not available - authenticated tests were skipped"
+            echo "This is expected for PRs from forks or automated bots"
+          else
+            echo "✅ Full test suite with authentication completed"
+          fi
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v4
         with:

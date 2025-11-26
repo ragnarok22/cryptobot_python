@@ -13,22 +13,28 @@ from cryptobot.models import Asset, ButtonName
 
 load_dotenv()
 
+# Check if API token is available (for CI environments like PRs from forks/bots)
+API_TOKEN = os.getenv("API_TOKEN")
+SKIP_AUTH_TESTS = not API_TOKEN or API_TOKEN.strip() == ""
+
 
 class TestCryptoBotSyncClient(unittest.TestCase):
     """Tests for `cryptobot` client"""
 
     def setUp(self):
         """Set up test fixtures, if any."""
-        api_token = os.getenv("API_TOKEN")
-        self.client = CryptoBotClient(api_token, is_mainnet=False)
+        if not SKIP_AUTH_TESTS:
+            self.client = CryptoBotClient(API_TOKEN, is_mainnet=False)
 
     def tearDown(self) -> None:
         """Tear down test fixtures, if any."""
 
+    @unittest.skipIf(
+        SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)"
+    )
     def test_get_me(self):
         """Retreating app information"""
-        api_token = os.getenv("API_TOKEN")
-        client = CryptoBotClient(api_token, is_mainnet=False)
+        client = CryptoBotClient(API_TOKEN, is_mainnet=False)
         info = client.get_me()
         self.assertIsNotNone(info.app_id)
         self.assertIsNotNone(info.name)
@@ -39,6 +45,9 @@ class TestCryptoBotSyncClient(unittest.TestCase):
         with self.assertRaises(CryptoBotError):
             client.get_me()
 
+    @unittest.skipIf(
+        SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)"
+    )
     def test_create_invoice(self):
         """Create a new invoice"""
         invoice = self.client.create_invoice(Asset.TON, 1)
@@ -51,6 +60,9 @@ class TestCryptoBotSyncClient(unittest.TestCase):
             f"https://t.me/CryptoTestnetBot?start={invoice.hash}", invoice.pay_url
         )
 
+    @unittest.skipIf(
+        SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)"
+    )
     def test_create_invoice_with_params(self):
         """Create a new invoice"""
         invoice = self.client.create_invoice(
@@ -75,6 +87,9 @@ class TestCryptoBotSyncClient(unittest.TestCase):
             f"https://t.me/CryptoTestnetBot?start={invoice.hash}", invoice.pay_url
         )
 
+    @unittest.skipIf(
+        SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)"
+    )
     def test_create_invoice_error(self):
         """Create a new invoice"""
         with self.assertRaises(CryptoBotError):
@@ -87,6 +102,9 @@ class TestCryptoBotSyncClient(unittest.TestCase):
     #     self.assertEqual(transfer.asset, 'TON')
     #     self.assertEqual(transfer.amount, '0.01')
 
+    @unittest.skipIf(
+        SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)"
+    )
     def test_get_invoices(self):
         """Get invoices"""
         invoices = self.client.get_invoices()
@@ -97,6 +115,9 @@ class TestCryptoBotSyncClient(unittest.TestCase):
             invoices[0].pay_url,
         )
 
+    @unittest.skipIf(
+        SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)"
+    )
     def test_get_balances(self):
         """Get balance"""
         balances = self.client.get_balances()
@@ -107,6 +128,9 @@ class TestCryptoBotSyncClient(unittest.TestCase):
         # rates = self.client.get_exchange_rates()
         # self.assertEqual(len(rates), 84)  # 7 assets and 6 exchange rates
 
+    @unittest.skipIf(
+        SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)"
+    )
     def test_get_currencies(self):
         """Get currencies"""
         currencies = self.client.get_currencies()

@@ -60,7 +60,7 @@ httpx = "^0.28.1"
 python-dotenv = "^1.2.1"
 uvicorn = "^0.38.0"
 colorama = "^0.4.6"
-fastapi = "^0.122.0"
+fastapi = "^0.123.0"
 pydantic-core = "^2.41.5"
 
 [tool.coverage.run]

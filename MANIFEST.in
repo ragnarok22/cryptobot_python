@@ -4,6 +4,9 @@ include HISTORY.rst
 include LICENSE
 include README.rst
 
+# Include py.typed for PEP 561 type checking support
+include cryptobot/py.typed
+
 recursive-include tests *
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]

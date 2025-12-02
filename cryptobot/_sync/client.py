@@ -22,13 +22,13 @@ class CryptoBotClient:
     def __init__(self, api_token, is_mainnet: bool = True, timeout: float = 5.0):
         self.api_token = api_token
         self.timeout = timeout
-        self.__base_url = (
+        self._base_url = (
             "https://pay.crypt.bot/api"
             if is_mainnet
             else "https://testnet-pay.crypt.bot/api"
         )
-        self.__http_client = httpx.Client(
-            base_url=self.__base_url,
+        self._http_client = httpx.Client(
+            base_url=self._base_url,
             timeout=self.timeout,
             headers={"Crypto-Pay-API-Token": self.api_token},
         )
@@ -49,13 +49,13 @@ class CryptoBotClient:
 
     def get_me(self) -> App:
         """Get basic information about an app"""
-        response = self.__http_client.get("/getMe")
+        response = self._http_client.get("/getMe")
         info = self._handle_response(response)
         return App(**info)
 
     def __create_invoice(self, **kwargs) -> Invoice:
         """Create a new invoice"""
-        response = self.__http_client.post("/createInvoice", json=kwargs)
+        response = self._http_client.post("/createInvoice", json=kwargs)
         info = self._handle_response(response)
         return Invoice(**info)
 
@@ -115,7 +115,7 @@ class CryptoBotClient:
             "comment": comment,
             "disable_send_notification": disable_send_notification,
         }
-        response = self.__http_client.post("/transfer", json=data)
+        response = self._http_client.post("/transfer", json=data)
         info = self._handle_response(response)
         return Transfer(**info)
 
@@ -140,35 +140,24 @@ class CryptoBotClient:
         if count:
             data["count"] = count
 
-        response = self.__http_client.get("/getInvoices", params=data)
+        response = self._http_client.get("/getInvoices", params=data)
         info = self._handle_response(response)
         return [Invoice(**i) for i in info["items"]]
 
     def get_balances(self) -> List[Balance]:
         """Get the balances of your app"""
-        response = self.__http_client.get("/getBalance")
+        response = self._http_client.get("/getBalance")
         info = self._handle_response(response)
         return [Balance(**i) for i in info]
 
     def get_exchange_rates(self) -> List[ExchangeRate]:
         """Get the exchange rates"""
-        response = self.__http_client.get("/getExchangeRates")
+        response = self._http_client.get("/getExchangeRates")
         info = self._handle_response(response)
         return [ExchangeRate(**i) for i in info]
 
     def get_currencies(self) -> List[Currency]:
         """Get the currencies"""
-        response = self.__http_client.get("/getCurrencies")
-        if response.status_code == 200:
-            info = response.json()["result"]
-            return [Currency(**i) for i in info]
-        else:
-            try:
-                data = response.json()["error"]
-                raise CryptoBotError.from_json(data)
-            except (ValueError, KeyError):
-                # Response is not JSON or doesn't have error field
-                raise CryptoBotError(
-                    code=response.status_code,
-                    name=f"HTTPError: {response.text[:100]}",
-                )
+        response = self._http_client.get("/getCurrencies")
+        info = self._handle_response(response)
+        return [Currency(**i) for i in info]

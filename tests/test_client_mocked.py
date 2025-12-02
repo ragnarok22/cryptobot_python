@@ -46,13 +46,13 @@ class TestCryptoBotClientInitialization:
         """Test URL construction for mainnet."""
         client = CryptoBotClient("test_token", is_mainnet=True)
         # Access the base URL through the httpx client
-        base_url = str(client._CryptoBotClient__http_client.base_url)
+        base_url = str(client._http_client.base_url)
         assert "pay.crypt.bot" in base_url
 
     def test_client_url_construction_testnet(self):
         """Test URL construction for testnet."""
         client = CryptoBotClient("test_token", is_mainnet=False)
-        base_url = str(client._CryptoBotClient__http_client.base_url)
+        base_url = str(client._http_client.base_url)
         assert "testnet-pay.crypt.bot" in base_url
 
 

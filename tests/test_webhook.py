@@ -90,6 +90,7 @@ class TestListener:
         listener = Listener(
             host="localhost",
             callback=callback,
+            api_token="test_token",
             port=8080,
             url="/test-webhook",
             log_level="info",
@@ -97,6 +98,7 @@ class TestListener:
 
         assert listener.host == "localhost"
         assert listener.callback == callback
+        assert listener.api_token == "test_token"
         assert listener.port == 8080
         assert listener.url == "/test-webhook"
         assert listener.log_level == "info"
@@ -104,7 +106,7 @@ class TestListener:
     def test_listener_default_values(self):
         """Test Listener default values."""
         callback = Mock()
-        listener = Listener(host="localhost", callback=callback)
+        listener = Listener(host="localhost", callback=callback, api_token="test_token")
 
         assert listener.port == 2203
         assert listener.url == "/webhook"
@@ -115,7 +117,9 @@ class TestListener:
     def test_listener_listen(self, mock_print, mock_uvicorn_run):
         """Test listener.listen() method."""
         callback = Mock()
-        listener = Listener(host="localhost", callback=callback, port=8080)
+        listener = Listener(
+            host="localhost", callback=callback, api_token="test_token", port=8080
+        )
 
         listener.listen()
 
@@ -130,7 +134,7 @@ class TestListener:
     def test_listener_app_exists(self):
         """Test that Listener has FastAPI app."""
         callback = Mock()
-        listener = Listener(host="localhost", callback=callback)
+        listener = Listener(host="localhost", callback=callback, api_token="test_token")
 
         # Check that app exists
         assert hasattr(listener, "app")
@@ -141,8 +145,12 @@ class TestListener:
         callback1 = Mock()
         callback2 = Mock()
 
-        listener1 = Listener(host="localhost", callback=callback1, port=8080)
-        listener2 = Listener(host="localhost", callback=callback2, port=8081)
+        listener1 = Listener(
+            host="localhost", callback=callback1, api_token="test_token1", port=8080
+        )
+        listener2 = Listener(
+            host="localhost", callback=callback2, api_token="test_token2", port=8081
+        )
 
         assert listener1.port != listener2.port
         assert listener1.callback != listener2.callback

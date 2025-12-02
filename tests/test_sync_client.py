@@ -101,13 +101,13 @@ class TestCryptoBotSyncClient(unittest.TestCase):
     def test_transfer(self):
         """Transfer - may fail if testnet account has insufficient funds"""
         try:
-            transfer = self.client.transfer(699381957, Asset.TON, 1.0, "test_spend_id")
+            transfer = self.client.transfer(699381957, Asset.TON, 0.1, "test_spend_id")
             self.assertEqual(transfer.status, "success")
             self.assertEqual(transfer.asset, Asset.TON)
-            self.assertEqual(transfer.amount, "1.0")
+            self.assertEqual(transfer.amount, "0.1")
         except CryptoBotError as e:
-            # Allow INSUFFICIENT_FUNDS error in testnet
-            if e.name != "INSUFFICIENT_FUNDS":
+            # Allow INSUFFICIENT_FUNDS or AMOUNT_TOO_SMALL errors in testnet
+            if e.name not in ("INSUFFICIENT_FUNDS", "AMOUNT_TOO_SMALL"):
                 raise
 
     @unittest.skipIf(

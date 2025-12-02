@@ -95,12 +95,15 @@ class TestCryptoBotSyncClient(unittest.TestCase):
         with self.assertRaises(CryptoBotError):
             self.client.create_invoice(Asset.TON, 0.0001)
 
-    # def test_transfer(self):
-    #     """Transfer"""
-    #     transfer = self.client.transfer(699381957, Asset.TON, 0.01, 'Test')
-    #     self.assertEqual(transfer.status, 'active')
-    #     self.assertEqual(transfer.asset, 'TON')
-    #     self.assertEqual(transfer.amount, '0.01')
+    @unittest.skipIf(
+        SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)"
+    )
+    def test_transfer(self):
+        """Transfer"""
+        transfer = self.client.transfer(699381957, Asset.TON, 0.01, "test_spend_id")
+        self.assertEqual(transfer.status, "success")
+        self.assertEqual(transfer.asset, Asset.TON)
+        self.assertEqual(transfer.amount, "0.01")
 
     @unittest.skipIf(
         SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)"

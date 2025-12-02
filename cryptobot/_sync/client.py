@@ -53,7 +53,7 @@ class CryptoBotClient:
         info = self._handle_response(response)
         return App(**info)
 
-    def __create_invoice(self, **kwargs) -> Invoice:
+    def _create_invoice(self, **kwargs) -> Invoice:
         """Create a new invoice"""
         response = self._http_client.post("/createInvoice", json=kwargs)
         info = self._handle_response(response)
@@ -73,7 +73,15 @@ class CryptoBotClient:
         expires_in: Optional[int] = None,
         swap_to: Optional[str] = None,
     ) -> Invoice:
-        """Create a new invoice"""
+        """Create a new invoice
+
+        Note: The minimum and maximum amount limits roughly correspond to 1-25000 USD
+        for each supported asset. Use get_exchange_rates() to convert amounts.
+        """
+        # Validate amount
+        if amount <= 0:
+            raise ValueError("Amount must be greater than 0")
+
         data = {
             "asset": asset.name,
             "amount": str(amount),
@@ -86,7 +94,6 @@ class CryptoBotClient:
             "expires_in": expires_in,
             "swap_to": swap_to,
         }
-        # TODO: Check the minimum amount
 
         # remove None values
         for key, value in dict(data).items():
@@ -95,7 +102,7 @@ class CryptoBotClient:
 
         if paid_btn_name:
             data["paid_btn_name"] = paid_btn_name.name
-        return self.__create_invoice(**data)
+        return self._create_invoice(**data)
 
     def transfer(
         self,
@@ -106,7 +113,15 @@ class CryptoBotClient:
         comment: Optional[str] = None,
         disable_send_notification: bool = False,
     ) -> Transfer:
-        """Send coins from your app's balance to a user"""
+        """Send coins from your app's balance to a user
+
+        Note: The minimum and maximum amount limits roughly correspond to 1-25000 USD
+        for each supported asset.
+        """
+        # Validate amount
+        if amount <= 0:
+            raise ValueError("Amount must be greater than 0")
+
         data = {
             "user_id": user_id,
             "asset": asset.name,

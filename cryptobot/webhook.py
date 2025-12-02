@@ -12,7 +12,7 @@ from cryptobot.errors import CryptoBotError
 logger = logging.getLogger(__name__)
 
 
-def check_signature(token: str, body: dict, headers) -> bool:
+def check_signature(token: str, body: str, headers) -> bool:
     """Verify webhook signature using HMAC-SHA256.
 
     This function validates that webhook requests are genuinely from Crypto Bot
@@ -21,7 +21,7 @@ def check_signature(token: str, body: dict, headers) -> bool:
 
     Args:
         token: Your Crypto Bot API token.
-        body: The webhook request body as a dictionary.
+        body: The raw webhook request body as a string (unparsed JSON).
         headers: The request headers containing the signature.
 
     Returns:
@@ -29,24 +29,30 @@ def check_signature(token: str, body: dict, headers) -> bool:
 
     Security Note:
         Always verify webhook signatures to prevent unauthorized access.
-        The signature is computed as: HMAC-SHA256(SHA256(api_token), request_body)
+        The signature is computed as: HMAC-SHA256(SHA256(api_token), raw_request_body)
+
+        IMPORTANT: The body must be the raw, unparsed JSON string as received from
+        the request, not a re-serialized dictionary. JSON serialization order and
+        formatting must match exactly for signature verification to succeed.
 
     Example:
         >>> headers = {"crypto-pay-api-signature": "abc123..."}
-        >>> body = {"update_id": 1, "update_type": "invoice_paid", ...}
-        >>> if check_signature("YOUR_API_TOKEN", body, headers):
+        >>> raw_body = '{"update_id":1,"update_type":"invoice_paid",...}'
+        >>> if check_signature("YOUR_API_TOKEN", raw_body, headers):
         ...     print("Valid webhook")
         ... else:
         ...     print("Invalid signature - possible attack!")
     """
     secret = hashlib.sha256(token.encode()).digest()
-    check_string = json.dumps(body)
     hmac = hashlib.sha256(secret)
-    hmac.update(check_string.encode())
-    hmac = hmac.hexdigest()
-    logger.debug(f"Computed HMAC: {hmac}")
-    logger.debug(f"Received signature: {headers.get('crypto-pay-api-signature')}")
-    return hmac == headers["crypto-pay-api-signature"]
+    hmac.update(body.encode() if isinstance(body, str) else body)
+    computed_signature = hmac.hexdigest()
+    received_signature = headers.get("crypto-pay-api-signature", "")
+
+    logger.debug(f"Computed HMAC: {computed_signature}")
+    logger.debug(f"Received signature: {received_signature}")
+
+    return computed_signature == received_signature
 
 
 @dataclass
@@ -120,19 +126,42 @@ class Listener:
     url: str = "/webhook"
     log_level: str = "error"
 
-    app = FastAPI()
-
     def __post_init__(self):
+        # Create a new FastAPI app instance for this listener
+        self.app = FastAPI()
+
         @self.app.post(self.url)
         async def listen_webhook(request: Request):
-            data = await request.json()
-            logger.info(f"Received webhook data: {data}")
+            try:
+                # Get raw body for signature verification
+                raw_body = await request.body()
+                raw_body_str = raw_body.decode("utf-8")
 
-            if not check_signature(self.api_token, data, request.headers):
-                raise CryptoBotError(code=400, name="Invalid signature")
+                # Parse JSON for use
+                data = json.loads(raw_body_str)
+                logger.info(f"Received webhook: update_type={data.get('update_type')}")
 
-            self.callback(request.headers, data)
-            return {"message": "Thank you CryptoBot"}
+                # Verify signature using raw body
+                if not check_signature(self.api_token, raw_body_str, request.headers):
+                    logger.warning("Invalid webhook signature detected")
+                    raise CryptoBotError(code=400, name="Invalid signature")
+
+                # Execute callback with error handling
+                try:
+                    self.callback(request.headers, data)
+                except Exception as e:
+                    logger.error(f"Callback function error: {e}", exc_info=True)
+                    raise CryptoBotError(code=500, name=f"Callback error: {str(e)}")
+
+                return {"ok": True}
+            except json.JSONDecodeError as e:
+                logger.error(f"Invalid JSON in webhook request: {e}")
+                raise CryptoBotError(code=400, name="Invalid JSON")
+            except CryptoBotError:
+                raise
+            except Exception as e:
+                logger.error(f"Unexpected error processing webhook: {e}", exc_info=True)
+                raise CryptoBotError(code=500, name=f"Internal error: {str(e)}")
 
     def listen(self):
         """Start the webhook server and listen for incoming requests.

@@ -15,49 +15,52 @@ class TestCheckSignature:
     def test_check_signature_valid(self):
         """Test signature verification with valid signature."""
         token = "test_token"
-        body = {"test": "data"}
+        body_dict = {"test": "data"}
+        raw_body = json.dumps(body_dict)
 
-        # Create expected signature
+        # Create expected signature using raw body
         secret = hashlib.sha256(token.encode()).digest()
-        check_string = json.dumps(body)
         hmac = hashlib.sha256(secret)
-        hmac.update(check_string.encode())
+        hmac.update(raw_body.encode())
         expected_signature = hmac.hexdigest()
 
         headers = {"crypto-pay-api-signature": expected_signature}
 
-        assert check_signature(token, body, headers) is True
+        assert check_signature(token, raw_body, headers) is True
 
     def test_check_signature_invalid(self):
         """Test signature verification with invalid signature."""
         token = "test_token"
-        body = {"test": "data"}
+        raw_body = json.dumps({"test": "data"})
         headers = {"crypto-pay-api-signature": "invalid_signature"}
 
-        assert check_signature(token, body, headers) is False
+        assert check_signature(token, raw_body, headers) is False
 
     def test_check_signature_different_body(self):
         """Test signature verification fails with different body."""
         token = "test_token"
-        original_body = {"test": "data"}
-        modified_body = {"test": "modified_data"}
+        original_body_dict = {"test": "data"}
+        modified_body_dict = {"test": "modified_data"}
+
+        # Create raw body strings
+        original_raw = json.dumps(original_body_dict)
+        modified_raw = json.dumps(modified_body_dict)
 
         # Create signature for original body
         secret = hashlib.sha256(token.encode()).digest()
-        check_string = json.dumps(original_body)
         hmac = hashlib.sha256(secret)
-        hmac.update(check_string.encode())
+        hmac.update(original_raw.encode())
         signature = hmac.hexdigest()
 
         headers = {"crypto-pay-api-signature": signature}
 
         # Verify with modified body should fail
-        assert check_signature(token, modified_body, headers) is False
+        assert check_signature(token, modified_raw, headers) is False
 
     def test_check_signature_complex_body(self):
         """Test signature verification with complex body structure."""
         token = "test_token"
-        body = {
+        body_dict = {
             "update_id": 12345,
             "update_type": "invoice_paid",
             "request_date": "2023-01-01T00:00:00Z",
@@ -70,15 +73,18 @@ class TestCheckSignature:
             },
         }
 
+        # Create raw body string
+        raw_body = json.dumps(body_dict)
+
+        # Create signature
         secret = hashlib.sha256(token.encode()).digest()
-        check_string = json.dumps(body)
         hmac = hashlib.sha256(secret)
-        hmac.update(check_string.encode())
+        hmac.update(raw_body.encode())
         expected_signature = hmac.hexdigest()
 
         headers = {"crypto-pay-api-signature": expected_signature}
 
-        assert check_signature(token, body, headers) is True
+        assert check_signature(token, raw_body, headers) is True
 
 
 class TestListener:
@@ -154,4 +160,5 @@ class TestListener:
 
         assert listener1.port != listener2.port
         assert listener1.callback != listener2.callback
-        # Note: Listeners share the same app class variable, which is expected behavior
+        # Each listener has its own FastAPI app instance
+        assert listener1.app is not listener2.app

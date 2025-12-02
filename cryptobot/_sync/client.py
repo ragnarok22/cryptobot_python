@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import httpx
 
@@ -33,53 +33,45 @@ class CryptoBotClient:
             headers={"Crypto-Pay-API-Token": self.api_token},
         )
 
+    def _handle_response(self, response: httpx.Response) -> dict:
+        """Handle HTTP response and raise appropriate errors"""
+        if response.status_code == 200:
+            return response.json()["result"]
+        try:
+            data = response.json()["error"]
+            raise CryptoBotError.from_json(data)
+        except (ValueError, KeyError):
+            # Response is not JSON or doesn't have error field
+            raise CryptoBotError(
+                code=response.status_code,
+                name=f"HTTPError: {response.text[:100]}",
+            )
+
     def get_me(self) -> App:
         """Get basic information about an app"""
         response = self.__http_client.get("/getMe")
-        if response.status_code == 200:
-            info = response.json()["result"]
-            return App(**info)
-        else:
-            try:
-                data = response.json()["error"]
-                raise CryptoBotError(**data)
-            except (ValueError, KeyError):
-                # Response is not JSON or doesn't have error field
-                raise CryptoBotError(
-                    code=response.status_code,
-                    name=f"HTTPError: {response.text[:100]}",
-                )
+        info = self._handle_response(response)
+        return App(**info)
 
     def __create_invoice(self, **kwargs) -> Invoice:
         """Create a new invoice"""
         response = self.__http_client.post("/createInvoice", json=kwargs)
-        if response.status_code == 200:
-            info = response.json()["result"]
-            return Invoice(**info)
-        else:
-            try:
-                data = response.json()["error"]
-                raise CryptoBotError.from_json(data)
-            except (ValueError, KeyError):
-                # Response is not JSON or doesn't have error field
-                raise CryptoBotError(
-                    code=response.status_code,
-                    name=f"HTTPError: {response.text[:100]}",
-                )
+        info = self._handle_response(response)
+        return Invoice(**info)
 
     def create_invoice(
         self,
         asset: Asset,
         amount: float,
-        description: str = None,
-        hidden_message: str = None,
-        paid_btn_name: ButtonName = None,
-        paid_btn_url: str = None,
-        payload: str = None,
-        allow_comments: bool = None,
-        allow_anonymous: bool = None,
-        expires_in: int = None,
-        swap_to: str = None,
+        description: Optional[str] = None,
+        hidden_message: Optional[str] = None,
+        paid_btn_name: Optional[ButtonName] = None,
+        paid_btn_url: Optional[str] = None,
+        payload: Optional[str] = None,
+        allow_comments: Optional[bool] = None,
+        allow_anonymous: Optional[bool] = None,
+        expires_in: Optional[int] = None,
+        swap_to: Optional[str] = None,
     ) -> Invoice:
         """Create a new invoice"""
         data = {
@@ -111,7 +103,7 @@ class CryptoBotClient:
         asset: Asset,
         amount: float,
         spend_id: str,
-        comment: str = None,
+        comment: Optional[str] = None,
         disable_send_notification: bool = False,
     ) -> Transfer:
         """Send coins from your app's balance to a user"""
@@ -140,9 +132,9 @@ class CryptoBotClient:
 
     def get_invoices(
         self,
-        asset: Asset = None,
-        invoice_ids: str = None,
-        status: Status = None,
+        asset: Optional[Asset] = None,
+        invoice_ids: Optional[str] = None,
+        status: Optional[Status] = None,
         offset: int = 0,
         count: int = 100,
     ) -> List[Invoice]:

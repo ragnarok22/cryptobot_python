@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
+from typing import List, Optional
 
 
 @dataclass
@@ -44,43 +45,43 @@ class Invoice:
     amount: str
     asset: Asset
 
-    currency_type: str = None
-    description: str = None
-    comment: str = None
-    hidden_message: str = None
-    payload: str = None
+    currency_type: Optional[str] = None
+    description: Optional[str] = None
+    comment: Optional[str] = None
+    hidden_message: Optional[str] = None
+    payload: Optional[str] = None
 
-    created_at: str = None
-    expiration_date: str = None
-    paid_at: str = None
+    created_at: Optional[str] = None
+    expiration_date: Optional[str] = None
+    paid_at: Optional[str] = None
 
-    fiat: str = None
-    accepted_assets: list = None
+    fiat: Optional[str] = None
+    accepted_assets: Optional[List[str]] = None
 
-    fee_asset: str = None
-    fee_amount: str = None
+    fee_asset: Optional[str] = None
+    fee_amount: Optional[str] = None
 
     paid_anonymously: bool = True
-    paid_amount: str = None
-    paid_fiat_rate: str = None
-    paid_usd_rate: str = None
-    paid_asset: str = None
-    paid_btn_name: ButtonName = None
-    paid_btn_url: str = None
+    paid_amount: Optional[str] = None
+    paid_fiat_rate: Optional[str] = None
+    paid_usd_rate: Optional[str] = None
+    paid_asset: Optional[str] = None
+    paid_btn_name: Optional[ButtonName] = None
+    paid_btn_url: Optional[str] = None
 
-    bot_invoice_url: str = None
+    bot_invoice_url: Optional[str] = None
 
     allow_comments: bool = True
     allow_anonymous: bool = True
 
-    swap_to: str = None
+    swap_to: Optional[str] = None
 
     # deprecated
-    fee: str = None
-    pay_url: str = None
-    usd_rate: str = None
-    mini_app_invoice_url: str = None
-    web_app_invoice_url: str = None
+    fee: Optional[str] = None
+    pay_url: Optional[str] = None
+    usd_rate: Optional[str] = None
+    mini_app_invoice_url: Optional[str] = None
+    web_app_invoice_url: Optional[str] = None
 
 
 @dataclass
@@ -95,7 +96,7 @@ class Transfer:
     amount: str
     status: Status
     completed_at: str
-    comment: str = None
+    comment: Optional[str] = None
 
 
 @dataclass
@@ -127,4 +128,4 @@ class Currency:
     name: str
     code: str
     decimals: int
-    url: str = None
+    url: Optional[str] = None

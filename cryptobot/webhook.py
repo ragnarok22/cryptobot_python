@@ -18,8 +18,8 @@ def check_signature(token: str, body: dict, headers):
     hmac = hashlib.sha256(secret)
     hmac.update(check_string.encode())
     hmac = hmac.hexdigest()
-    print(hmac)
-    print(headers["crypto-pay-api-signature"])
+    logger.debug(f"Computed HMAC: {hmac}")
+    logger.debug(f"Received signature: {headers.get('crypto-pay-api-signature')}")
     return hmac == headers["crypto-pay-api-signature"]
 
 
@@ -27,6 +27,7 @@ def check_signature(token: str, body: dict, headers):
 class Listener:
     host: str
     callback: callable
+    api_token: str
     port: int = 2203
     url: str = "/webhook"
     log_level: str = "error"
@@ -37,11 +38,9 @@ class Listener:
         @self.app.post(self.url)
         async def listen_webhook(request: Request):
             data = await request.json()
-            print(data)
+            logger.info(f"Received webhook data: {data}")
 
-            if not check_signature(
-                "49418:AAAUuM5C7EEiUbLD53oXo7coFbLmZDMHoYv", data, request.headers
-            ):
+            if not check_signature(self.api_token, data, request.headers):
                 raise CryptoBotError(code=400, name="Invalid signature")
 
             self.callback(request.headers, data)

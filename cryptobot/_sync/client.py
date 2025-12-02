@@ -17,7 +17,27 @@ from ..models import (
 
 
 class CryptoBotClient:
-    """Crypto Bot Client"""
+    """Crypto Bot API client for creating invoices and managing cryptocurrency payments.
+
+    This client provides a synchronous interface to the Crypto Bot API, supporting
+    invoice creation, transfers, balance checking, and exchange rate queries.
+
+    Args:
+        api_token: Your Crypto Bot API token. Get it from @CryptoBot on Telegram.
+        is_mainnet: If True, use mainnet. If False, use testnet. Default: True.
+        timeout: HTTP request timeout in seconds. Default: 5.0.
+
+    Example:
+        >>> from cryptobot import CryptoBotClient
+        >>> from cryptobot.models import Asset
+        >>>
+        >>> # Initialize client
+        >>> client = CryptoBotClient("YOUR_API_TOKEN")
+        >>>
+        >>> # Create a simple invoice
+        >>> invoice = client.create_invoice(Asset.TON, 1.5)
+        >>> print(invoice.bot_invoice_url)
+    """
 
     def __init__(self, api_token, is_mainnet: bool = True, timeout: float = 5.0):
         self.api_token = api_token
@@ -48,7 +68,21 @@ class CryptoBotClient:
             )
 
     def get_me(self) -> App:
-        """Get basic information about an app"""
+        """Get basic information about your Crypto Bot application.
+
+        Returns:
+            App object containing app_id, name, and payment_processing_bot_username.
+
+        Raises:
+            CryptoBotError: If the API request fails or authentication is invalid.
+
+        Example:
+            >>> client = CryptoBotClient("YOUR_API_TOKEN")
+            >>> app = client.get_me()
+            >>> print(f"App Name: {app.name}")
+            >>> print(f"App ID: {app.app_id}")
+            >>> print(f"Bot Username: {app.payment_processing_bot_username}")
+        """
         response = self._http_client.get("/getMe")
         info = self._handle_response(response)
         return App(**info)
@@ -73,10 +107,55 @@ class CryptoBotClient:
         expires_in: Optional[int] = None,
         swap_to: Optional[str] = None,
     ) -> Invoice:
-        """Create a new invoice
+        """Create a new cryptocurrency payment invoice.
 
-        Note: The minimum and maximum amount limits roughly correspond to 1-25000 USD
-        for each supported asset. Use get_exchange_rates() to convert amounts.
+        Args:
+            asset: Cryptocurrency asset (e.g., Asset.BTC, Asset.TON, Asset.ETH).
+            amount: Invoice amount in the specified cryptocurrency.
+            description: Optional description shown to the customer (up to 1024 chars).
+            hidden_message: Optional message shown after successful payment (up to 2048 chars).
+            paid_btn_name: Optional name of the button shown after payment (ButtonName enum).
+            paid_btn_url: Optional URL opened when the button is pressed (up to 1024 chars).
+            payload: Optional data (up to 4096 bytes) attached to the invoice.
+            allow_comments: Allow customers to add comments. Default: True.
+            allow_anonymous: Allow anonymous payments. Default: True.
+            expires_in: Optional time in seconds until invoice expiration (1-2678400).
+            swap_to: Optional asset code to convert the payment to (e.g., "USDT").
+
+        Returns:
+            Invoice object with payment URL, status, and other details.
+
+        Raises:
+            ValueError: If amount is less than or equal to 0.
+            CryptoBotError: If the API request fails.
+
+        Note:
+            Amount limits roughly correspond to 1-25,000 USD equivalent for each asset.
+            Use get_exchange_rates() to convert amounts between currencies.
+
+        Examples:
+            Simple invoice:
+                >>> invoice = client.create_invoice(Asset.TON, 1.5)
+                >>> print(invoice.bot_invoice_url)
+
+            Invoice with description and custom button:
+                >>> invoice = client.create_invoice(
+                ...     asset=Asset.BTC,
+                ...     amount=0.0001,
+                ...     description="Premium Membership",
+                ...     hidden_message="Thank you for your purchase!",
+                ...     paid_btn_name=ButtonName.viewItem,
+                ...     paid_btn_url="https://example.com/premium"
+                ... )
+                >>> print(f"Invoice ID: {invoice.invoice_id}")
+
+            Invoice that expires in 1 hour:
+                >>> invoice = client.create_invoice(
+                ...     asset=Asset.USDT,
+                ...     amount=10,
+                ...     description="Limited time offer",
+                ...     expires_in=3600  # 1 hour
+                ... )
         """
         # Validate amount
         if amount <= 0:
@@ -113,10 +192,45 @@ class CryptoBotClient:
         comment: Optional[str] = None,
         disable_send_notification: bool = False,
     ) -> Transfer:
-        """Send coins from your app's balance to a user
+        """Send cryptocurrency from your app's balance to a Telegram user.
 
-        Note: The minimum and maximum amount limits roughly correspond to 1-25000 USD
-        for each supported asset.
+        Args:
+            user_id: Telegram user ID to receive the transfer.
+            asset: Cryptocurrency asset to send (e.g., Asset.TON, Asset.BTC).
+            amount: Amount to transfer in the specified cryptocurrency.
+            spend_id: Unique string to prevent duplicate transfers (up to 64 chars).
+            comment: Optional comment for the transfer (up to 1024 chars).
+            disable_send_notification: Don't send notification to the user. Default: False.
+
+        Returns:
+            Transfer object with transfer details and status.
+
+        Raises:
+            ValueError: If amount is less than or equal to 0.
+            CryptoBotError: If transfer fails (e.g., insufficient funds, invalid user).
+
+        Note:
+            Amount limits roughly correspond to 1-25,000 USD equivalent for each asset.
+            The spend_id must be unique to prevent duplicate transfers.
+
+        Examples:
+            Simple transfer:
+                >>> transfer = client.transfer(
+                ...     user_id=123456789,
+                ...     asset=Asset.TON,
+                ...     amount=1.5,
+                ...     spend_id="order_12345"
+                ... )
+                >>> print(f"Transfer ID: {transfer.transfer_id}")
+
+            Transfer with comment:
+                >>> transfer = client.transfer(
+                ...     user_id=123456789,
+                ...     asset=Asset.USDT,
+                ...     amount=10,
+                ...     spend_id="reward_abc123",
+                ...     comment="Cashback reward for your purchase!"
+                ... )
         """
         # Validate amount
         if amount <= 0:
@@ -142,7 +256,40 @@ class CryptoBotClient:
         offset: int = 0,
         count: int = 100,
     ) -> List[Invoice]:
-        """Get a list of invoices"""
+        """Get a list of invoices created by your app.
+
+        Args:
+            asset: Filter by cryptocurrency asset (e.g., Asset.BTC). Default: all assets.
+            invoice_ids: Comma-separated list of invoice IDs to retrieve.
+            status: Filter by invoice status (Status.active, Status.paid, Status.expired).
+            offset: Number of invoices to skip. Default: 0.
+            count: Number of invoices to return (1-1000). Default: 100.
+
+        Returns:
+            List of Invoice objects matching the filter criteria.
+
+        Raises:
+            CryptoBotError: If the API request fails.
+
+        Examples:
+            Get all invoices:
+                >>> invoices = client.get_invoices()
+                >>> for invoice in invoices:
+                ...     print(f"{invoice.invoice_id}: {invoice.status}")
+
+            Get only paid TON invoices:
+                >>> paid_invoices = client.get_invoices(
+                ...     asset=Asset.TON,
+                ...     status=Status.paid
+                ... )
+
+            Get specific invoices by ID:
+                >>> invoices = client.get_invoices(invoice_ids="123,456,789")
+
+            Pagination example:
+                >>> page1 = client.get_invoices(count=50, offset=0)
+                >>> page2 = client.get_invoices(count=50, offset=50)
+        """
         data = {}
         if asset:
             data["asset"] = asset.name
@@ -160,19 +307,71 @@ class CryptoBotClient:
         return [Invoice(**i) for i in info["items"]]
 
     def get_balances(self) -> List[Balance]:
-        """Get the balances of your app"""
+        """Get cryptocurrency balances of your app.
+
+        Returns:
+            List of Balance objects for all supported cryptocurrencies.
+
+        Raises:
+            CryptoBotError: If the API request fails.
+
+        Example:
+            >>> balances = client.get_balances()
+            >>> for balance in balances:
+            ...     print(f"{balance.currency_code}: {balance.available} available, {balance.onhold} on hold")
+            BTC: 0.00150000 available, 0.00000000 on hold
+            TON: 150.5 available, 10.0 on hold
+        """
         response = self._http_client.get("/getBalance")
         info = self._handle_response(response)
         return [Balance(**i) for i in info]
 
     def get_exchange_rates(self) -> List[ExchangeRate]:
-        """Get the exchange rates"""
+        """Get current exchange rates for all supported cryptocurrencies.
+
+        Returns:
+            List of ExchangeRate objects with conversion rates.
+
+        Raises:
+            CryptoBotError: If the API request fails.
+
+        Example:
+            >>> rates = client.get_exchange_rates()
+            >>> for rate in rates:
+            ...     if rate.source == Asset.BTC and rate.target == "USD":
+            ...         print(f"1 BTC = ${rate.rate} USD")
+            1 BTC = $45000.50 USD
+
+            Calculate invoice amount:
+                >>> # Convert $100 USD to TON
+                >>> rates = client.get_exchange_rates()
+                >>> ton_usd_rate = next(r for r in rates if r.source == Asset.TON and r.target == "USD")
+                >>> ton_amount = 100 / float(ton_usd_rate.rate)
+                >>> invoice = client.create_invoice(Asset.TON, ton_amount)
+        """
         response = self._http_client.get("/getExchangeRates")
         info = self._handle_response(response)
         return [ExchangeRate(**i) for i in info]
 
     def get_currencies(self) -> List[Currency]:
-        """Get the currencies"""
+        """Get information about supported cryptocurrencies.
+
+        Returns:
+            List of Currency objects with details about each supported cryptocurrency.
+
+        Raises:
+            CryptoBotError: If the API request fails.
+
+        Example:
+            >>> currencies = client.get_currencies()
+            >>> for currency in currencies:
+            ...     print(f"{currency.code}: {currency.name} (decimals: {currency.decimals})")
+            ...     print(f"  Blockchain: {currency.is_blockchain}, Stablecoin: {currency.is_stablecoin}")
+            BTC: Bitcoin (decimals: 8)
+              Blockchain: True, Stablecoin: False
+            USDT: Tether (decimals: 6)
+              Blockchain: True, Stablecoin: True
+        """
         response = self._http_client.get("/getCurrencies")
         info = self._handle_response(response)
         return [Currency(**i) for i in info]

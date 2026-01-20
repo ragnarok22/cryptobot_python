@@ -182,9 +182,7 @@ class Listener:
         url = f"https://{self.host}:{self.port}{self.url}"
         logger.info(f"Listening on {url}")
 
-        print(
-            Fore.BLUE
-            + r"""
+        print(Fore.BLUE + r"""
  $$$$$$\                                  $$\                     $$$$$$$\              $$\
 $$  __$$\                                 $$ |                    $$  __$$\             $$ |
 $$ /  \__| $$$$$$\  $$\   $$\  $$$$$$\  $$$$$$\    $$$$$$\        $$ |  $$ | $$$$$$\  $$$$$$\
@@ -196,14 +194,10 @@ $$ |  $$\ $$ |      $$ |  $$ |$$ |  $$ |  $$ |$$\ $$ |  $$ |      $$ |  $$ |$$ |
                     $$\   $$ |$$ |
                     \$$$$$$  |$$ |
                      \______/ \__|
-"""
-        )
-        print(
-            Style.RESET_ALL
-            + f"""[Webhook Listener]
+""")
+        print(Style.RESET_ALL + f"""[Webhook Listener]
 
 * Docs: https://help.crypt.bot/crypto-pay-api#Webhook
 * Listening on {url} (Press CTRL+C to stop)
-            """
-        )
+            """)
         uvicorn.run(self.app, host=self.host, port=self.port, log_level=self.log_level)

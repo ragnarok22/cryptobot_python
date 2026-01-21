@@ -1,5 +1,10 @@
 # History
 
+## 0.4.1 (2026-01-20)
+
+* Bug fixes and stability improvements
+* Updated dependencies and development tools
+
 ## 0.3.0 (2025-11-18)
 
 * Added Spanish documentation support with complete translations

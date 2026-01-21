@@ -29,9 +29,7 @@ class TestCryptoBotSyncClient(unittest.TestCase):
     def tearDown(self) -> None:
         """Tear down test fixtures, if any."""
 
-    @unittest.skipIf(
-        SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)"
-    )
+    @unittest.skipIf(SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)")
     def test_get_me(self):
         """Retreating app information"""
         client = CryptoBotClient(API_TOKEN, is_mainnet=False)
@@ -45,9 +43,7 @@ class TestCryptoBotSyncClient(unittest.TestCase):
         with self.assertRaises(CryptoBotError):
             client.get_me()
 
-    @unittest.skipIf(
-        SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)"
-    )
+    @unittest.skipIf(SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)")
     def test_create_invoice(self):
         """Create a new invoice"""
         invoice = self.client.create_invoice(Asset.TON, 1)
@@ -56,13 +52,9 @@ class TestCryptoBotSyncClient(unittest.TestCase):
         self.assertEqual(invoice.amount, "1")
         self.assertEqual(invoice.allow_comments, True)
         self.assertEqual(invoice.allow_anonymous, True)
-        self.assertEqual(
-            f"https://t.me/CryptoTestnetBot?start={invoice.hash}", invoice.pay_url
-        )
+        self.assertEqual(f"https://t.me/CryptoTestnetBot?start={invoice.hash}", invoice.pay_url)
 
-    @unittest.skipIf(
-        SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)"
-    )
+    @unittest.skipIf(SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)")
     def test_create_invoice_with_params(self):
         """Create a new invoice"""
         invoice = self.client.create_invoice(
@@ -83,21 +75,15 @@ class TestCryptoBotSyncClient(unittest.TestCase):
         self.assertEqual(invoice.amount, "1")
         self.assertEqual(invoice.allow_comments, False)
         self.assertEqual(invoice.allow_anonymous, False)
-        self.assertEqual(
-            f"https://t.me/CryptoTestnetBot?start={invoice.hash}", invoice.pay_url
-        )
+        self.assertEqual(f"https://t.me/CryptoTestnetBot?start={invoice.hash}", invoice.pay_url)
 
-    @unittest.skipIf(
-        SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)"
-    )
+    @unittest.skipIf(SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)")
     def test_create_invoice_error(self):
         """Create a new invoice"""
         with self.assertRaises(CryptoBotError):
             self.client.create_invoice(Asset.TON, 0.0001)
 
-    @unittest.skipIf(
-        SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)"
-    )
+    @unittest.skipIf(SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)")
     def test_transfer(self):
         """Transfer - may fail if testnet account has insufficient funds"""
         try:
@@ -110,9 +96,7 @@ class TestCryptoBotSyncClient(unittest.TestCase):
             if e.name not in ("INSUFFICIENT_FUNDS", "AMOUNT_TOO_SMALL"):
                 raise
 
-    @unittest.skipIf(
-        SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)"
-    )
+    @unittest.skipIf(SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)")
     def test_get_invoices(self):
         """Get invoices"""
         invoices = self.client.get_invoices()
@@ -123,9 +107,7 @@ class TestCryptoBotSyncClient(unittest.TestCase):
             invoices[0].pay_url,
         )
 
-    @unittest.skipIf(
-        SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)"
-    )
+    @unittest.skipIf(SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)")
     def test_get_balances(self):
         """Get balance"""
         balances = self.client.get_balances()
@@ -136,9 +118,7 @@ class TestCryptoBotSyncClient(unittest.TestCase):
         # rates = self.client.get_exchange_rates()
         # self.assertEqual(len(rates), 84)  # 7 assets and 6 exchange rates
 
-    @unittest.skipIf(
-        SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)"
-    )
+    @unittest.skipIf(SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)")
     def test_get_currencies(self):
         """Get currencies"""
         currencies = self.client.get_currencies()

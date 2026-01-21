@@ -144,16 +144,12 @@ class TestListener:
     def test_listener_listen(self, mock_print, mock_uvicorn_run):
         """Test listener.listen() method."""
         callback = Mock()
-        listener = Listener(
-            host="localhost", callback=callback, api_token="test_token", port=8080
-        )
+        listener = Listener(host="localhost", callback=callback, api_token="test_token", port=8080)
 
         listener.listen()
 
         # Check that uvicorn.run was called with correct parameters
-        mock_uvicorn_run.assert_called_once_with(
-            listener.app, host="localhost", port=8080, log_level="error"
-        )
+        mock_uvicorn_run.assert_called_once_with(listener.app, host="localhost", port=8080, log_level="error")
 
         # Check that banner was printed
         assert mock_print.call_count >= 2  # ASCII art + info message
@@ -172,12 +168,8 @@ class TestListener:
         callback1 = Mock()
         callback2 = Mock()
 
-        listener1 = Listener(
-            host="localhost", callback=callback1, api_token="test_token1", port=8080
-        )
-        listener2 = Listener(
-            host="localhost", callback=callback2, api_token="test_token2", port=8081
-        )
+        listener1 = Listener(host="localhost", callback=callback1, api_token="test_token1", port=8080)
+        listener2 = Listener(host="localhost", callback=callback2, api_token="test_token2", port=8081)
 
         assert listener1.port != listener2.port
         assert listener1.callback != listener2.callback
@@ -199,22 +191,15 @@ class TestListenerWebhookEndpoint:
         headers = {"crypto-pay-api-signature": make_signature(token, raw_body)}
 
         transport = httpx.ASGITransport(app=listener.app, raise_app_exceptions=True)
-        async with httpx.AsyncClient(
-            transport=transport, base_url="http://testserver"
-        ) as client:
-            response = await client.post(
-                listener.url, content=raw_body, headers=headers
-            )
+        async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+            response = await client.post(listener.url, content=raw_body, headers=headers)
 
         assert response.status_code == 200
         assert response.json() == {"ok": True}
         callback.assert_called_once()
         passed_headers, passed_data = callback.call_args[0]
         assert passed_data == payload
-        assert (
-            passed_headers.get("crypto-pay-api-signature")
-            == headers["crypto-pay-api-signature"]
-        )
+        assert passed_headers.get("crypto-pay-api-signature") == headers["crypto-pay-api-signature"]
 
     @pytest.mark.asyncio
     async def test_webhook_invalid_signature_raises_error(self):
@@ -226,9 +211,7 @@ class TestListenerWebhookEndpoint:
         raw_body = json.dumps(payload)
 
         transport = httpx.ASGITransport(app=listener.app, raise_app_exceptions=True)
-        async with httpx.AsyncClient(
-            transport=transport, base_url="http://testserver"
-        ) as client:
+        async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
             with pytest.raises(CryptoBotError) as exc_info:
                 await client.post(
                     listener.url,
@@ -247,9 +230,7 @@ class TestListenerWebhookEndpoint:
         listener = Listener(host="localhost", callback=callback, api_token=token)
 
         transport = httpx.ASGITransport(app=listener.app, raise_app_exceptions=True)
-        async with httpx.AsyncClient(
-            transport=transport, base_url="http://testserver"
-        ) as client:
+        async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
             with pytest.raises(CryptoBotError) as exc_info:
                 await client.post(
                     listener.url,
@@ -274,9 +255,7 @@ class TestListenerWebhookEndpoint:
         headers = {"crypto-pay-api-signature": make_signature(token, raw_body)}
 
         transport = httpx.ASGITransport(app=listener.app, raise_app_exceptions=True)
-        async with httpx.AsyncClient(
-            transport=transport, base_url="http://testserver"
-        ) as client:
+        async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
             with pytest.raises(CryptoBotError) as exc_info:
                 await client.post(
                     listener.url,

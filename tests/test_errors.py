@@ -19,9 +19,7 @@ class TestCryptoBotError:
     def test_cryptobot_error_with_description(self):
         """Test creating CryptoBotError with description using parse_json."""
         # Using from_json to add description dynamically
-        error = CryptoBotError.from_json(
-            {"code": 401, "name": "UNAUTHORIZED", "description": "Invalid API token"}
-        )
+        error = CryptoBotError.from_json({"code": 401, "name": "UNAUTHORIZED", "description": "Invalid API token"})
         assert error.code == 401
         assert error.name == "UNAUTHORIZED"
         assert error.description == "Invalid API token"

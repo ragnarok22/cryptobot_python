@@ -86,9 +86,7 @@ class TestCryptoBotClientGetMe:
         """Test get_me request with error response."""
         mock_response = Mock()
         mock_response.status_code = 401
-        mock_response.json.return_value = {
-            "error": {"code": 401, "name": "UNAUTHORIZED"}
-        }
+        mock_response.json.return_value = {"error": {"code": 401, "name": "UNAUTHORIZED"}}
         mock_get.return_value = mock_response
 
         client = CryptoBotClient("test_token")
@@ -268,9 +266,7 @@ class TestCryptoBotClientTransfer:
         client = CryptoBotClient("test_token")
 
         with pytest.raises(CryptoBotError) as exc_info:
-            client.transfer(
-                user_id=12345, asset=Asset.BTC, amount=100.0, spend_id="test_id"
-            )
+            client.transfer(user_id=12345, asset=Asset.BTC, amount=100.0, spend_id="test_id")
 
         error = exc_info.value
         assert error.name == "INSUFFICIENT_FUNDS"
@@ -335,9 +331,7 @@ class TestCryptoBotClientGetInvoices:
         mock_get.return_value = mock_response
 
         client = CryptoBotClient("test_token")
-        invoices = client.get_invoices(
-            asset=Asset.USDT, status=Status.paid, offset=10, count=5
-        )
+        invoices = client.get_invoices(asset=Asset.USDT, status=Status.paid, offset=10, count=5)
 
         assert len(invoices) == 1
         assert invoices[0].status == "paid"

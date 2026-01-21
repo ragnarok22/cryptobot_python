@@ -42,11 +42,7 @@ class CryptoBotClient:
     def __init__(self, api_token, is_mainnet: bool = True, timeout: float = 5.0):
         self.api_token = api_token
         self.timeout = timeout
-        self._base_url = (
-            "https://pay.crypt.bot/api"
-            if is_mainnet
-            else "https://testnet-pay.crypt.bot/api"
-        )
+        self._base_url = "https://pay.crypt.bot/api" if is_mainnet else "https://testnet-pay.crypt.bot/api"
         self._http_client = httpx.Client(
             base_url=self._base_url,
             timeout=self.timeout,

@@ -61,9 +61,7 @@ class TestApp:
 
     def test_app_creation(self):
         """Test creating App instance."""
-        app = App(
-            app_id=12345, name="Test App", payment_processing_bot_username="TestBot"
-        )
+        app = App(app_id=12345, name="Test App", payment_processing_bot_username="TestBot")
         assert app.app_id == 12345
         assert app.name == "Test App"
         assert app.payment_processing_bot_username == "TestBot"

@@ -26,7 +26,7 @@ poetry run coverage run -m pytest     # Run tests with coverage
 
 ### Code Quality
 ```bash
-make format                           # Format code with black and isort
+make format                           # Format code with ruff (format + auto-fix)
 make lint                              # Run flake8 linting (uses max-line-length=127, max-complexity=10)
 poetry run flake8 cryptobot tests     # Direct flake8 execution
 ```

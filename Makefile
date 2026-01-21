@@ -52,9 +52,9 @@ lint/flake8: ## check style with flake8
 
 lint: lint/flake8 ## check style
 
-format: ## format code with black and isort
-	poetry run isort cryptobot tests
-	poetry run black cryptobot tests
+format: ## format code with ruff
+	poetry run ruff format cryptobot tests
+	poetry run ruff check --fix cryptobot tests
 
 test: ## run tests quickly with the default Python
 	poetry run coverage run -m pytest

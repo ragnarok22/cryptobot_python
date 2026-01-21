@@ -39,9 +39,7 @@ setup(
     include_package_data=True,
     keywords="cryptobot",
     name="cryptobot_python",
-    packages=find_packages(
-        where=".", exclude=["tests", "*.tests", "*.tests.*", "tests.*"]
-    ),
+    packages=find_packages(where=".", exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/ragnarok22/cryptobot_python",

@@ -1,4 +1,4 @@
-.PHONY: clean clean-build clean-pyc clean-test coverage dist docs help install lint lint/flake8
+.PHONY: clean clean-build clean-pyc clean-test coverage dist docs help install lint lint/flake8 format
 .DEFAULT_GOAL := help
 
 define BROWSER_PYSCRIPT
@@ -51,6 +51,10 @@ lint/flake8: ## check style with flake8
 	poetry run flake8 cryptobot tests --count --show-source --max-complexity=10 --max-line-length=127 --exclude=.venv --statistics
 
 lint: lint/flake8 ## check style
+
+format: ## format code with black and isort
+	poetry run isort cryptobot tests
+	poetry run black cryptobot tests
 
 test: ## run tests quickly with the default Python
 	poetry run coverage run -m pytest

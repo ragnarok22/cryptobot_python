@@ -18,13 +18,13 @@ jobs:
         python-version: [ "3.9.12", "3.10", "3.11", "3.12", "3.13", "3.14" ]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
-      - uses: abatilo/actions-poetry@v2
-      - uses: actions/cache@v4
+      - uses: abatilo/actions-poetry@v3
+      - uses: actions/cache@v5
         name: Define a cache for the virtual environment based on the dependencies lock file
         with:
           path: ./.venv
@@ -50,7 +50,7 @@ jobs:
           fi
       - name: Upload coverage reports to Codecov
         if: success() && matrix.python-version == '3.14'
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: ragnarok22/cryptobot_python

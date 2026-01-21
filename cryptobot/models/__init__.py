@@ -60,6 +60,7 @@ class Invoice:
 
     fee_asset: Optional[str] = None
     fee_amount: Optional[str] = None
+    fee_in_usd: Optional[str] = None
 
     paid_anonymously: bool = True
     paid_amount: Optional[str] = None

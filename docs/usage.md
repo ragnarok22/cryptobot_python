@@ -2,11 +2,12 @@
 
 ## Quick Start
 
-To use CryptoBot Python in a project, first import the client and models:
+Import the client, core models, and error types:
 
 ```python
 from cryptobot import CryptoBotClient
-from cryptobot.models import Asset
+from cryptobot.models import Asset, Status
+from cryptobot.errors import CryptoBotError
 ```
 
 Create a client instance with your API token:
@@ -158,18 +159,32 @@ paid_invoices = client.get_invoices(
 
 ### Testnet vs Mainnet
 
-By default, the client uses the mainnet environment. To use testnet:
+By default, the client uses the mainnet environment. To target the testnet (with a testnet token), set `is_mainnet=False`:
 
 ```python
-client = CryptoBotClient("YOUR_TESTNET_TOKEN", testnet=True)
+client = CryptoBotClient("YOUR_TESTNET_TOKEN", is_mainnet=False)
 ```
 
 ### Custom Timeout
 
-Configure request timeout (default is 30 seconds):
+Configure request timeout (default is 5 seconds):
 
 ```python
 client = CryptoBotClient("YOUR_API_TOKEN", timeout=60)
+```
+
+### Swap Incoming Payments
+
+Automatically convert payments to a different asset by using `swap_to`:
+
+```python
+invoice = client.create_invoice(
+    asset=Asset.TON,
+    amount=20,
+    description="Swap TON to USDT on receipt",
+    swap_to="USDT",
+)
+print(invoice.bot_invoice_url)
 ```
 
 ## Error Handling
@@ -239,7 +254,7 @@ async def webhook_handler(request: Request):
 
 ## Available Assets
 
-The library supports the following cryptocurrencies:
+The library supports these assets (see {class}`cryptobot.models.Asset` for the canonical list):
 
 ```python
 from cryptobot.models import Asset
@@ -250,7 +265,9 @@ Asset.TON     # Toncoin
 Asset.ETH     # Ethereum
 Asset.USDT    # Tether
 Asset.USDC    # USD Coin
+Asset.BUSD    # Binance USD
 Asset.BNB     # Binance Coin
+Asset.TRX     # TRON
 ```
 
 ## Advanced Patterns
@@ -396,7 +413,7 @@ invoice = create_flexible_invoice(client, 50.0, "Premium subscription")
 2. **Use unique spend_ids** for transfers to prevent duplicates
 3. **Validate user input** before creating invoices or transfers
 4. **Store API tokens securely** using environment variables
-5. **Use testnet for development** and testing
+5. **Use a dedicated testnet token** with `is_mainnet=False` during development
 6. **Implement proper webhook signature verification** for security
 7. **Set appropriate invoice expiration times** to avoid stale invoices
 8. **Use pagination** when retrieving large numbers of invoices

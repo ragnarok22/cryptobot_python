@@ -15,7 +15,7 @@ and a synchronous client for invoices, transfers, balances, exchange rates, and 
 - Synchronous `httpx`-based API client (`CryptoBotClient`)
 - Dataclass models for API responses (`Invoice`, `Transfer`, `Balance`, `ExchangeRate`, `Currency`)
 - Enum guard rails for assets, statuses, and paid button names
-- Mainnet/testnet support and configurable timeouts
+- Mainnet/testnet support with configurable timeouts and retries
 - FastAPI-powered webhook listener with signature verification helpers
 - Custom exception model (`CryptoBotError`) with API code/name fields
 
@@ -45,6 +45,8 @@ client = CryptoBotClient(
     api_token=os.environ["CRYPTOBOT_API_TOKEN"],
     is_mainnet=True,
     timeout=5.0,
+    max_retries=2,
+    retry_backoff=0.5,
 )
 
 app = client.get_me()
@@ -63,6 +65,18 @@ To use testnet instead of mainnet:
 
 ```python
 client = CryptoBotClient(api_token=os.environ["CRYPTOBOT_TESTNET_TOKEN"], is_mainnet=False)
+```
+
+Retry behavior is optional and disabled by default (`max_retries=0`). The default retryable status codes are
+`429, 500, 502, 503, 504`.
+
+```python
+client = CryptoBotClient(
+    api_token=os.environ["CRYPTOBOT_API_TOKEN"],
+    max_retries=3,
+    retry_backoff=0.5,
+    retryable_status_codes={429, 500, 502, 503, 504},
+)
 ```
 
 ## Core API

@@ -13,44 +13,39 @@ API_TOKEN = os.environ["CRYPTOBOT_API_TOKEN"]
 TESTNET_TOKEN = os.environ.get("CRYPTOBOT_TESTNET_TOKEN")
 ```
 
-## Retry and Backoff Wrapper
+## Built-in Retry and Backoff
 
-Use a wrapper to retry only transient failures (`429` and `5xx`):
+`CryptoBotClient` includes optional retry logic for transient failures. Retries are applied to:
+
+1. HTTP status codes in `retryable_status_codes` (default: `429, 500, 502, 503, 504`)
+2. `httpx` transport exceptions such as timeouts and network errors
+
+Retries are disabled by default (`max_retries=0`).
 
 ```python
-import time
-
 from cryptobot import CryptoBotClient
-from cryptobot.errors import CryptoBotError
 from cryptobot.models import Asset
 
 
-class ResilientCryptoBotClient:
-    def __init__(self, api_token: str, is_mainnet: bool = True, timeout: float = 5.0, max_retries: int = 3):
-        self.client = CryptoBotClient(api_token, is_mainnet=is_mainnet, timeout=timeout)
-        self.max_retries = max_retries
+client = CryptoBotClient(
+    api_token=API_TOKEN,
+    max_retries=3,
+    retry_backoff=0.5,
+)
 
-    def _run(self, fn, *args, **kwargs):
-        for attempt in range(1, self.max_retries + 1):
-            try:
-                return fn(*args, **kwargs)
-            except CryptoBotError as exc:
-                is_retryable = exc.code == 429 or exc.code >= 500
-                if not is_retryable or attempt == self.max_retries:
-                    raise
-                delay = 0.5 * (2 ** (attempt - 1))
-                time.sleep(delay)
-
-    def create_invoice(self, **kwargs):
-        return self._run(self.client.create_invoice, **kwargs)
-
-    def transfer(self, **kwargs):
-        return self._run(self.client.transfer, **kwargs)
-
-
-resilient = ResilientCryptoBotClient(API_TOKEN)
-invoice = resilient.create_invoice(asset=Asset.USDT, amount=10, description="Retry-safe invoice")
+invoice = client.create_invoice(asset=Asset.USDT, amount=10, description="Retry-safe invoice")
 print(invoice.invoice_id)
+```
+
+You can override retryable status codes:
+
+```python
+client = CryptoBotClient(
+    api_token=API_TOKEN,
+    max_retries=2,
+    retry_backoff=1.0,
+    retryable_status_codes={429, 503},
+)
 ```
 
 ## Tuned HTTPX Client

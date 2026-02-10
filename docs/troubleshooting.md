@@ -16,6 +16,7 @@ CryptoBotError: code=401, name=UNAUTHORIZED
 import os
 
 from cryptobot import CryptoBotClient
+from cryptobot.models import Asset
 
 client = CryptoBotClient(api_token=os.environ["CRYPTOBOT_API_TOKEN"])
 print(client.get_me().name)
@@ -140,27 +141,21 @@ def unique_spend_id(prefix: str, user_id: int) -> str:
 
 ## Timeout and Connection Issues
 
-Increase timeout and retry transient transport failures:
+Increase timeout and enable built-in retry/backoff for transient transport errors:
 
 ```python
-import time
-
-import httpx
 import os
 
 from cryptobot import CryptoBotClient
 
-client = CryptoBotClient(api_token=os.environ["CRYPTOBOT_API_TOKEN"], timeout=30.0)
+client = CryptoBotClient(
+    api_token=os.environ["CRYPTOBOT_API_TOKEN"],
+    timeout=30.0,
+    max_retries=3,
+    retry_backoff=0.5,
+)
 
-
-def create_invoice_with_retry(**kwargs):
-    for attempt in range(3):
-        try:
-            return client.create_invoice(**kwargs)
-        except (httpx.TimeoutException, httpx.ConnectError):
-            if attempt == 2:
-                raise
-            time.sleep(2 ** attempt)
+invoice = client.create_invoice(asset=Asset.USDT, amount=5, description="network-safe")
 ```
 
 ## Webhook Signature Failures
@@ -239,19 +234,19 @@ CryptoBotError: code=429, name=TOO_MANY_REQUESTS
 ### Fix
 
 ```python
-import time
+import os
 
-from cryptobot.errors import CryptoBotError
+from cryptobot import CryptoBotClient
 
+client = CryptoBotClient(
+    api_token=os.environ["CRYPTOBOT_API_TOKEN"],
+    max_retries=4,
+    retry_backoff=0.5,
+    retryable_status_codes={429},
+)
 
-def call_with_backoff(func, *args, **kwargs):
-    for attempt in range(4):
-        try:
-            return func(*args, **kwargs)
-        except CryptoBotError as exc:
-            if exc.code != 429 or attempt == 3:
-                raise
-            time.sleep(2 ** attempt)
+app = client.get_me()
+print(app.name)
 ```
 
 ## Testnet Smoke Test

@@ -1,3 +1,8 @@
+---
+name: release
+description: Prepare and publish a new cryptobot-python release. Use when the user asks to cut a release, bump the package version, update HISTORY.md, create a git tag, or create a GitHub release.
+---
+
 # Release Skill
 
 Create a new release for the cryptobot-python package.

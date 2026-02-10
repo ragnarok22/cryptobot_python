@@ -3,13 +3,13 @@
 """Simplified tests for webhook functionality in `cryptobot` package."""
 
 import hashlib
+import hmac
 import json
 from unittest.mock import Mock, patch
 
 import httpx
 import pytest
 
-from cryptobot.errors import CryptoBotError
 from cryptobot.webhook import Listener, check_signature
 
 
@@ -17,9 +17,7 @@ def make_signature(token, raw_body):
     """Create a signature matching check_signature for test payloads."""
 
     secret = hashlib.sha256(token.encode()).digest()
-    hmac = hashlib.sha256(secret)
-    hmac.update(raw_body if isinstance(raw_body, bytes) else raw_body.encode())
-    return hmac.hexdigest()
+    return hmac.new(secret, raw_body if isinstance(raw_body, bytes) else raw_body.encode(), hashlib.sha256).hexdigest()
 
 
 class TestCheckSignature:
@@ -30,14 +28,7 @@ class TestCheckSignature:
         token = "test_token"
         body_dict = {"test": "data"}
         raw_body = json.dumps(body_dict)
-
-        # Create expected signature using raw body
-        secret = hashlib.sha256(token.encode()).digest()
-        hmac = hashlib.sha256(secret)
-        hmac.update(raw_body.encode())
-        expected_signature = hmac.hexdigest()
-
-        headers = {"crypto-pay-api-signature": expected_signature}
+        headers = {"crypto-pay-api-signature": make_signature(token, raw_body)}
 
         assert check_signature(token, raw_body, headers) is True
 
@@ -59,13 +50,7 @@ class TestCheckSignature:
         original_raw = json.dumps(original_body_dict)
         modified_raw = json.dumps(modified_body_dict)
 
-        # Create signature for original body
-        secret = hashlib.sha256(token.encode()).digest()
-        hmac = hashlib.sha256(secret)
-        hmac.update(original_raw.encode())
-        signature = hmac.hexdigest()
-
-        headers = {"crypto-pay-api-signature": signature}
+        headers = {"crypto-pay-api-signature": make_signature(token, original_raw)}
 
         # Verify with modified body should fail
         assert check_signature(token, modified_raw, headers) is False
@@ -89,13 +74,7 @@ class TestCheckSignature:
         # Create raw body string
         raw_body = json.dumps(body_dict)
 
-        # Create signature
-        secret = hashlib.sha256(token.encode()).digest()
-        hmac = hashlib.sha256(secret)
-        hmac.update(raw_body.encode())
-        expected_signature = hmac.hexdigest()
-
-        headers = {"crypto-pay-api-signature": expected_signature}
+        headers = {"crypto-pay-api-signature": make_signature(token, raw_body)}
 
         assert check_signature(token, raw_body, headers) is True
 
@@ -138,6 +117,10 @@ class TestListener:
         assert listener.port == 2203
         assert listener.url == "/webhook"
         assert listener.log_level == "error"
+
+    def test_listener_requires_callable_callback(self):
+        with pytest.raises(TypeError, match="callback must be callable"):
+            Listener(host="localhost", callback=None, api_token="test_token")
 
     @patch("cryptobot.webhook.uvicorn.run")
     @patch("builtins.print")
@@ -190,7 +173,7 @@ class TestListenerWebhookEndpoint:
         raw_body = json.dumps(payload)
         headers = {"crypto-pay-api-signature": make_signature(token, raw_body)}
 
-        transport = httpx.ASGITransport(app=listener.app, raise_app_exceptions=True)
+        transport = httpx.ASGITransport(app=listener.app, raise_app_exceptions=False)
         async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
             response = await client.post(listener.url, content=raw_body, headers=headers)
 
@@ -210,37 +193,75 @@ class TestListenerWebhookEndpoint:
         payload = {"update_type": "invoice_paid", "payload": {"invoice_id": 1}}
         raw_body = json.dumps(payload)
 
-        transport = httpx.ASGITransport(app=listener.app, raise_app_exceptions=True)
+        transport = httpx.ASGITransport(app=listener.app, raise_app_exceptions=False)
         async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
-            with pytest.raises(CryptoBotError) as exc_info:
-                await client.post(
-                    listener.url,
-                    content=raw_body,
-                    headers={"crypto-pay-api-signature": "bad"},
-                )
+            response = await client.post(
+                listener.url,
+                content=raw_body,
+                headers={"crypto-pay-api-signature": "bad"},
+            )
 
         callback.assert_not_called()
-        assert exc_info.value.code == 400
-        assert exc_info.value.name == "Invalid signature"
+        assert response.status_code == 400
+        assert response.json() == {"detail": "Invalid signature"}
+
+    @pytest.mark.asyncio
+    async def test_webhook_missing_signature_returns_400(self):
+        callback = Mock()
+        token = "test_token"
+        listener = Listener(host="localhost", callback=callback, api_token=token)
+
+        payload = {"update_type": "invoice_paid", "payload": {"invoice_id": 1}}
+        raw_body = json.dumps(payload)
+
+        transport = httpx.ASGITransport(app=listener.app, raise_app_exceptions=False)
+        async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+            response = await client.post(
+                listener.url,
+                content=raw_body,
+            )
+
+        callback.assert_not_called()
+        assert response.status_code == 400
+        assert response.json() == {"detail": "Invalid signature"}
 
     @pytest.mark.asyncio
     async def test_webhook_invalid_json_raises_error(self):
         callback = Mock()
         token = "test_token"
         listener = Listener(host="localhost", callback=callback, api_token=token)
+        raw_body = "not-json"
+        headers = {"crypto-pay-api-signature": make_signature(token, raw_body)}
 
-        transport = httpx.ASGITransport(app=listener.app, raise_app_exceptions=True)
+        transport = httpx.ASGITransport(app=listener.app, raise_app_exceptions=False)
         async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
-            with pytest.raises(CryptoBotError) as exc_info:
-                await client.post(
-                    listener.url,
-                    content="not-json",
-                    headers={"crypto-pay-api-signature": "bad"},
-                )
+            response = await client.post(
+                listener.url,
+                content=raw_body,
+                headers=headers,
+            )
 
         callback.assert_not_called()
-        assert exc_info.value.code == 400
-        assert exc_info.value.name == "Invalid JSON"
+        assert response.status_code == 400
+        assert response.json() == {"detail": "Invalid JSON"}
+
+    @pytest.mark.asyncio
+    async def test_webhook_invalid_encoding_returns_400(self):
+        callback = Mock()
+        token = "test_token"
+        listener = Listener(host="localhost", callback=callback, api_token=token)
+
+        transport = httpx.ASGITransport(app=listener.app, raise_app_exceptions=False)
+        async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+            response = await client.post(
+                listener.url,
+                content=b"\xff\xfe\xfa",
+                headers={"crypto-pay-api-signature": "bad"},
+            )
+
+        callback.assert_not_called()
+        assert response.status_code == 400
+        assert response.json() == {"detail": "Invalid encoding"}
 
     @pytest.mark.asyncio
     async def test_webhook_callback_error_propagates(self):
@@ -254,14 +275,34 @@ class TestListenerWebhookEndpoint:
         raw_body = json.dumps(payload)
         headers = {"crypto-pay-api-signature": make_signature(token, raw_body)}
 
-        transport = httpx.ASGITransport(app=listener.app, raise_app_exceptions=True)
+        transport = httpx.ASGITransport(app=listener.app, raise_app_exceptions=False)
         async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
-            with pytest.raises(CryptoBotError) as exc_info:
-                await client.post(
-                    listener.url,
-                    content=raw_body,
-                    headers=headers,
-                )
+            response = await client.post(
+                listener.url,
+                content=raw_body,
+                headers=headers,
+            )
 
-        assert exc_info.value.code == 500
-        assert exc_info.value.name.startswith("Callback error: boom")
+        assert response.status_code == 500
+        assert response.json() == {"detail": "Callback error"}
+
+    @pytest.mark.asyncio
+    async def test_webhook_async_callback_is_awaited(self):
+        was_called = {"value": False}
+
+        async def async_callback(headers, data):
+            was_called["value"] = True
+
+        token = "test_token"
+        listener = Listener(host="localhost", callback=async_callback, api_token=token)
+
+        payload = {"update_type": "invoice_paid", "payload": {"invoice_id": 3}}
+        raw_body = json.dumps(payload)
+        headers = {"crypto-pay-api-signature": make_signature(token, raw_body)}
+
+        transport = httpx.ASGITransport(app=listener.app, raise_app_exceptions=False)
+        async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+            response = await client.post(listener.url, content=raw_body, headers=headers)
+
+        assert response.status_code == 200
+        assert was_called["value"] is True

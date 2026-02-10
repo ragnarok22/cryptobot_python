@@ -1,18 +1,19 @@
 import hashlib
+import hmac
+import inspect
 import json
 import logging
 from dataclasses import dataclass
+from typing import Union
 
 import uvicorn
 from colorama import Fore, Style
-from fastapi import FastAPI, Request
-
-from cryptobot.errors import CryptoBotError
+from fastapi import FastAPI, HTTPException, Request
 
 logger = logging.getLogger(__name__)
 
 
-def check_signature(token: str, body: str, headers) -> bool:
+def check_signature(token: str, body: Union[str, bytes], headers) -> bool:
     """Verify webhook signature using HMAC-SHA256.
 
     This function validates that webhook requests are genuinely from Crypto Bot
@@ -21,7 +22,7 @@ def check_signature(token: str, body: str, headers) -> bool:
 
     Args:
         token: Your Crypto Bot API token.
-        body: The raw webhook request body as a string (unparsed JSON).
+        body: The raw webhook request body as a string (unparsed JSON) or bytes.
         headers: The request headers containing the signature.
 
     Returns:
@@ -44,15 +45,14 @@ def check_signature(token: str, body: str, headers) -> bool:
         ...     print("Invalid signature - possible attack!")
     """
     secret = hashlib.sha256(token.encode()).digest()
-    hmac = hashlib.sha256(secret)
-    hmac.update(body.encode() if isinstance(body, str) else body)
-    computed_signature = hmac.hexdigest()
+    raw_body = body.encode() if isinstance(body, str) else body
+    computed_signature = hmac.new(secret, raw_body, hashlib.sha256).hexdigest()
     received_signature = headers.get("crypto-pay-api-signature", "")
 
     logger.debug(f"Computed HMAC: {computed_signature}")
     logger.debug(f"Received signature: {received_signature}")
 
-    return computed_signature == received_signature
+    return hmac.compare_digest(computed_signature, received_signature)
 
 
 @dataclass
@@ -126,42 +126,53 @@ class Listener:
     url: str = "/webhook"
     log_level: str = "error"
 
+    async def _read_raw_body(self, request: Request) -> str:
+        raw_body = await request.body()
+        try:
+            return raw_body.decode("utf-8")
+        except UnicodeDecodeError as e:
+            logger.error(f"Invalid body encoding in webhook request: {e}")
+            raise HTTPException(status_code=400, detail="Invalid encoding")
+
+    def _verify_signature(self, raw_body: str, headers) -> None:
+        if not check_signature(self.api_token, raw_body, headers):
+            logger.warning("Invalid webhook signature detected")
+            raise HTTPException(status_code=400, detail="Invalid signature")
+
+    @staticmethod
+    def _parse_json(raw_body: str) -> dict:
+        try:
+            return json.loads(raw_body)
+        except json.JSONDecodeError as e:
+            logger.error(f"Invalid JSON in webhook request: {e}")
+            raise HTTPException(status_code=400, detail="Invalid JSON")
+
+    async def _execute_callback(self, headers, data) -> None:
+        try:
+            callback_result = self.callback(headers, data)
+            if inspect.isawaitable(callback_result):
+                await callback_result
+        except Exception as e:
+            logger.error(f"Callback function error: {e}", exc_info=True)
+            raise HTTPException(status_code=500, detail="Callback error")
+
     def __post_init__(self):
+        if not callable(self.callback):
+            raise TypeError("callback must be callable")
+
         # Create a new FastAPI app instance for this listener
         self.app = FastAPI()
 
         @self.app.post(self.url)
         async def listen_webhook(request: Request):
-            try:
-                # Get raw body for signature verification
-                raw_body = await request.body()
-                raw_body_str = raw_body.decode("utf-8")
+            raw_body = await self._read_raw_body(request)
+            self._verify_signature(raw_body, request.headers)
+            data = self._parse_json(raw_body)
 
-                # Parse JSON for use
-                data = json.loads(raw_body_str)
-                logger.info(f"Received webhook: update_type={data.get('update_type')}")
+            logger.info(f"Received webhook: update_type={data.get('update_type')}")
+            await self._execute_callback(request.headers, data)
 
-                # Verify signature using raw body
-                if not check_signature(self.api_token, raw_body_str, request.headers):
-                    logger.warning("Invalid webhook signature detected")
-                    raise CryptoBotError(code=400, name="Invalid signature")
-
-                # Execute callback with error handling
-                try:
-                    self.callback(request.headers, data)
-                except Exception as e:
-                    logger.error(f"Callback function error: {e}", exc_info=True)
-                    raise CryptoBotError(code=500, name=f"Callback error: {str(e)}")
-
-                return {"ok": True}
-            except json.JSONDecodeError as e:
-                logger.error(f"Invalid JSON in webhook request: {e}")
-                raise CryptoBotError(code=400, name="Invalid JSON")
-            except CryptoBotError:
-                raise
-            except Exception as e:
-                logger.error(f"Unexpected error processing webhook: {e}", exc_info=True)
-                raise CryptoBotError(code=500, name=f"Internal error: {str(e)}")
+            return {"ok": True}
 
     def listen(self):
         """Start the webhook server and listen for incoming requests.
@@ -177,9 +188,9 @@ class Listener:
             >>> listener.listen()  # Server starts and blocks here
             [Webhook Listener]
             * Docs: https://help.crypt.bot/crypto-pay-api#Webhook
-            * Listening on https://0.0.0.0:2203/webhook (Press CTRL+C to stop)
+            * Listening on http://0.0.0.0:2203/webhook (Press CTRL+C to stop)
         """
-        url = f"https://{self.host}:{self.port}{self.url}"
+        url = f"http://{self.host}:{self.port}{self.url}"
         logger.info(f"Listening on {url}")
 
         print(

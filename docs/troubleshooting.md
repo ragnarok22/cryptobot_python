@@ -17,6 +17,7 @@ import os
 
 from cryptobot import CryptoBotClient
 from cryptobot.models import Asset
+from cryptobot.models import Asset
 
 client = CryptoBotClient(api_token=os.environ["CRYPTOBOT_API_TOKEN"])
 print(client.get_me().name)

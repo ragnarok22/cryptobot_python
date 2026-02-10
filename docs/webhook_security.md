@@ -153,7 +153,8 @@ Thread(target=worker, daemon=True).start()
 ### 1. Run listener locally
 
 ```bash
-poetry run python -m cryptobot.webhook
+# Start your own listener script (example filename)
+poetry run python listener.py
 ```
 
 ### 2. Expose local port with ngrok

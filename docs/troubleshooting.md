@@ -146,10 +146,11 @@ Increase timeout and retry transient transport failures:
 import time
 
 import httpx
+import os
 
 from cryptobot import CryptoBotClient
 
-client = CryptoBotClient(api_token="...", timeout=30.0)
+client = CryptoBotClient(api_token=os.environ["CRYPTOBOT_API_TOKEN"], timeout=30.0)
 
 
 def create_invoice_with_retry(**kwargs):

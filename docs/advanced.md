@@ -150,7 +150,7 @@ Cache exchange rates with a TTL to reduce API calls:
 ```python
 from datetime import datetime, timedelta
 from threading import Lock
-from typing import List
+from typing import List, Optional
 
 from cryptobot import CryptoBotClient
 from cryptobot.models import ExchangeRate
@@ -161,7 +161,7 @@ class ExchangeRateCache:
         self.client = client
         self.ttl = timedelta(seconds=ttl_seconds)
         self._rates: List[ExchangeRate] = []
-        self._fetched_at: datetime | None = None
+        self._fetched_at: Optional[datetime] = None
         self._lock = Lock()
 
     def get_rates(self, force_refresh: bool = False) -> List[ExchangeRate]:

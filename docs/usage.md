@@ -5,15 +5,21 @@
 Import the client, core models, and error types:
 
 ```python
+import os
+
 from cryptobot import CryptoBotClient
-from cryptobot.models import Asset, Status
 from cryptobot.errors import CryptoBotError
+from cryptobot.models import Asset, ButtonName, Status
 ```
 
 Create a client instance with your API token:
 
 ```python
-client = CryptoBotClient("YOUR_API_TOKEN")
+client = CryptoBotClient(
+    api_token=os.environ["CRYPTOBOT_API_TOKEN"],
+    is_mainnet=True,
+    timeout=5.0,
+)
 ```
 
 ## Basic Operations
@@ -53,7 +59,7 @@ invoice = client.create_invoice(
     asset=Asset.BTC,
     amount=0.001,
     description="Premium service subscription",
-    paid_btn_name="callback",  # Button name for paid invoice
+    paid_btn_name=ButtonName.callback,  # Enum value for paid invoice button
     paid_btn_url="https://example.com/success",  # URL for success callback
     payload="user_123_premium",  # Custom payload for tracking
     allow_comments=True,  # Allow user comments
@@ -77,7 +83,7 @@ try:
     )
     print(f"Transfer completed: {transfer.transfer_id}")
 except CryptoBotError as e:
-    print(f"Transfer failed: {e.name} - {e.description}")
+    print(f"Transfer failed: {e.code} - {e.name}")
 ```
 
 ### Checking Balances
@@ -148,8 +154,8 @@ invoices = client.get_invoices()
 # Get invoices with filters
 paid_invoices = client.get_invoices(
     asset=Asset.USDT,
-    invoice_ids=["INV123", "INV456"],
-    status="paid",
+    invoice_ids="123,456",
+    status=Status.paid,
     offset=0,
     count=50
 )
@@ -199,57 +205,67 @@ try:
 except CryptoBotError as exc:
     print(f"Error code: {exc.code}")
     print(f"Error name: {exc.name}")
-    print(f"Description: {exc.description}")
 ```
 
 ## Webhook Integration
 
 ### Using the Built-in Webhook Server
 
-CryptoBot Python includes a FastAPI-based webhook server for handling payment notifications:
+CryptoBot Python includes a FastAPI-based webhook listener for handling payment notifications:
 
 ```python
-from cryptobot.webhook import app
-import uvicorn
+import os
 
-# Run the webhook server
-uvicorn.run(app, host="0.0.0.0", port=8000)
+from cryptobot.webhook import Listener
+
+
+def handle_webhook(headers, data):
+    if data.get("update_type") == "invoice_paid":
+        payload = data.get("payload", {})
+        print("Paid invoice:", payload.get("invoice_id"))
+
+
+listener = Listener(
+    host="0.0.0.0",
+    callback=handle_webhook,
+    api_token=os.environ["CRYPTOBOT_API_TOKEN"],
+    port=2203,
+    url="/webhook",
+    log_level="info",
+)
+listener.listen()
 ```
 
-The webhook server automatically handles signature verification and provides a colorful startup banner.
+The listener automatically verifies signatures and provides a startup banner.
 
 ### Custom Webhook Handler
 
-You can also create your own webhook handler:
+You can also create your own webhook handler and verify signatures with `check_signature`:
 
 ```python
+import json
+import os
+
+from cryptobot.webhook import check_signature
 from fastapi import FastAPI, Request, HTTPException
-import hmac
-import hashlib
 
 app = FastAPI()
+api_token = os.environ["CRYPTOBOT_API_TOKEN"]
 
 @app.post("/webhook")
 async def webhook_handler(request: Request):
-    # Get the signature from headers
-    signature = request.headers.get("crypto-pay-api-signature")
+    # Read the raw body first (required for signature verification)
+    raw_body = await request.body()
+    raw_body_str = raw_body.decode("utf-8")
 
-    # Read the request body
-    body = await request.body()
+    if not check_signature(api_token, raw_body_str, request.headers):
+        raise HTTPException(status_code=400, detail="Invalid signature")
 
-    # Verify signature (replace with your webhook secret)
-    secret_key = "YOUR_WEBHOOK_SECRET"
-    expected_signature = hmac.new(
-        secret_key.encode(), body, hashlib.sha256
-    ).hexdigest()
-
-    if not hmac.compare_digest(signature, expected_signature):
-        raise HTTPException(status_code=401, detail="Invalid signature")
-
-    # Process the webhook data
+    data = json.loads(raw_body_str)
+    # Process the verified webhook data
     # ...
 
-    return {"status": "ok"}
+    return {"ok": True}
 ```
 
 ## Available Assets

@@ -154,12 +154,15 @@ invoices = client.get_invoices()
 # Get invoices with filters
 paid_invoices = client.get_invoices(
     asset=Asset.USDT,
-    invoice_ids="123,456",
+    invoice_ids=[123, 456],
     status=Status.paid,
     offset=0,
     count=50
 )
 ```
+
+`invoice_ids` accepts either a comma-separated string (`"123,456"`) or `list[int]` (`[123, 456]`).
+`count` is validated between `1` and `1000`.
 
 ## Environment Configuration
 
@@ -216,7 +219,7 @@ CryptoBot Python includes a FastAPI-based webhook listener for handling payment 
 ```python
 import os
 
-from cryptobot.webhook import Listener
+from cryptobot.webhook import InMemoryReplayKeyStore, Listener
 
 
 def handle_webhook(headers, data):
@@ -229,6 +232,8 @@ listener = Listener(
     host="0.0.0.0",
     callback=handle_webhook,
     api_token=os.environ["CRYPTOBOT_API_TOKEN"],
+    replay_store=InMemoryReplayKeyStore(),
+    replay_ttl_seconds=3600,
     port=2203,
     url="/webhook",
     log_level="info",
@@ -236,7 +241,7 @@ listener = Listener(
 listener.listen()
 ```
 
-The listener automatically verifies signatures and provides a startup banner.
+The listener automatically verifies signatures, can reject duplicate replayed webhook payloads, and provides a startup banner.
 
 ### Custom Webhook Handler
 
@@ -288,40 +293,18 @@ Asset.TRX     # TRON
 
 ## Advanced Patterns
 
-### Pagination with get_invoices
+### Pagination with iterators
 
-When dealing with many invoices, use pagination to retrieve them in batches:
+When dealing with many invoices, prefer the built-in paginated iterator helpers:
 
 ```python
-def get_all_paid_invoices(client, asset=None):
-    """Retrieve all paid invoices using pagination"""
-    all_invoices = []
-    offset = 0
-    batch_size = 100
+# Iterate by page
+for page in client.iter_invoice_pages(asset=Asset.USDT, status=Status.paid, page_size=100):
+    print("page size:", len(page))
 
-    while True:
-        batch = client.get_invoices(
-            asset=asset,
-            status=Status.paid,
-            offset=offset,
-            count=batch_size
-        )
-
-        if not batch:
-            break
-
-        all_invoices.extend(batch)
-        offset += batch_size
-
-        # If we got fewer than batch_size, we're done
-        if len(batch) < batch_size:
-            break
-
-    return all_invoices
-
-# Usage
-paid_invoices = get_all_paid_invoices(client, asset=Asset.USDT)
-print(f"Total paid invoices: {len(paid_invoices)}")
+# Iterate flattened invoices
+for invoice in client.iter_invoices(asset=Asset.USDT, status=Status.paid, page_size=100):
+    print(invoice.invoice_id, invoice.status)
 ```
 
 ### Invoice Status Checking

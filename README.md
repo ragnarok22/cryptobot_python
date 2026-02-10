@@ -16,7 +16,7 @@ and a synchronous client for invoices, transfers, balances, exchange rates, and 
 - Dataclass models for API responses (`Invoice`, `Transfer`, `Balance`, `ExchangeRate`, `Currency`)
 - Enum guard rails for assets, statuses, and paid button names
 - Mainnet/testnet support with configurable timeouts and retries
-- FastAPI-powered webhook listener with signature verification helpers
+- FastAPI-powered webhook listener with signature verification and optional replay protection
 - Custom exception model (`CryptoBotError`) with API code/name fields
 
 ## Installation
@@ -90,6 +90,8 @@ client = CryptoBotClient(
 - `get_balances()`
 - `get_exchange_rates()`
 - `get_currencies()`
+- `iter_invoice_pages(...)`
+- `iter_invoices(...)`
 
 Example transfer with idempotency via `spend_id`:
 
@@ -117,7 +119,7 @@ Use the built-in listener to validate incoming signatures and process updates:
 ```python
 import os
 
-from cryptobot.webhook import Listener
+from cryptobot.webhook import InMemoryReplayKeyStore, Listener
 
 
 def handle_webhook(headers, data):
@@ -130,6 +132,8 @@ listener = Listener(
     host="0.0.0.0",
     callback=handle_webhook,
     api_token=os.environ["CRYPTOBOT_API_TOKEN"],
+    replay_store=InMemoryReplayKeyStore(),
+    replay_ttl_seconds=3600,
     port=2203,
     url="/webhook",
     log_level="info",

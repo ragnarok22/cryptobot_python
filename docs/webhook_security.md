@@ -27,7 +27,7 @@ The signature arrives in the `crypto-pay-api-signature` header.
 ```python
 import os
 
-from cryptobot.webhook import Listener
+from cryptobot.webhook import InMemoryReplayKeyStore, Listener
 
 
 def handle_webhook(headers, data):
@@ -40,6 +40,8 @@ listener = Listener(
     host="127.0.0.1",  # Prefer localhost behind reverse proxy
     callback=handle_webhook,
     api_token=os.environ["CRYPTOBOT_API_TOKEN"],
+    replay_store=InMemoryReplayKeyStore(),
+    replay_ttl_seconds=3600,
     port=2203,
     url="/webhook",
     log_level="info",
@@ -78,17 +80,24 @@ async def webhook(request: Request):
 
 ## Replay Protection
 
-Track processed update IDs (or invoice IDs) to avoid duplicate business actions.
+`Listener` supports pluggable replay protection via `replay_store`.
+For production, prefer a shared store (e.g., Redis) implementing:
+
+- `put_if_absent(key: str, ttl_seconds: int | None) -> bool`
+- `remove(key: str) -> None`
+
+Built-in in-memory replay protection:
 
 ```python
-processed_updates: set[int] = set()
+from cryptobot.webhook import InMemoryReplayKeyStore, Listener
 
-
-def already_processed(update_id: int) -> bool:
-    if update_id in processed_updates:
-        return True
-    processed_updates.add(update_id)
-    return False
+listener = Listener(
+    host="127.0.0.1",
+    callback=handle_webhook,
+    api_token=os.environ["CRYPTOBOT_API_TOKEN"],
+    replay_store=InMemoryReplayKeyStore(),
+    replay_ttl_seconds=3600,
+)
 ```
 
 In production, store this in Redis or your database instead of process memory.

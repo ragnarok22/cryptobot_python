@@ -2801,4 +2801,4 @@ webhook = ["colorama", "fastapi", "python-dotenv", "uvicorn"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9.12,<4.0"
-content-hash = "06d31c65b0ba67890f2b919bc9dc7129a4fefc02229cac3f66e20aaf98795d51"
+content-hash = "dd3226617f7413dd5abf74cce8ea57ec6d959c8d4b1ac04db91647ba52d927bf"

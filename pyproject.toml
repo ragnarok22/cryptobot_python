@@ -23,6 +23,10 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules"
 ]
 
+[project.optional-dependencies]
+docs = ["sphinx", "sphinx-rtd-theme", "myst-parser", "sphinx-intl"]
+webhook = ["fastapi", "uvicorn", "colorama", "python-dotenv"]
+
 [project.urls]
 homepage = "https://cryptobot-python.readthedocs.io/en/latest"
 repository = "https://github.com/ragnarok22/cryptobot_python"
@@ -33,10 +37,6 @@ documentation = "https://cryptobot-python.readthedocs.io/en/latest"
 packages = [
     { include = "cryptobot" }
 ]
-
-[tool.poetry.extras]
-docs = ["sphinx", "sphinx-rtd-theme", "myst-parser", "sphinx-intl"]
-webhook = ["fastapi", "uvicorn", "colorama", "python-dotenv"]
 
 [tool.poetry.group.dev.dependencies]
 flake8 = ">=6.0.0,<7.4.0"

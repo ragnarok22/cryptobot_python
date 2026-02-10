@@ -13,5 +13,5 @@ class CryptoBotError(Exception):
     def from_json(cls, json: Any) -> "CryptoBotError":
         return parse_json(cls, **json)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"code={self.code}, name={self.name}"

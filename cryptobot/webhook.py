@@ -7,7 +7,7 @@ import threading
 import time
 from collections.abc import Awaitable, Mapping
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, Optional, Protocol, Union
+from typing import Any, Callable, Optional, Protocol, Union
 
 import uvicorn
 from colorama import Fore, Style
@@ -37,8 +37,8 @@ class ReplayKeyStore(Protocol):
 class InMemoryReplayKeyStore:
     """Thread-safe in-memory replay key store with optional TTL eviction."""
 
-    def __init__(self):
-        self._keys: Dict[str, Optional[float]] = {}
+    def __init__(self) -> None:
+        self._keys: dict[str, Optional[float]] = {}
         self._lock = threading.Lock()
 
     def put_if_absent(self, key: str, ttl_seconds: Optional[int] = None) -> bool:
@@ -64,12 +64,12 @@ class InMemoryReplayKeyStore:
 
 
 WebhookHeaders = Mapping[str, str]
-WebhookPayload = Dict[str, Any]
+WebhookPayload = dict[str, Any]
 ReplayKeyResolver = Callable[[WebhookPayload, str, WebhookHeaders], Optional[str]]
 WebhookCallback = Callable[[WebhookHeaders, WebhookPayload], Union[None, Awaitable[None]]]
 
 
-def check_signature(token: str, body: Union[str, bytes], headers) -> bool:
+def check_signature(token: str, body: Union[str, bytes], headers: WebhookHeaders) -> bool:
     """Verify webhook signature using HMAC-SHA256.
 
     This function validates that webhook requests are genuinely from Crypto Bot
@@ -194,18 +194,24 @@ class Listener:
             logger.error(f"Invalid body encoding in webhook request: {e}")
             raise HTTPException(status_code=400, detail="Invalid encoding") from e
 
-    def _verify_signature(self, raw_body: str, headers) -> None:
+    def _verify_signature(self, raw_body: str, headers: WebhookHeaders) -> None:
         if not check_signature(self.api_token, raw_body, headers):
             logger.warning("Invalid webhook signature detected")
             raise HTTPException(status_code=400, detail="Invalid signature")
 
     @staticmethod
-    def _parse_json(raw_body: str) -> dict:
+    def _parse_json(raw_body: str) -> WebhookPayload:
         try:
-            return json.loads(raw_body)
+            data = json.loads(raw_body)
         except json.JSONDecodeError as e:
             logger.error(f"Invalid JSON in webhook request: {e}")
             raise HTTPException(status_code=400, detail="Invalid JSON") from e
+
+        if not isinstance(data, dict):
+            logger.error("Invalid JSON type in webhook request: expected object payload")
+            raise HTTPException(status_code=400, detail="Invalid JSON payload")
+
+        return data
 
     @staticmethod
     def _default_replay_key(data: WebhookPayload, raw_body: str, _headers: WebhookHeaders) -> str:
@@ -259,7 +265,7 @@ class Listener:
         if inspect.isawaitable(callback_result):
             await callback_result
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if not callable(self.callback):
             raise TypeError("callback must be callable")
         if self.replay_store is not None and not hasattr(self.replay_store, "put_if_absent"):
@@ -273,7 +279,7 @@ class Listener:
         self.app = FastAPI()
 
         @self.app.post(self.url)
-        async def listen_webhook(request: Request):
+        async def listen_webhook(request: Request) -> dict[str, bool]:
             raw_body = await self._read_raw_body(request)
             self._verify_signature(raw_body, request.headers)
             data = self._parse_json(raw_body)
@@ -290,7 +296,7 @@ class Listener:
 
             return {"ok": True}
 
-    def listen(self):
+    def listen(self) -> None:
         """Start the webhook server and listen for incoming requests.
 
         This method starts a uvicorn server that listens for webhook notifications.

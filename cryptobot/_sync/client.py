@@ -1,7 +1,8 @@
 import time
 from collections.abc import Iterator
 from contextlib import suppress
-from typing import Callable, List, Optional, Set, Union
+from types import TracebackType
+from typing import Any, Callable, List, Optional, Set, Union
 
 import httpx
 
@@ -74,7 +75,7 @@ class CryptoBotClient:
         )
 
     def _retry_delay(self, attempt: int, response: Optional[httpx.Response] = None) -> float:
-        delay = self.retry_backoff * (2**attempt)
+        delay: float = self.retry_backoff * (2**attempt)
 
         if response is not None:
             retry_after = response.headers.get("Retry-After")
@@ -82,9 +83,9 @@ class CryptoBotClient:
                 with suppress(ValueError):
                     delay = max(delay, float(retry_after))
 
-        return max(0.0, delay)
+        return delay if delay > 0.0 else 0.0
 
-    def _execute_with_retry(self, request_fn: Callable, *args, **kwargs) -> httpx.Response:
+    def _execute_with_retry(self, request_fn: Callable[..., httpx.Response], *args: Any, **kwargs: Any) -> httpx.Response:
         retryable_exceptions = (
             httpx.TimeoutException,
             httpx.NetworkError,
@@ -113,7 +114,7 @@ class CryptoBotClient:
         # This is unreachable due to the return/raise branches above.
         raise RuntimeError("Unexpected retry flow state")
 
-    def _handle_response(self, response: httpx.Response) -> dict:
+    def _handle_response(self, response: httpx.Response) -> Any:
         """Handle HTTP responses consistently and raise typed errors for malformed payloads."""
         try:
             payload = response.json()
@@ -146,7 +147,12 @@ class CryptoBotClient:
     def __enter__(self) -> "CryptoBotClient":
         return self
 
-    def __exit__(self, exc_type, exc, tb) -> None:
+    def __exit__(
+        self,
+        exc_type: Optional[type[BaseException]],
+        exc: Optional[BaseException],
+        tb: Optional[TracebackType],
+    ) -> None:
         self.close()
 
     @staticmethod
@@ -209,7 +215,7 @@ class CryptoBotClient:
         info = self._handle_response(response)
         return parse_json(App, **info)
 
-    def _create_invoice(self, **kwargs) -> Invoice:
+    def _create_invoice(self, **kwargs: Any) -> Invoice:
         """Create a new invoice"""
         response = self._execute_with_retry(self._http_client.post, "/createInvoice", json=kwargs)
         info = self._handle_response(response)
@@ -419,7 +425,7 @@ class CryptoBotClient:
         self._validate_count(count)
         normalized_invoice_ids = self._normalize_invoice_ids(invoice_ids)
 
-        data = {}
+        data: dict[str, Any] = {}
         if asset:
             data["asset"] = asset.name
         if normalized_invoice_ids is not None:

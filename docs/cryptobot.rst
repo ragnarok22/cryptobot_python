@@ -12,6 +12,14 @@ Subpackages
 Submodules
 ----------
 
+cryptobot.client module
+-----------------------
+
+.. automodule:: cryptobot.client
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 cryptobot.errors module
 -----------------------
 

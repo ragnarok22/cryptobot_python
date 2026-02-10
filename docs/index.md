@@ -1,11 +1,12 @@
 # Welcome to CryptoBot Python
 
 CryptoBot Python is an unofficial, friendly client library for the [Crypto Bot](https://pay.crypt.bot/) API.
-It provides typed models and a synchronous client for invoices, transfers, balances, exchange rates, and webhook handling.
+It provides typed models and synchronous/async clients for invoices, transfers, balances, exchange rates, and webhook handling.
 
 ## Highlights
 
 - Synchronous API client built on `httpx`
+- Async API client built on `httpx`
 - Dataclass response models (`Invoice`, `Transfer`, `Balance`, `ExchangeRate`, `Currency`)
 - Enum safety for assets, statuses, and paid button names
 - Mainnet/testnet support with configurable timeout

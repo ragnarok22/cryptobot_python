@@ -22,6 +22,18 @@ client = CryptoBotClient(
 )
 ```
 
+Async quick start:
+
+```python
+from cryptobot import AsyncCryptoBotClient
+
+
+async def run():
+    async with AsyncCryptoBotClient(api_token=os.environ["CRYPTOBOT_API_TOKEN"]) as client:
+        app = await client.get_me()
+        print(app.name)
+```
+
 ## Basic Operations
 
 ### Getting App Information

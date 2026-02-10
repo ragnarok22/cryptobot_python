@@ -8,11 +8,12 @@
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/ragnarok22/cryptobot_python)
 
 Unofficial but friendly Python client for the [Crypto Bot](https://pay.crypt.bot/) API. It provides typed models, sane defaults,
-and a synchronous client for invoices, transfers, balances, exchange rates, and webhook handling.
+and synchronous/async clients for invoices, transfers, balances, exchange rates, and webhook handling.
 
 ## Features
 
 - Synchronous `httpx`-based API client (`CryptoBotClient`)
+- Async `httpx`-based API client (`AsyncCryptoBotClient`)
 - Dataclass models for API responses (`Invoice`, `Transfer`, `Balance`, `ExchangeRate`, `Currency`)
 - Enum guard rails for assets, statuses, and paid button names
 - Mainnet/testnet support with configurable timeouts and retries
@@ -79,6 +80,24 @@ client = CryptoBotClient(
 )
 ```
 
+Async usage:
+
+```python
+import os
+
+from cryptobot import AsyncCryptoBotClient
+from cryptobot.models import Asset
+
+
+async def main():
+    async with AsyncCryptoBotClient(api_token=os.environ["CRYPTOBOT_API_TOKEN"], max_retries=2) as client:
+        app = await client.get_me()
+        print(app.name)
+
+        invoice = await client.create_invoice(asset=Asset.USDT, amount=5.25, description="Async order #42")
+        print(invoice.invoice_id, invoice.bot_invoice_url)
+```
+
 ## Core API
 
 `CryptoBotClient` methods:
@@ -92,6 +111,9 @@ client = CryptoBotClient(
 - `get_currencies()`
 - `iter_invoice_pages(...)`
 - `iter_invoices(...)`
+
+`AsyncCryptoBotClient` provides the same methods with `await`, plus async iterators for
+`iter_invoice_pages(...)` and `iter_invoices(...)`.
 
 Example transfer with idempotency via `spend_id`:
 

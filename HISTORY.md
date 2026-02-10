@@ -1,5 +1,13 @@
 # History
 
+## 0.5.0 (2026-02-10)
+
+* Added async API client support alongside the synchronous client.
+* Added invoice pagination helpers and iterator utilities.
+* Added webhook replay protection and strengthened signature validation/error handling.
+* Improved response parsing, retry configurability, and type hint coverage.
+* Expanded tests and refreshed documentation examples and troubleshooting guidance.
+
 ## 0.4.1 (2026-01-20)
 
 * Bug fixes and stability improvements

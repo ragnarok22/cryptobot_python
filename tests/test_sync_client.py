@@ -31,8 +31,8 @@ class TestCryptoBotSyncClient(unittest.TestCase):
 
         try:
             socket.getaddrinfo("testnet-pay.crypt.bot", 443)
-        except socket.gaierror:
-            raise unittest.SkipTest("Integration target is not reachable from this environment")
+        except socket.gaierror as exc:
+            raise unittest.SkipTest("Integration target is not reachable from this environment") from exc
 
     def setUp(self):
         """Set up test fixtures, if any."""

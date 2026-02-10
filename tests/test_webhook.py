@@ -10,7 +10,7 @@ from unittest.mock import Mock, patch
 import httpx
 import pytest
 
-from cryptobot.webhook import Listener, check_signature
+from cryptobot.webhook import InMemoryReplayKeyStore, Listener, check_signature
 
 
 def make_signature(token, raw_body):
@@ -121,6 +121,13 @@ class TestListener:
     def test_listener_requires_callable_callback(self):
         with pytest.raises(TypeError, match="callback must be callable"):
             Listener(host="localhost", callback=None, api_token="test_token")
+
+    def test_listener_requires_replay_store_contract(self):
+        class InvalidStore:
+            pass
+
+        with pytest.raises(TypeError, match="replay_store must implement put_if_absent"):
+            Listener(host="localhost", callback=Mock(), api_token="test_token", replay_store=InvalidStore())
 
     @patch("cryptobot.webhook.uvicorn.run")
     @patch("builtins.print")
@@ -306,3 +313,76 @@ class TestListenerWebhookEndpoint:
 
         assert response.status_code == 200
         assert was_called["value"] is True
+
+    @pytest.mark.asyncio
+    async def test_webhook_replay_duplicate_rejected(self):
+        callback = Mock()
+        token = "test_token"
+        replay_store = InMemoryReplayKeyStore()
+        listener = Listener(host="localhost", callback=callback, api_token=token, replay_store=replay_store)
+
+        payload = {"update_id": 42, "update_type": "invoice_paid", "payload": {"invoice_id": 100}}
+        raw_body = json.dumps(payload)
+        headers = {"crypto-pay-api-signature": make_signature(token, raw_body)}
+
+        transport = httpx.ASGITransport(app=listener.app, raise_app_exceptions=False)
+        async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+            first = await client.post(listener.url, content=raw_body, headers=headers)
+            second = await client.post(listener.url, content=raw_body, headers=headers)
+
+        assert first.status_code == 200
+        assert second.status_code == 409
+        assert second.json() == {"detail": "Duplicate webhook"}
+        callback.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_webhook_replay_key_released_on_callback_error(self):
+        call_count = {"value": 0}
+
+        def flaky_callback(headers, data):
+            call_count["value"] += 1
+            if call_count["value"] == 1:
+                raise ValueError("temporary failure")
+
+        token = "test_token"
+        replay_store = InMemoryReplayKeyStore()
+        listener = Listener(host="localhost", callback=flaky_callback, api_token=token, replay_store=replay_store)
+
+        payload = {"update_id": 99, "update_type": "invoice_paid", "payload": {"invoice_id": 555}}
+        raw_body = json.dumps(payload)
+        headers = {"crypto-pay-api-signature": make_signature(token, raw_body)}
+
+        transport = httpx.ASGITransport(app=listener.app, raise_app_exceptions=False)
+        async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+            first = await client.post(listener.url, content=raw_body, headers=headers)
+            second = await client.post(listener.url, content=raw_body, headers=headers)
+
+        assert first.status_code == 500
+        assert second.status_code == 200
+        assert call_count["value"] == 2
+
+    @pytest.mark.asyncio
+    async def test_webhook_replay_key_resolver_can_disable_dedupe(self):
+        callback = Mock()
+        token = "test_token"
+        replay_store = InMemoryReplayKeyStore()
+        listener = Listener(
+            host="localhost",
+            callback=callback,
+            api_token=token,
+            replay_store=replay_store,
+            replay_key_resolver=lambda data, raw_body, headers: None,
+        )
+
+        payload = {"update_type": "invoice_paid", "payload": {"invoice_id": 11}}
+        raw_body = json.dumps(payload)
+        headers = {"crypto-pay-api-signature": make_signature(token, raw_body)}
+
+        transport = httpx.ASGITransport(app=listener.app, raise_app_exceptions=False)
+        async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+            first = await client.post(listener.url, content=raw_body, headers=headers)
+            second = await client.post(listener.url, content=raw_body, headers=headers)
+
+        assert first.status_code == 200
+        assert second.status_code == 200
+        assert callback.call_count == 2

@@ -3,14 +3,70 @@ import hmac
 import inspect
 import json
 import logging
-from dataclasses import dataclass
-from typing import Union
+import threading
+import time
+from collections.abc import Awaitable, Mapping
+from dataclasses import dataclass, field
+from typing import Any, Callable, Dict, Optional, Protocol, Union
 
 import uvicorn
 from colorama import Fore, Style
 from fastapi import FastAPI, HTTPException, Request
 
 logger = logging.getLogger(__name__)
+
+
+class ReplayKeyStore(Protocol):
+    """Storage contract for webhook replay-protection keys."""
+
+    def put_if_absent(self, key: str, ttl_seconds: Optional[int] = None) -> bool:
+        """Atomically store key if absent.
+
+        Returns:
+            True when key is accepted and stored.
+            False when key already exists (replay detected).
+        """
+
+    def remove(self, key: str) -> None:
+        """Remove a previously stored key.
+
+        Implementations may use this to roll back reservation when callback fails.
+        """
+
+
+class InMemoryReplayKeyStore:
+    """Thread-safe in-memory replay key store with optional TTL eviction."""
+
+    def __init__(self):
+        self._keys: Dict[str, Optional[float]] = {}
+        self._lock = threading.Lock()
+
+    def put_if_absent(self, key: str, ttl_seconds: Optional[int] = None) -> bool:
+        with self._lock:
+            now = time.monotonic()
+            self._purge_expired(now)
+
+            expiry = now + ttl_seconds if ttl_seconds and ttl_seconds > 0 else None
+            if key in self._keys:
+                return False
+
+            self._keys[key] = expiry
+            return True
+
+    def remove(self, key: str) -> None:
+        with self._lock:
+            self._keys.pop(key, None)
+
+    def _purge_expired(self, now: float) -> None:
+        expired_keys = [key for key, expires_at in self._keys.items() if expires_at is not None and now >= expires_at]
+        for key in expired_keys:
+            del self._keys[key]
+
+
+WebhookHeaders = Mapping[str, str]
+WebhookPayload = Dict[str, Any]
+ReplayKeyResolver = Callable[[WebhookPayload, str, WebhookHeaders], Optional[str]]
+WebhookCallback = Callable[[WebhookHeaders, WebhookPayload], Union[None, Awaitable[None]]]
 
 
 def check_signature(token: str, body: Union[str, bytes], headers) -> bool:
@@ -120,11 +176,15 @@ class Listener:
     """
 
     host: str
-    callback: callable
+    callback: WebhookCallback
     api_token: str
     port: int = 2203
     url: str = "/webhook"
     log_level: str = "error"
+    replay_store: Optional[ReplayKeyStore] = None
+    replay_ttl_seconds: int = 3600
+    replay_key_resolver: Optional[ReplayKeyResolver] = None
+    app: FastAPI = field(init=False, repr=False)
 
     async def _read_raw_body(self, request: Request) -> str:
         raw_body = await request.body()
@@ -132,7 +192,7 @@ class Listener:
             return raw_body.decode("utf-8")
         except UnicodeDecodeError as e:
             logger.error(f"Invalid body encoding in webhook request: {e}")
-            raise HTTPException(status_code=400, detail="Invalid encoding")
+            raise HTTPException(status_code=400, detail="Invalid encoding") from e
 
     def _verify_signature(self, raw_body: str, headers) -> None:
         if not check_signature(self.api_token, raw_body, headers):
@@ -145,20 +205,69 @@ class Listener:
             return json.loads(raw_body)
         except json.JSONDecodeError as e:
             logger.error(f"Invalid JSON in webhook request: {e}")
-            raise HTTPException(status_code=400, detail="Invalid JSON")
+            raise HTTPException(status_code=400, detail="Invalid JSON") from e
 
-    async def _execute_callback(self, headers, data) -> None:
+    @staticmethod
+    def _default_replay_key(data: WebhookPayload, raw_body: str, _headers: WebhookHeaders) -> str:
+        update_id = data.get("update_id")
+        if update_id is not None:
+            return f"update_id:{update_id}"
+
+        update_type = data.get("update_type", "unknown")
+        payload = data.get("payload")
+        if isinstance(payload, dict):
+            for field_name in ("invoice_id", "transfer_id", "check_id"):
+                value = payload.get(field_name)
+                if value is not None:
+                    return f"{update_type}:{field_name}:{value}"
+
+        body_hash = hashlib.sha256(raw_body.encode("utf-8")).hexdigest()
+        return f"body:{body_hash}"
+
+    def _reserve_replay_key(self, raw_body: str, data: WebhookPayload, headers: WebhookHeaders) -> Optional[str]:
+        if self.replay_store is None:
+            return None
+
+        resolver = self.replay_key_resolver or self._default_replay_key
+        replay_key = resolver(data, raw_body, headers)
+        if replay_key is None:
+            return None
+
+        replay_key = str(replay_key).strip()
+        if not replay_key:
+            return None
+
+        ttl_seconds = self.replay_ttl_seconds if self.replay_ttl_seconds > 0 else None
+        is_accepted = self.replay_store.put_if_absent(replay_key, ttl_seconds=ttl_seconds)
+        if not is_accepted:
+            logger.warning("Replay webhook rejected. key=%s", replay_key)
+            raise HTTPException(status_code=409, detail="Duplicate webhook")
+
+        return replay_key
+
+    def _release_replay_key(self, replay_key: Optional[str]) -> None:
+        if not replay_key or self.replay_store is None:
+            return
+
         try:
-            callback_result = self.callback(headers, data)
-            if inspect.isawaitable(callback_result):
-                await callback_result
+            self.replay_store.remove(replay_key)
         except Exception as e:
-            logger.error(f"Callback function error: {e}", exc_info=True)
-            raise HTTPException(status_code=500, detail="Callback error")
+            logger.warning("Failed to release replay key %s after callback failure: %s", replay_key, e)
+
+    async def _execute_callback(self, headers: WebhookHeaders, data: WebhookPayload) -> None:
+        callback_result = self.callback(headers, data)
+        if inspect.isawaitable(callback_result):
+            await callback_result
 
     def __post_init__(self):
         if not callable(self.callback):
             raise TypeError("callback must be callable")
+        if self.replay_store is not None and not hasattr(self.replay_store, "put_if_absent"):
+            raise TypeError("replay_store must implement put_if_absent(key, ttl_seconds=None)")
+        if self.replay_ttl_seconds < 0:
+            raise ValueError("replay_ttl_seconds must be >= 0")
+        if self.replay_key_resolver is not None and not callable(self.replay_key_resolver):
+            raise TypeError("replay_key_resolver must be callable")
 
         # Create a new FastAPI app instance for this listener
         self.app = FastAPI()
@@ -170,7 +279,14 @@ class Listener:
             data = self._parse_json(raw_body)
 
             logger.info(f"Received webhook: update_type={data.get('update_type')}")
-            await self._execute_callback(request.headers, data)
+            replay_key = self._reserve_replay_key(raw_body, data, request.headers)
+
+            try:
+                await self._execute_callback(request.headers, data)
+            except Exception as e:
+                self._release_replay_key(replay_key)
+                logger.error(f"Callback function error: {e}", exc_info=True)
+                raise HTTPException(status_code=500, detail="Callback error") from e
 
             return {"ok": True}
 

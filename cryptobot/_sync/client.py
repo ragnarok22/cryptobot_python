@@ -1,5 +1,7 @@
 import time
-from typing import Callable, List, Optional, Set
+from collections.abc import Iterator
+from contextlib import suppress
+from typing import Callable, List, Optional, Set, Union
 
 import httpx
 
@@ -77,10 +79,8 @@ class CryptoBotClient:
         if response is not None:
             retry_after = response.headers.get("Retry-After")
             if retry_after:
-                try:
+                with suppress(ValueError):
                     delay = max(delay, float(retry_after))
-                except ValueError:
-                    pass
 
         return max(0.0, delay)
 
@@ -117,11 +117,11 @@ class CryptoBotClient:
         """Handle HTTP responses consistently and raise typed errors for malformed payloads."""
         try:
             payload = response.json()
-        except ValueError:
+        except ValueError as exc:
             raise CryptoBotError(
                 code=response.status_code,
                 name=f"Invalid JSON response: {self._short_text(response)}",
-            )
+            ) from exc
 
         if response.status_code == 200:
             if isinstance(payload, dict) and "result" in payload:
@@ -148,6 +148,46 @@ class CryptoBotClient:
 
     def __exit__(self, exc_type, exc, tb) -> None:
         self.close()
+
+    @staticmethod
+    def _validate_count(count: int) -> None:
+        if count < 1 or count > 1000:
+            raise ValueError("count must be between 1 and 1000")
+
+    @staticmethod
+    def _validate_expires_in(expires_in: int) -> None:
+        if expires_in < 1 or expires_in > 2678400:
+            raise ValueError("expires_in must be between 1 and 2678400 seconds")
+
+    @staticmethod
+    def _normalize_invoice_ids(invoice_ids: Optional[Union[str, List[int]]]) -> Optional[str]:
+        if invoice_ids is None:
+            return None
+
+        if isinstance(invoice_ids, str):
+            normalized = ",".join(part.strip() for part in invoice_ids.split(",") if part.strip())
+            if not normalized:
+                raise ValueError("invoice_ids string cannot be empty")
+
+            for part in normalized.split(","):
+                if not part.isdigit() or int(part) <= 0:
+                    raise ValueError("invoice_ids string must contain positive integer IDs")
+
+            return normalized
+
+        if isinstance(invoice_ids, list):
+            if not invoice_ids:
+                raise ValueError("invoice_ids list cannot be empty")
+
+            normalized_parts = []
+            for invoice_id in invoice_ids:
+                if isinstance(invoice_id, bool) or not isinstance(invoice_id, int) or invoice_id <= 0:
+                    raise ValueError("invoice_ids list must contain positive integers")
+                normalized_parts.append(str(invoice_id))
+
+            return ",".join(normalized_parts)
+
+        raise TypeError("invoice_ids must be a comma-separated string or list of integers")
 
     def get_me(self) -> App:
         """Get basic information about your Crypto Bot application.
@@ -242,6 +282,8 @@ class CryptoBotClient:
         # Validate amount
         if amount <= 0:
             raise ValueError("Amount must be greater than 0")
+        if expires_in is not None:
+            self._validate_expires_in(expires_in)
 
         data = {
             "asset": asset.name,
@@ -333,7 +375,7 @@ class CryptoBotClient:
     def get_invoices(
         self,
         asset: Optional[Asset] = None,
-        invoice_ids: Optional[str] = None,
+        invoice_ids: Optional[Union[str, List[int]]] = None,
         status: Optional[Status] = None,
         offset: int = 0,
         count: int = 100,
@@ -342,7 +384,7 @@ class CryptoBotClient:
 
         Args:
             asset: Filter by cryptocurrency asset (e.g., Asset.BTC). Default: all assets.
-            invoice_ids: Comma-separated list of invoice IDs to retrieve.
+            invoice_ids: Comma-separated IDs string or list of invoice IDs to retrieve.
             status: Filter by invoice status (Status.active, Status.paid, Status.expired).
             offset: Number of invoices to skip. Default: 0.
             count: Number of invoices to return (1-1000). Default: 100.
@@ -372,21 +414,76 @@ class CryptoBotClient:
                 >>> page1 = client.get_invoices(count=50, offset=0)
                 >>> page2 = client.get_invoices(count=50, offset=50)
         """
+        if offset < 0:
+            raise ValueError("offset must be greater than or equal to 0")
+        self._validate_count(count)
+        normalized_invoice_ids = self._normalize_invoice_ids(invoice_ids)
+
         data = {}
         if asset:
             data["asset"] = asset.name
-        if invoice_ids:
-            data["invoice_ids"] = invoice_ids
+        if normalized_invoice_ids is not None:
+            data["invoice_ids"] = normalized_invoice_ids
         if status:
             data["status"] = status.name
         if offset:
             data["offset"] = offset
-        if count:
-            data["count"] = count
+        data["count"] = count
 
         response = self._execute_with_retry(self._http_client.get, "/getInvoices", params=data)
         info = self._handle_response(response)
         return [parse_json(Invoice, **i) for i in info["items"]]
+
+    def iter_invoice_pages(
+        self,
+        asset: Optional[Asset] = None,
+        invoice_ids: Optional[Union[str, List[int]]] = None,
+        status: Optional[Status] = None,
+        page_size: int = 100,
+        start_offset: int = 0,
+    ) -> Iterator[List[Invoice]]:
+        """Iterate over invoice result pages until no more invoices are available."""
+        if start_offset < 0:
+            raise ValueError("start_offset must be greater than or equal to 0")
+        self._validate_count(page_size)
+
+        offset = start_offset
+        while True:
+            page = self.get_invoices(
+                asset=asset,
+                invoice_ids=invoice_ids,
+                status=status,
+                offset=offset,
+                count=page_size,
+            )
+            if not page:
+                break
+
+            yield page
+
+            if len(page) < page_size:
+                break
+
+            offset += page_size
+
+    def iter_invoices(
+        self,
+        asset: Optional[Asset] = None,
+        invoice_ids: Optional[Union[str, List[int]]] = None,
+        status: Optional[Status] = None,
+        page_size: int = 100,
+        start_offset: int = 0,
+    ) -> Iterator[Invoice]:
+        """Iterate invoices item-by-item across paginated get_invoices results."""
+        for page in self.iter_invoice_pages(
+            asset=asset,
+            invoice_ids=invoice_ids,
+            status=status,
+            page_size=page_size,
+            start_offset=start_offset,
+        ):
+            for invoice in page:
+                yield invoice
 
     def get_balances(self) -> List[Balance]:
         """Get cryptocurrency balances of your app.

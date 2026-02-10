@@ -33,6 +33,10 @@ jobs:
         run: poetry install
       - name: Lint with flake8
         run: make lint
+      - name: Lint with Ruff
+        run: poetry run ruff check cryptobot tests
+      - name: Type check with mypy
+        run: poetry run mypy cryptobot
       - name: Test with pytest
         run: |
           make test

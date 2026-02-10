@@ -1,4 +1,4 @@
-.PHONY: clean clean-build clean-pyc clean-test coverage dist docs help install lint lint/flake8 format
+.PHONY: clean clean-build clean-pyc clean-test coverage dist docs help install lint lint/flake8 lint/ruff lint/mypy format
 .DEFAULT_GOAL := help
 
 define BROWSER_PYSCRIPT
@@ -50,7 +50,13 @@ clean-test: ## remove test and coverage artifacts
 lint/flake8: ## check style with flake8
 	poetry run flake8 cryptobot tests --count --show-source --max-complexity=10 --max-line-length=127 --exclude=.venv --statistics
 
-lint: lint/flake8 ## check style
+lint/ruff: ## check style with ruff
+	poetry run ruff check cryptobot tests
+
+lint/mypy: ## run static type checks
+	poetry run mypy cryptobot
+
+lint: lint/flake8 lint/ruff lint/mypy ## check style and typing
 
 format: ## format code with ruff
 	poetry run ruff format cryptobot tests

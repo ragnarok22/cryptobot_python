@@ -290,6 +290,18 @@ class TestCryptoBotClientCreateInvoice:
         assert error.code == 400
         assert error.name == "BAD_REQUEST"
 
+    @patch("httpx.Client.post")
+    def test_create_invoice_validates_expires_in_range(self, mock_post):
+        client = CryptoBotClient("test_token")
+
+        with pytest.raises(ValueError, match="expires_in must be between 1 and 2678400 seconds"):
+            client.create_invoice(Asset.TON, 1, expires_in=0)
+
+        with pytest.raises(ValueError, match="expires_in must be between 1 and 2678400 seconds"):
+            client.create_invoice(Asset.TON, 1, expires_in=2678401)
+
+        mock_post.assert_not_called()
+
 
 class TestCryptoBotClientTransfer:
     """Tests for transfer method."""
@@ -423,6 +435,103 @@ class TestCryptoBotClientGetInvoices:
         assert params["status"] == "paid"
         assert params["offset"] == 10
         assert params["count"] == 5
+
+    @patch("httpx.Client.get")
+    def test_get_invoices_accepts_list_invoice_ids(self, mock_get):
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"result": {"items": []}}
+        mock_get.return_value = mock_response
+
+        client = CryptoBotClient("test_token")
+        client.get_invoices(invoice_ids=[123, 456, 789], count=10)
+
+        params = mock_get.call_args[1]["params"]
+        assert params["invoice_ids"] == "123,456,789"
+        assert params["count"] == 10
+
+    def test_get_invoices_validates_count_range(self):
+        client = CryptoBotClient("test_token")
+
+        with pytest.raises(ValueError, match="count must be between 1 and 1000"):
+            client.get_invoices(count=0)
+
+        with pytest.raises(ValueError, match="count must be between 1 and 1000"):
+            client.get_invoices(count=1001)
+
+    def test_get_invoices_validates_offset(self):
+        client = CryptoBotClient("test_token")
+
+        with pytest.raises(ValueError, match="offset must be greater than or equal to 0"):
+            client.get_invoices(offset=-1)
+
+    def test_get_invoices_validates_invoice_ids(self):
+        client = CryptoBotClient("test_token")
+
+        with pytest.raises(ValueError, match="invoice_ids string must contain positive integer IDs"):
+            client.get_invoices(invoice_ids="1,-2,3")
+
+        with pytest.raises(ValueError, match="invoice_ids list must contain positive integers"):
+            client.get_invoices(invoice_ids=[1, -2, 3])
+
+        with pytest.raises(TypeError, match="invoice_ids must be a comma-separated string or list of integers"):
+            client.get_invoices(invoice_ids=123)  # type: ignore[arg-type]
+
+
+class TestCryptoBotClientInvoiceIterators:
+    """Tests for paginated invoice helpers."""
+
+    @patch("httpx.Client.get")
+    def test_iter_invoice_pages(self, mock_get):
+        page1 = Mock()
+        page1.status_code = 200
+        page1.json.return_value = {
+            "result": {
+                "items": [
+                    {"invoice_id": 1, "status": "active", "hash": "h1", "amount": "1", "asset": "TON"},
+                    {"invoice_id": 2, "status": "active", "hash": "h2", "amount": "1", "asset": "TON"},
+                ]
+            }
+        }
+        page2 = Mock()
+        page2.status_code = 200
+        page2.json.return_value = {
+            "result": {
+                "items": [
+                    {"invoice_id": 3, "status": "paid", "hash": "h3", "amount": "2", "asset": "TON"},
+                ]
+            }
+        }
+        mock_get.side_effect = [page1, page2]
+
+        client = CryptoBotClient("test_token")
+        pages = list(client.iter_invoice_pages(page_size=2))
+
+        assert len(pages) == 2
+        assert [invoice.invoice_id for invoice in pages[0]] == [1, 2]
+        assert [invoice.invoice_id for invoice in pages[1]] == [3]
+
+    @patch("httpx.Client.get")
+    def test_iter_invoices_flattens_pages(self, mock_get):
+        page1 = Mock()
+        page1.status_code = 200
+        page1.json.return_value = {
+            "result": {
+                "items": [
+                    {"invoice_id": 10, "status": "active", "hash": "a", "amount": "1", "asset": "USDT"},
+                    {"invoice_id": 11, "status": "active", "hash": "b", "amount": "1", "asset": "USDT"},
+                ]
+            }
+        }
+        page2 = Mock()
+        page2.status_code = 200
+        page2.json.return_value = {"result": {"items": []}}
+        mock_get.side_effect = [page1, page2]
+
+        client = CryptoBotClient("test_token")
+        invoice_ids = [invoice.invoice_id for invoice in client.iter_invoices(page_size=2)]
+
+        assert invoice_ids == [10, 11]
 
 
 class TestCryptoBotClientGetBalances:
@@ -590,5 +699,5 @@ class TestCryptoBotClientErrorHandling:
         assert Asset.BTC.name == "BTC"
 
         # Invalid asset values would be caught at the enum level
-        with pytest.raises(AttributeError):
-            Asset.INVALID_ASSET
+        with pytest.raises(KeyError):
+            Asset["INVALID_ASSET"]

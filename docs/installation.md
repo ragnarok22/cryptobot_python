@@ -11,6 +11,12 @@
 pip install cryptobot-python
 ```
 
+Install webhook-specific dependencies (FastAPI/Uvicorn) only when needed:
+
+```bash
+pip install "cryptobot-python[webhook]"
+```
+
 ## Verify Installation
 
 ```python

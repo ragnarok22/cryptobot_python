@@ -82,6 +82,12 @@ Ready to contribute? Here's how to set up `cryptobot_python` for local developme
    $ make test-all
    ```
 
+   To run integration tests (network + API token required):
+
+   ```console
+   $ pytest --run-integration tests/test_sync_client.py
+   ```
+
 6. Commit your changes and push your branch to GitHub:
 
    ```console

@@ -1,4 +1,5 @@
-from typing import List, Optional
+import time
+from typing import Callable, List, Optional, Set
 
 import httpx
 
@@ -27,6 +28,9 @@ class CryptoBotClient:
         api_token: Your Crypto Bot API token. Get it from @CryptoBot on Telegram.
         is_mainnet: If True, use mainnet. If False, use testnet. Default: True.
         timeout: HTTP request timeout in seconds. Default: 5.0.
+        max_retries: Number of retries for retryable failures. Default: 0 (disabled).
+        retry_backoff: Base seconds for exponential backoff between retries. Default: 0.5.
+        retryable_status_codes: HTTP status codes that should be retried. Default: {429, 500, 502, 503, 504}.
 
     Example:
         >>> from cryptobot import CryptoBotClient
@@ -44,15 +48,70 @@ class CryptoBotClient:
     def _short_text(response: httpx.Response, limit: int = 100) -> str:
         return str(getattr(response, "text", ""))[:limit]
 
-    def __init__(self, api_token: str, is_mainnet: bool = True, timeout: float = 5.0):
+    def __init__(
+        self,
+        api_token: str,
+        is_mainnet: bool = True,
+        timeout: float = 5.0,
+        max_retries: int = 0,
+        retry_backoff: float = 0.5,
+        retryable_status_codes: Optional[Set[int]] = None,
+    ):
         self.api_token = api_token
         self.timeout = timeout
+        self.max_retries = max(0, max_retries)
+        self.retry_backoff = max(0.0, retry_backoff)
+        self.retryable_status_codes = (
+            set(retryable_status_codes) if retryable_status_codes is not None else {429, 500, 502, 503, 504}
+        )
         self._base_url = "https://pay.crypt.bot/api" if is_mainnet else "https://testnet-pay.crypt.bot/api"
         self._http_client = httpx.Client(
             base_url=self._base_url,
             timeout=self.timeout,
             headers={"Crypto-Pay-API-Token": self.api_token},
         )
+
+    def _retry_delay(self, attempt: int, response: Optional[httpx.Response] = None) -> float:
+        delay = self.retry_backoff * (2**attempt)
+
+        if response is not None:
+            retry_after = response.headers.get("Retry-After")
+            if retry_after:
+                try:
+                    delay = max(delay, float(retry_after))
+                except ValueError:
+                    pass
+
+        return max(0.0, delay)
+
+    def _execute_with_retry(self, request_fn: Callable, *args, **kwargs) -> httpx.Response:
+        retryable_exceptions = (
+            httpx.TimeoutException,
+            httpx.NetworkError,
+            httpx.RemoteProtocolError,
+        )
+
+        for attempt in range(self.max_retries + 1):
+            try:
+                response = request_fn(*args, **kwargs)
+            except retryable_exceptions:
+                if attempt >= self.max_retries:
+                    raise
+                delay = self._retry_delay(attempt)
+                if delay > 0:
+                    time.sleep(delay)
+                continue
+
+            if response.status_code in self.retryable_status_codes and attempt < self.max_retries:
+                delay = self._retry_delay(attempt, response)
+                if delay > 0:
+                    time.sleep(delay)
+                continue
+
+            return response
+
+        # This is unreachable due to the return/raise branches above.
+        raise RuntimeError("Unexpected retry flow state")
 
     def _handle_response(self, response: httpx.Response) -> dict:
         """Handle HTTP responses consistently and raise typed errors for malformed payloads."""
@@ -106,13 +165,13 @@ class CryptoBotClient:
             >>> print(f"App ID: {app.app_id}")
             >>> print(f"Bot Username: {app.payment_processing_bot_username}")
         """
-        response = self._http_client.get("/getMe")
+        response = self._execute_with_retry(self._http_client.get, "/getMe")
         info = self._handle_response(response)
         return parse_json(App, **info)
 
     def _create_invoice(self, **kwargs) -> Invoice:
         """Create a new invoice"""
-        response = self._http_client.post("/createInvoice", json=kwargs)
+        response = self._execute_with_retry(self._http_client.post, "/createInvoice", json=kwargs)
         info = self._handle_response(response)
         return parse_json(Invoice, **info)
 
@@ -267,7 +326,7 @@ class CryptoBotClient:
             "comment": comment,
             "disable_send_notification": disable_send_notification,
         }
-        response = self._http_client.post("/transfer", json=data)
+        response = self._execute_with_retry(self._http_client.post, "/transfer", json=data)
         info = self._handle_response(response)
         return parse_json(Transfer, **info)
 
@@ -325,7 +384,7 @@ class CryptoBotClient:
         if count:
             data["count"] = count
 
-        response = self._http_client.get("/getInvoices", params=data)
+        response = self._execute_with_retry(self._http_client.get, "/getInvoices", params=data)
         info = self._handle_response(response)
         return [parse_json(Invoice, **i) for i in info["items"]]
 
@@ -345,7 +404,7 @@ class CryptoBotClient:
             BTC: 0.00150000 available, 0.00000000 on hold
             TON: 150.5 available, 10.0 on hold
         """
-        response = self._http_client.get("/getBalance")
+        response = self._execute_with_retry(self._http_client.get, "/getBalance")
         info = self._handle_response(response)
         return [parse_json(Balance, **i) for i in info]
 
@@ -372,7 +431,7 @@ class CryptoBotClient:
                 >>> ton_amount = 100 / float(ton_usd_rate.rate)
                 >>> invoice = client.create_invoice(Asset.TON, ton_amount)
         """
-        response = self._http_client.get("/getExchangeRates")
+        response = self._execute_with_retry(self._http_client.get, "/getExchangeRates")
         info = self._handle_response(response)
         return [parse_json(ExchangeRate, **i) for i in info]
 
@@ -395,6 +454,6 @@ class CryptoBotClient:
             USDT: Tether (decimals: 6)
               Blockchain: True, Stablecoin: True
         """
-        response = self._http_client.get("/getCurrencies")
+        response = self._execute_with_retry(self._http_client.get, "/getCurrencies")
         info = self._handle_response(response)
         return [parse_json(Currency, **i) for i in info]

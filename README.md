@@ -27,6 +27,12 @@ CryptoBot Python supports Python `>=3.9.12`.
 pip install cryptobot-python
 ```
 
+Install webhook server dependencies only when needed:
+
+```bash
+pip install "cryptobot-python[webhook]"
+```
+
 ## Quick Start
 
 ```python

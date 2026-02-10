@@ -56,11 +56,83 @@ class TestCryptoBotClientInitialization:
         base_url = str(client._http_client.base_url)
         assert "testnet-pay.crypt.bot" in base_url
 
+    def test_retry_configuration_defaults(self):
+        client = CryptoBotClient("test_token")
+        assert client.max_retries == 0
+        assert client.retry_backoff == 0.5
+        assert client.retryable_status_codes == {429, 500, 502, 503, 504}
+
     def test_client_context_manager_closes_http_client(self):
         """Test context manager support closes the underlying HTTP client."""
         with CryptoBotClient("test_token") as client:
             assert not client._http_client.is_closed
         assert client._http_client.is_closed
+
+
+class TestCryptoBotClientRetryPolicy:
+    """Tests for retry/backoff behavior."""
+
+    @patch("httpx.Client.get")
+    def test_retry_on_retryable_status_then_success(self, mock_get):
+        retry_response = Mock()
+        retry_response.status_code = 429
+        retry_response.headers = {}
+        retry_response.json.return_value = {"error": {"code": 429, "name": "TOO_MANY_REQUESTS"}}
+
+        ok_response = Mock()
+        ok_response.status_code = 200
+        ok_response.headers = {}
+        ok_response.json.return_value = {
+            "result": {
+                "app_id": 1,
+                "name": "Retry App",
+                "payment_processing_bot_username": "RetryBot",
+            }
+        }
+
+        mock_get.side_effect = [retry_response, ok_response]
+
+        client = CryptoBotClient("test_token", max_retries=1, retry_backoff=0)
+        app = client.get_me()
+
+        assert app.app_id == 1
+        assert mock_get.call_count == 2
+
+    @patch("httpx.Client.get")
+    def test_no_retry_on_non_retryable_status(self, mock_get):
+        bad_request = Mock()
+        bad_request.status_code = 400
+        bad_request.headers = {}
+        bad_request.json.return_value = {"error": {"code": 400, "name": "BAD_REQUEST"}}
+        mock_get.return_value = bad_request
+
+        client = CryptoBotClient("test_token", max_retries=3, retry_backoff=0)
+        with pytest.raises(CryptoBotError) as exc_info:
+            client.get_me()
+
+        assert exc_info.value.code == 400
+        assert mock_get.call_count == 1
+
+    @patch("httpx.Client.get")
+    def test_retry_on_timeout_exception_then_success(self, mock_get):
+        ok_response = Mock()
+        ok_response.status_code = 200
+        ok_response.headers = {}
+        ok_response.json.return_value = {
+            "result": {
+                "app_id": 2,
+                "name": "Recovered App",
+                "payment_processing_bot_username": "RecoveredBot",
+            }
+        }
+
+        mock_get.side_effect = [httpx.TimeoutException("timeout"), ok_response]
+
+        client = CryptoBotClient("test_token", max_retries=1, retry_backoff=0)
+        app = client.get_me()
+
+        assert app.app_id == 2
+        assert mock_get.call_count == 2
 
 
 class TestCryptoBotClientGetMe:

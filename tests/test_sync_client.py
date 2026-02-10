@@ -3,8 +3,10 @@
 """Tests for `cryptobot` package."""
 
 import os
+import socket
 import unittest
 
+import pytest
 from dotenv import load_dotenv
 
 from cryptobot import CryptoBotClient
@@ -18,13 +20,23 @@ API_TOKEN = os.getenv("API_TOKEN")
 SKIP_AUTH_TESTS = not API_TOKEN or API_TOKEN.strip() == ""
 
 
+@pytest.mark.integration
 class TestCryptoBotSyncClient(unittest.TestCase):
     """Tests for `cryptobot` client"""
 
+    @classmethod
+    def setUpClass(cls):
+        if SKIP_AUTH_TESTS:
+            raise unittest.SkipTest("API_TOKEN not available (e.g., PR from fork/bot)")
+
+        try:
+            socket.getaddrinfo("testnet-pay.crypt.bot", 443)
+        except socket.gaierror:
+            raise unittest.SkipTest("Integration target is not reachable from this environment")
+
     def setUp(self):
         """Set up test fixtures, if any."""
-        if not SKIP_AUTH_TESTS:
-            self.client = CryptoBotClient(API_TOKEN, is_mainnet=False)
+        self.client = CryptoBotClient(API_TOKEN, is_mainnet=False)
 
     def tearDown(self) -> None:
         """Tear down test fixtures, if any."""
@@ -37,6 +49,7 @@ class TestCryptoBotSyncClient(unittest.TestCase):
         self.assertIsNotNone(info.app_id)
         self.assertIsNotNone(info.name)
 
+    @unittest.skipIf(SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)")
     def test_get_me_error(self):
         """Retreating app information"""
         client = CryptoBotClient("WRONG_TOKEN", is_mainnet=False)

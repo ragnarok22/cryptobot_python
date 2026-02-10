@@ -29,7 +29,7 @@ from cryptobot import AsyncCryptoBotClient
 
 
 async def run():
-    async with AsyncCryptoBotClient(api_token=os.environ["CRYPTOBOT_API_TOKEN"]) as client:
+    async with AsyncCryptoBotClient(api_token=os.environ["CRYPTOBOT_API_TOKEN"], max_retries=2) as client:
         app = await client.get_me()
         print(app.name)
 ```
@@ -176,6 +176,23 @@ paid_invoices = client.get_invoices(
 `invoice_ids` accepts either a comma-separated string (`"123,456"`) or `list[int]` (`[123, 456]`).
 `count` is validated between `1` and `1000`.
 
+Async equivalent:
+
+```python
+import os
+
+from cryptobot import AsyncCryptoBotClient
+from cryptobot.models import Asset, Status
+
+async with AsyncCryptoBotClient(api_token=os.environ["CRYPTOBOT_API_TOKEN"]) as async_client:
+    paid_invoices = await async_client.get_invoices(
+        asset=Asset.USDT,
+        invoice_ids=[123, 456],
+        status=Status.paid,
+        count=50,
+    )
+```
+
 ## Environment Configuration
 
 ### Testnet vs Mainnet
@@ -193,6 +210,22 @@ Configure request timeout (default is 5 seconds):
 ```python
 client = CryptoBotClient(os.environ["CRYPTOBOT_API_TOKEN"], timeout=60)
 ```
+
+### Built-in Retries
+
+Retry behavior is optional and disabled by default (`max_retries=0`).
+
+```python
+client = CryptoBotClient(
+    api_token=os.environ["CRYPTOBOT_API_TOKEN"],
+    timeout=30.0,
+    max_retries=3,
+    retry_backoff=0.5,
+    retryable_status_codes={429, 500, 502, 503, 504},
+)
+```
+
+When present, the `Retry-After` response header is respected automatically before the next attempt.
 
 ### Swap Incoming Payments
 
@@ -254,6 +287,18 @@ listener.listen()
 ```
 
 The listener automatically verifies signatures, can reject duplicate replayed webhook payloads, and provides a startup banner.
+`callback` can be synchronous (`def`) or asynchronous (`async def`).
+
+For custom replay de-duplication keys, provide `replay_key_resolver`:
+
+```python
+def replay_key_resolver(data, raw_body, headers):
+    payload = data.get("payload", {})
+    invoice_id = payload.get("invoice_id")
+    if invoice_id is not None:
+        return f"invoice_paid:{invoice_id}"
+    return None
+```
 
 ### Custom Webhook Handler
 
@@ -318,6 +363,34 @@ for page in client.iter_invoice_pages(asset=Asset.USDT, status=Status.paid, page
 for invoice in client.iter_invoices(asset=Asset.USDT, status=Status.paid, page_size=100):
     print(invoice.invoice_id, invoice.status)
 ```
+
+Async pagination with equivalent helpers:
+
+```python
+import os
+
+from cryptobot import AsyncCryptoBotClient
+from cryptobot.models import Asset, Status
+
+async with AsyncCryptoBotClient(api_token=os.environ["CRYPTOBOT_API_TOKEN"]) as async_client:
+    async for page in async_client.iter_invoice_pages(
+        asset=Asset.USDT,
+        status=Status.paid,
+        page_size=100,
+        start_offset=0,
+    ):
+        print("page size:", len(page))
+
+    async for invoice in async_client.iter_invoices(
+        asset=Asset.USDT,
+        status=Status.paid,
+        page_size=100,
+        start_offset=0,
+    ):
+        print(invoice.invoice_id, invoice.status)
+```
+
+Both iterator variants support `start_offset` and validate `page_size` in the same `1..1000` range.
 
 ### Invoice Status Checking
 

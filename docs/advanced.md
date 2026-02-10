@@ -48,6 +48,27 @@ client = CryptoBotClient(
 )
 ```
 
+Equivalent async configuration:
+
+```python
+import asyncio
+
+from cryptobot import AsyncCryptoBotClient
+
+
+async def warmup():
+    async with AsyncCryptoBotClient(
+        api_token=API_TOKEN,
+        max_retries=2,
+        retry_backoff=1.0,
+        retryable_status_codes={429, 503},
+    ) as client:
+        print((await client.get_me()).name)
+
+
+asyncio.run(warmup())
+```
+
 ## Tuned HTTPX Client
 
 If you need custom connection limits or transport configuration, replace the internal `httpx.Client` after initialization:

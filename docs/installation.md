@@ -11,10 +11,11 @@
 pip install cryptobot-python
 ```
 
-Install webhook-specific dependencies (FastAPI/Uvicorn) only when needed:
+Install optional extras only when needed:
 
 ```bash
 pip install "cryptobot-python[webhook]"
+pip install "cryptobot-python[docs]"
 ```
 
 ## Verify Installation
@@ -36,6 +37,12 @@ For documentation tooling:
 
 ```bash
 poetry install --extras docs
+```
+
+For local webhook development with FastAPI/Uvicorn:
+
+```bash
+poetry install --extras webhook
 ```
 
 ## Development Setup

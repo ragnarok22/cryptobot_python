@@ -49,6 +49,8 @@ listener = Listener(
 listener.listen()
 ```
 
+`callback` can be synchronous (`def`) or asynchronous (`async def`).
+
 ## Manual Verification (Custom FastAPI App)
 
 If you manage your own FastAPI route, verify against the **raw body string**.
@@ -89,6 +91,8 @@ For production, prefer a shared store (e.g., Redis) implementing:
 Built-in in-memory replay protection:
 
 ```python
+import os
+
 from cryptobot.webhook import InMemoryReplayKeyStore, Listener
 
 listener = Listener(
@@ -101,6 +105,34 @@ listener = Listener(
 ```
 
 In production, store this in Redis or your database instead of process memory.
+
+### Custom Replay Keys
+
+If your integration has a stable business identifier, use `replay_key_resolver`:
+
+```python
+import os
+
+from cryptobot.webhook import InMemoryReplayKeyStore, Listener
+
+
+def replay_key_resolver(data, raw_body, headers):
+    payload = data.get("payload", {})
+    invoice_id = payload.get("invoice_id")
+    if invoice_id is not None:
+        return f"invoice_paid:{invoice_id}"
+    return None
+
+
+listener = Listener(
+    host="127.0.0.1",
+    callback=handle_webhook,
+    api_token=os.environ["CRYPTOBOT_API_TOKEN"],
+    replay_store=InMemoryReplayKeyStore(),
+    replay_ttl_seconds=3600,
+    replay_key_resolver=replay_key_resolver,
+)
+```
 
 ## Deployment Hardening
 
@@ -180,6 +212,7 @@ Use the HTTPS URL from ngrok plus `/webhook`.
 
 ```python
 import hashlib
+import hmac
 import json
 
 from fastapi.testclient import TestClient
@@ -189,9 +222,7 @@ from cryptobot.webhook import Listener
 
 def sign(token: str, raw_body: str) -> str:
     secret = hashlib.sha256(token.encode()).digest()
-    h = hashlib.sha256(secret)
-    h.update(raw_body.encode())
-    return h.hexdigest()
+    return hmac.new(secret, raw_body.encode("utf-8"), hashlib.sha256).hexdigest()
 
 
 def test_valid_signature():

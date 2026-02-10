@@ -20,6 +20,13 @@ and synchronous/async clients for invoices, transfers, balances, exchange rates,
 - FastAPI-powered webhook listener with signature verification and optional replay protection
 - Custom exception model (`CryptoBotError`) with API code/name fields
 
+## What's New in 0.5.0
+
+- Added `AsyncCryptoBotClient` with method parity and async invoice iterators
+- Added invoice pagination helpers: `iter_invoice_pages(...)` and `iter_invoices(...)`
+- Added configurable retries/backoff (`max_retries`, `retry_backoff`, `retryable_status_codes`)
+- Added webhook replay protection (`replay_store`, `replay_ttl_seconds`, `replay_key_resolver`)
+
 ## Installation
 
 CryptoBot Python supports Python `>=3.9.12`.
@@ -32,6 +39,12 @@ Install webhook server dependencies only when needed:
 
 ```bash
 pip install "cryptobot-python[webhook]"
+```
+
+Install documentation tooling extras only when needed:
+
+```bash
+pip install "cryptobot-python[docs]"
 ```
 
 ## Quick Start
@@ -83,6 +96,7 @@ client = CryptoBotClient(
 Async usage:
 
 ```python
+import asyncio
 import os
 
 from cryptobot import AsyncCryptoBotClient
@@ -96,6 +110,9 @@ async def main():
 
         invoice = await client.create_invoice(asset=Asset.USDT, amount=5.25, description="Async order #42")
         print(invoice.invoice_id, invoice.bot_invoice_url)
+
+
+asyncio.run(main())
 ```
 
 ## Core API
@@ -114,6 +131,9 @@ async def main():
 
 `AsyncCryptoBotClient` provides the same methods with `await`, plus async iterators for
 `iter_invoice_pages(...)` and `iter_invoices(...)`.
+
+`get_invoices(...)` accepts `invoice_ids` as a comma-separated string (`"1,2,3"`) or `list[int]` (`[1, 2, 3]`).
+Iterator helpers accept `page_size` and `start_offset` to support controlled pagination scans.
 
 Example transfer with idempotency via `spend_id`:
 
@@ -162,6 +182,9 @@ listener = Listener(
 )
 listener.listen()
 ```
+
+`Listener` accepts both sync and async callback functions.
+For custom dedupe behavior, pass `replay_key_resolver(data, raw_body, headers)` with a stable key strategy.
 
 For custom webhook stacks, use `cryptobot.webhook.check_signature(...)` to verify
 `crypto-pay-api-signature` against the raw request body.

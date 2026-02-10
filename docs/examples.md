@@ -1,6 +1,6 @@
 # Real-World Examples
 
-This page shows complete integration patterns built on top of `CryptoBotClient`.
+This page shows complete integration patterns built on top of `CryptoBotClient` and `AsyncCryptoBotClient`.
 
 ## Shared Setup
 
@@ -12,6 +12,36 @@ from cryptobot.errors import CryptoBotError
 from cryptobot.models import Asset, ButtonName, Status
 
 client = CryptoBotClient(api_token=os.environ["CRYPTOBOT_API_TOKEN"])
+```
+
+## Async Invoice Scanner
+
+Use async pagination helpers to process large paid-invoice sets without loading everything at once.
+
+```python
+import asyncio
+import os
+
+from cryptobot import AsyncCryptoBotClient
+from cryptobot.models import Asset, Status
+
+
+async def scan_paid_invoices():
+    async with AsyncCryptoBotClient(
+        api_token=os.environ["CRYPTOBOT_API_TOKEN"],
+        max_retries=2,
+        retry_backoff=0.5,
+    ) as client:
+        async for invoice in client.iter_invoices(
+            asset=Asset.USDT,
+            status=Status.paid,
+            page_size=100,
+            start_offset=0,
+        ):
+            print("paid invoice:", invoice.invoice_id, invoice.paid_amount or invoice.amount)
+
+
+asyncio.run(scan_paid_invoices())
 ```
 
 ## E-Commerce Checkout
@@ -161,7 +191,7 @@ Use the listener to mark orders as paid without polling.
 ```python
 import os
 
-from cryptobot.webhook import Listener
+from cryptobot.webhook import InMemoryReplayKeyStore, Listener
 
 
 def handle_webhook(headers, data):
@@ -179,6 +209,8 @@ listener = Listener(
     host="0.0.0.0",
     callback=handle_webhook,
     api_token=os.environ["CRYPTOBOT_API_TOKEN"],
+    replay_store=InMemoryReplayKeyStore(),
+    replay_ttl_seconds=3600,
     port=2203,
     url="/webhook",
     log_level="info",

@@ -16,8 +16,6 @@ CryptoBotError: code=401, name=UNAUTHORIZED
 import os
 
 from cryptobot import CryptoBotClient
-from cryptobot.models import Asset
-from cryptobot.models import Asset
 
 client = CryptoBotClient(api_token=os.environ["CRYPTOBOT_API_TOKEN"])
 print(client.get_me().name)
@@ -148,6 +146,7 @@ Increase timeout and enable built-in retry/backoff for transient transport error
 import os
 
 from cryptobot import CryptoBotClient
+from cryptobot.models import Asset
 
 client = CryptoBotClient(
     api_token=os.environ["CRYPTOBOT_API_TOKEN"],

@@ -9,8 +9,9 @@ It provides typed models and synchronous/async clients for invoices, transfers, 
 - Async API client built on `httpx`
 - Dataclass response models (`Invoice`, `Transfer`, `Balance`, `ExchangeRate`, `Currency`)
 - Enum safety for assets, statuses, and paid button names
-- Mainnet/testnet support with configurable timeout
-- FastAPI webhook listener with signature verification
+- Mainnet/testnet support with configurable timeout and retries
+- Built-in invoice pagination helpers (`iter_invoice_pages`, `iter_invoices`)
+- FastAPI webhook listener with signature verification and optional replay protection
 - Structured API errors via `CryptoBotError` (`code`, `name`)
 
 ## Quick Example

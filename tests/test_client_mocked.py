@@ -19,6 +19,7 @@ from cryptobot.models import (
     Invoice,
     Status,
     Transfer,
+    TransferStatus,
 )
 
 
@@ -54,6 +55,12 @@ class TestCryptoBotClientInitialization:
         client = CryptoBotClient("test_token", is_mainnet=False)
         base_url = str(client._http_client.base_url)
         assert "testnet-pay.crypt.bot" in base_url
+
+    def test_client_context_manager_closes_http_client(self):
+        """Test context manager support closes the underlying HTTP client."""
+        with CryptoBotClient("test_token") as client:
+            assert not client._http_client.is_closed
+        assert client._http_client.is_closed
 
 
 class TestCryptoBotClientGetMe:
@@ -127,9 +134,9 @@ class TestCryptoBotClientCreateInvoice:
 
         assert isinstance(invoice, Invoice)
         assert invoice.invoice_id == 123
-        assert invoice.status == "active"
+        assert invoice.status == Status.active
         assert invoice.amount == "10.50"
-        assert invoice.asset == "USDT"
+        assert invoice.asset == Asset.USDT
 
         # Check that post was called with correct parameters
         mock_post.assert_called_once()
@@ -178,7 +185,7 @@ class TestCryptoBotClientCreateInvoice:
         )
 
         assert invoice.description == "Test invoice"
-        assert invoice.paid_btn_name == "viewItem"
+        assert invoice.paid_btn_name == ButtonName.viewItem
         assert invoice.allow_comments is False
 
         # Verify request parameters
@@ -245,8 +252,9 @@ class TestCryptoBotClientTransfer:
         assert isinstance(transfer, Transfer)
         assert transfer.transfer_id == 789
         assert transfer.user_id == 12345
-        assert transfer.asset == "TON"
+        assert transfer.asset == Asset.TON
         assert transfer.amount == "5.0"
+        assert transfer.status == TransferStatus.completed
         assert transfer.comment == "Payment for services"
 
     @patch("httpx.Client.post")
@@ -334,7 +342,7 @@ class TestCryptoBotClientGetInvoices:
         invoices = client.get_invoices(asset=Asset.USDT, status=Status.paid, offset=10, count=5)
 
         assert len(invoices) == 1
-        assert invoices[0].status == "paid"
+        assert invoices[0].status == Status.paid
 
         # Check request parameters
         call_args = mock_get.call_args
@@ -406,7 +414,7 @@ class TestCryptoBotClientGetExchangeRates:
 
         assert len(rates) == 2
         assert all(isinstance(rate, ExchangeRate) for rate in rates)
-        assert rates[0].source == "BTC"
+        assert rates[0].source == Asset.BTC
         assert rates[0].target == "USD"
         assert rates[0].rate == "50000.00"
 
@@ -485,8 +493,9 @@ class TestCryptoBotClientErrorHandling:
 
         client = CryptoBotClient("test_token")
 
-        with pytest.raises(ValueError):
+        with pytest.raises(CryptoBotError) as exc_info:
             client.get_balances()
+        assert exc_info.value.name.startswith("Invalid JSON response:")
 
     @patch("httpx.Client.get")
     def test_unexpected_response_structure(self, mock_get):
@@ -498,8 +507,10 @@ class TestCryptoBotClientErrorHandling:
 
         client = CryptoBotClient("test_token")
 
-        with pytest.raises(KeyError):
+        with pytest.raises(CryptoBotError) as exc_info:
             client.get_me()
+        assert exc_info.value.code == 200
+        assert exc_info.value.name == "Malformed success response: missing 'result'"
 
     def test_invalid_asset_enum(self):
         """Test validation of asset enum values."""

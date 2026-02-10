@@ -27,6 +27,10 @@ class Status(Enum):
     expired = "expired"
 
 
+class TransferStatus(Enum):
+    completed = "completed"
+
+
 class ButtonName(Enum):
     viewItem = "viewItem"
     openChannel = "openChannel"
@@ -56,9 +60,9 @@ class Invoice:
     paid_at: Optional[str] = None
 
     fiat: Optional[str] = None
-    accepted_assets: Optional[List[str]] = None
+    accepted_assets: Optional[List[Asset]] = None
 
-    fee_asset: Optional[str] = None
+    fee_asset: Optional[Asset] = None
     fee_amount: Optional[str] = None
     fee_in_usd: Optional[str] = None
 
@@ -66,7 +70,7 @@ class Invoice:
     paid_amount: Optional[str] = None
     paid_fiat_rate: Optional[str] = None
     paid_usd_rate: Optional[str] = None
-    paid_asset: Optional[str] = None
+    paid_asset: Optional[Asset] = None
     paid_btn_name: Optional[ButtonName] = None
     paid_btn_url: Optional[str] = None
 
@@ -95,7 +99,7 @@ class Transfer:
     user_id: int
     asset: Asset
     amount: str
-    status: Status
+    status: TransferStatus
     completed_at: str
     comment: Optional[str] = None
 

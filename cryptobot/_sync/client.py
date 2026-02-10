@@ -2,6 +2,7 @@ from typing import List, Optional
 
 import httpx
 
+from .._utils import parse_json
 from ..errors import CryptoBotError
 from ..models import (
     App,
@@ -39,7 +40,11 @@ class CryptoBotClient:
         >>> print(invoice.bot_invoice_url)
     """
 
-    def __init__(self, api_token, is_mainnet: bool = True, timeout: float = 5.0):
+    @staticmethod
+    def _short_text(response: httpx.Response, limit: int = 100) -> str:
+        return str(getattr(response, "text", ""))[:limit]
+
+    def __init__(self, api_token: str, is_mainnet: bool = True, timeout: float = 5.0):
         self.api_token = api_token
         self.timeout = timeout
         self._base_url = "https://pay.crypt.bot/api" if is_mainnet else "https://testnet-pay.crypt.bot/api"
@@ -50,18 +55,40 @@ class CryptoBotClient:
         )
 
     def _handle_response(self, response: httpx.Response) -> dict:
-        """Handle HTTP response and raise appropriate errors"""
-        if response.status_code == 200:
-            return response.json()["result"]
+        """Handle HTTP responses consistently and raise typed errors for malformed payloads."""
         try:
-            data = response.json()["error"]
-            raise CryptoBotError.from_json(data)
-        except (ValueError, KeyError):
-            # Response is not JSON or doesn't have error field
+            payload = response.json()
+        except ValueError:
             raise CryptoBotError(
                 code=response.status_code,
-                name=f"HTTPError: {response.text[:100]}",
+                name=f"Invalid JSON response: {self._short_text(response)}",
             )
+
+        if response.status_code == 200:
+            if isinstance(payload, dict) and "result" in payload:
+                return payload["result"]
+            raise CryptoBotError(
+                code=200,
+                name="Malformed success response: missing 'result'",
+            )
+
+        if isinstance(payload, dict) and isinstance(payload.get("error"), dict):
+            raise CryptoBotError.from_json(payload["error"])
+
+        raise CryptoBotError(
+            code=response.status_code,
+            name=f"HTTPError: {self._short_text(response)}",
+        )
+
+    def close(self) -> None:
+        """Close the underlying HTTP client and release network resources."""
+        self._http_client.close()
+
+    def __enter__(self) -> "CryptoBotClient":
+        return self
+
+    def __exit__(self, exc_type, exc, tb) -> None:
+        self.close()
 
     def get_me(self) -> App:
         """Get basic information about your Crypto Bot application.
@@ -81,13 +108,13 @@ class CryptoBotClient:
         """
         response = self._http_client.get("/getMe")
         info = self._handle_response(response)
-        return App(**info)
+        return parse_json(App, **info)
 
     def _create_invoice(self, **kwargs) -> Invoice:
         """Create a new invoice"""
         response = self._http_client.post("/createInvoice", json=kwargs)
         info = self._handle_response(response)
-        return Invoice(**info)
+        return parse_json(Invoice, **info)
 
     def create_invoice(
         self,
@@ -242,7 +269,7 @@ class CryptoBotClient:
         }
         response = self._http_client.post("/transfer", json=data)
         info = self._handle_response(response)
-        return Transfer(**info)
+        return parse_json(Transfer, **info)
 
     def get_invoices(
         self,
@@ -300,7 +327,7 @@ class CryptoBotClient:
 
         response = self._http_client.get("/getInvoices", params=data)
         info = self._handle_response(response)
-        return [Invoice(**i) for i in info["items"]]
+        return [parse_json(Invoice, **i) for i in info["items"]]
 
     def get_balances(self) -> List[Balance]:
         """Get cryptocurrency balances of your app.
@@ -320,7 +347,7 @@ class CryptoBotClient:
         """
         response = self._http_client.get("/getBalance")
         info = self._handle_response(response)
-        return [Balance(**i) for i in info]
+        return [parse_json(Balance, **i) for i in info]
 
     def get_exchange_rates(self) -> List[ExchangeRate]:
         """Get current exchange rates for all supported cryptocurrencies.
@@ -347,7 +374,7 @@ class CryptoBotClient:
         """
         response = self._http_client.get("/getExchangeRates")
         info = self._handle_response(response)
-        return [ExchangeRate(**i) for i in info]
+        return [parse_json(ExchangeRate, **i) for i in info]
 
     def get_currencies(self) -> List[Currency]:
         """Get information about supported cryptocurrencies.
@@ -370,4 +397,4 @@ class CryptoBotClient:
         """
         response = self._http_client.get("/getCurrencies")
         info = self._handle_response(response)
-        return [Currency(**i) for i in info]
+        return [parse_json(Currency, **i) for i in info]

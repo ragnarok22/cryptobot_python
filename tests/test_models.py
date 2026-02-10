@@ -14,6 +14,7 @@ from cryptobot.models import (
     Invoice,
     Status,
     Transfer,
+    TransferStatus,
 )
 
 
@@ -159,14 +160,14 @@ class TestTransfer:
             user_id=456,
             asset=Asset.TON,
             amount="10.0",
-            status=Status.paid,
+            status=TransferStatus.completed,
             completed_at="2023-01-01T12:00:00Z",
         )
         assert transfer.transfer_id == 123
         assert transfer.user_id == 456
         assert transfer.asset == Asset.TON
         assert transfer.amount == "10.0"
-        assert transfer.status == Status.paid
+        assert transfer.status == TransferStatus.completed
         assert transfer.completed_at == "2023-01-01T12:00:00Z"
 
     def test_transfer_with_comment(self):
@@ -176,7 +177,7 @@ class TestTransfer:
             user_id=101,
             asset=Asset.USDT,
             amount="50.0",
-            status=Status.active,
+            status=TransferStatus.completed,
             completed_at="2023-01-02T15:30:00Z",
             comment="Payment for services",
         )
@@ -308,7 +309,7 @@ class TestDataclassFeatures:
             user_id=2,
             asset=Asset.ETH,
             amount="5.0",
-            status=Status.paid,
+            status=TransferStatus.completed,
             completed_at="2023-01-01T00:00:00Z",
         )
 

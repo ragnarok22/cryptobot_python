@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 from cryptobot import CryptoBotClient
 from cryptobot.errors import CryptoBotError
-from cryptobot.models import Asset, ButtonName
+from cryptobot.models import Asset, ButtonName, Status, TransferStatus
 
 load_dotenv()
 
@@ -47,8 +47,8 @@ class TestCryptoBotSyncClient(unittest.TestCase):
     def test_create_invoice(self):
         """Create a new invoice"""
         invoice = self.client.create_invoice(Asset.TON, 1)
-        self.assertEqual(invoice.status, "active")
-        self.assertEqual(invoice.asset, "TON")
+        self.assertEqual(invoice.status, Status.active)
+        self.assertEqual(invoice.asset, Asset.TON)
         self.assertEqual(invoice.amount, "1")
         self.assertEqual(invoice.allow_comments, True)
         self.assertEqual(invoice.allow_anonymous, True)
@@ -70,8 +70,8 @@ class TestCryptoBotSyncClient(unittest.TestCase):
             expires_in=1,
             swap_to="USDT",
         )
-        self.assertEqual(invoice.status, "active")
-        self.assertEqual(invoice.asset, "TON")
+        self.assertEqual(invoice.status, Status.active)
+        self.assertEqual(invoice.asset, Asset.TON)
         self.assertEqual(invoice.amount, "1")
         self.assertEqual(invoice.allow_comments, False)
         self.assertEqual(invoice.allow_anonymous, False)
@@ -88,7 +88,7 @@ class TestCryptoBotSyncClient(unittest.TestCase):
         """Transfer - may fail if testnet account has insufficient funds"""
         try:
             transfer = self.client.transfer(699381957, Asset.TON, 0.1, "test_spend_id")
-            self.assertEqual(transfer.status, "success")
+            self.assertIn(transfer.status, (TransferStatus.completed, "success"))
             self.assertEqual(transfer.asset, Asset.TON)
             self.assertEqual(transfer.amount, "0.1")
         except CryptoBotError as e:
@@ -100,7 +100,7 @@ class TestCryptoBotSyncClient(unittest.TestCase):
     def test_get_invoices(self):
         """Get invoices"""
         invoices = self.client.get_invoices()
-        self.assertEqual(invoices[0].asset, "TON")
+        self.assertEqual(invoices[0].asset, Asset.TON)
         self.assertEqual(invoices[0].amount, "1")
         self.assertEqual(
             f"https://t.me/CryptoTestnetBot?start={invoices[0].hash}",

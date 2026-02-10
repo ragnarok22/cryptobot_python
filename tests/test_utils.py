@@ -3,6 +3,7 @@
 """Tests for utility functions in `cryptobot` package."""
 
 from dataclasses import dataclass
+from enum import Enum
 from typing import Optional
 
 import pytest
@@ -24,6 +25,26 @@ class SimpleClass:
 
     name: str
     value: int
+
+
+class SampleEnum(Enum):
+    A = "A"
+    B = "B"
+
+
+@dataclass
+class EnumClass:
+    """Dataclass with enum fields for parse_json conversion tests."""
+
+    status: SampleEnum
+    optional_status: Optional[SampleEnum] = None
+
+
+@dataclass
+class EnumListClass:
+    """Dataclass with list enum field for parse_json conversion tests."""
+
+    statuses: list[SampleEnum]
 
 
 class TestParseJson:
@@ -191,3 +212,14 @@ class TestParseJson:
         assert result.name == "test_name"
         assert result.value == 42
         assert result.extra_field == "extra"
+
+    def test_parse_json_converts_enum_fields(self):
+        """Test parse_json converts enum-typed fields."""
+        result = parse_json(EnumClass, status="A", optional_status="B")
+        assert result.status == SampleEnum.A
+        assert result.optional_status == SampleEnum.B
+
+    def test_parse_json_converts_enum_lists(self):
+        """Test parse_json converts list enum-typed fields."""
+        result = parse_json(EnumListClass, statuses=["A", "B"])
+        assert result.statuses == [SampleEnum.A, SampleEnum.B]

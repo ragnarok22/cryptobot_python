@@ -10,7 +10,7 @@ Here's a complete example of integrating cryptocurrency payments into an online 
 
 ```python
 from cryptobot import CryptoBotClient
-from cryptobot.models import Asset, Status
+from cryptobot.models import Asset, ButtonName, Status
 from cryptobot.errors import CryptoBotError
 import os
 from decimal import Decimal
@@ -32,7 +32,7 @@ class CryptoStore:
                 description=f"Order {order_id}",
                 payload=order_id,
                 expires_in=1800,  # 30 minutes
-                paid_btn_name="callback",
+                paid_btn_name=ButtonName.callback,
                 paid_btn_url=f"https://mystore.com/order/{order_id}/complete"
             )
 
@@ -472,7 +472,7 @@ Create a tip bot for content creators:
 
 ```python
 from cryptobot import CryptoBotClient
-from cryptobot.models import Asset
+from cryptobot.models import Asset, ButtonName, Status
 import os
 
 class TipBot:
@@ -497,7 +497,7 @@ class TipBot:
             description=description,
             allow_comments=True,
             allow_anonymous=True,
-            paid_btn_name="callback",
+            paid_btn_name=ButtonName.callback,
             paid_btn_url=f"https://creator.com/{self.creator_name}/thanks"
         )
 
@@ -511,7 +511,7 @@ class TipBot:
 
     def get_total_tips(self):
         """Calculate total tips received"""
-        invoices = self.client.get_invoices(status="paid")
+        invoices = self.client.get_invoices(status=Status.paid)
 
         tips_by_asset = {}
         for invoice in invoices:
@@ -560,7 +560,7 @@ Handle in-game currency purchases:
 
 ```python
 from cryptobot import CryptoBotClient
-from cryptobot.models import Asset, Status
+from cryptobot.models import Asset, ButtonName, Status
 import os
 
 class GameStore:
@@ -586,7 +586,7 @@ class GameStore:
             description=f"{package['gems']} Gems Package",
             payload=f"PLAYER_{player_id}_{package_name}",
             expires_in=600,  # 10 minutes
-            paid_btn_name="callback",
+            paid_btn_name=ButtonName.callback,
             paid_btn_url=f"https://game.com/player/{player_id}/gems"
         )
 

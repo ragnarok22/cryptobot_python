@@ -112,7 +112,7 @@ class CryptoBotClient:
             return response
 
         # This is unreachable due to the return/raise branches above.
-        raise RuntimeError("Unexpected retry flow state")
+        raise RuntimeError("Unexpected retry flow state")  # pragma: no cover
 
     def _handle_response(self, response: httpx.Response) -> Any:
         """Handle HTTP responses consistently and raise typed errors for malformed payloads."""

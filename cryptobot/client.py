@@ -90,7 +90,7 @@ class AsyncCryptoBotClient:
 
             return response
 
-        raise RuntimeError("Unexpected retry flow state")
+        raise RuntimeError("Unexpected retry flow state")  # pragma: no cover
 
     def _handle_response(self, response: httpx.Response) -> Any:
         try:

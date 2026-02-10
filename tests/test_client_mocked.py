@@ -134,6 +134,59 @@ class TestCryptoBotClientRetryPolicy:
         assert app.app_id == 2
         assert mock_get.call_count == 2
 
+    def test_retry_delay_uses_retry_after_header(self):
+        client = CryptoBotClient("test_token", retry_backoff=0.5)
+        response = Mock()
+        response.headers = {"Retry-After": "2"}
+        assert client._retry_delay(0, response) == 2.0
+
+    @patch("httpx.Client.get")
+    @patch("cryptobot._sync.client.time.sleep")
+    def test_retry_timeout_sleep_called(self, mock_sleep, mock_get):
+        ok_response = Mock()
+        ok_response.status_code = 200
+        ok_response.headers = {}
+        ok_response.json.return_value = {
+            "result": {
+                "app_id": 3,
+                "name": "Sleep App",
+                "payment_processing_bot_username": "SleepBot",
+            }
+        }
+        mock_get.side_effect = [httpx.TimeoutException("timeout"), ok_response]
+
+        client = CryptoBotClient("test_token", max_retries=1, retry_backoff=0.1)
+        app = client.get_me()
+
+        assert app.app_id == 3
+        mock_sleep.assert_called_once()
+
+    @patch("httpx.Client.get")
+    @patch("cryptobot._sync.client.time.sleep")
+    def test_retry_status_sleep_called(self, mock_sleep, mock_get):
+        retry_response = Mock()
+        retry_response.status_code = 429
+        retry_response.headers = {"Retry-After": "1"}
+        retry_response.json.return_value = {"error": {"code": 429, "name": "TOO_MANY_REQUESTS"}}
+
+        ok_response = Mock()
+        ok_response.status_code = 200
+        ok_response.headers = {}
+        ok_response.json.return_value = {
+            "result": {
+                "app_id": 4,
+                "name": "RetryAfter App",
+                "payment_processing_bot_username": "RetryAfterBot",
+            }
+        }
+        mock_get.side_effect = [retry_response, ok_response]
+
+        client = CryptoBotClient("test_token", max_retries=1, retry_backoff=0.1)
+        app = client.get_me()
+
+        assert app.app_id == 4
+        mock_sleep.assert_called_once()
+
 
 class TestCryptoBotClientGetMe:
     """Tests for get_me method."""
@@ -176,6 +229,22 @@ class TestCryptoBotClientGetMe:
         error = exc_info.value
         assert error.code == 401
         assert error.name == "UNAUTHORIZED"
+
+    @patch("httpx.Client.get")
+    def test_get_me_http_error_fallback(self, mock_get):
+        mock_response = Mock()
+        mock_response.status_code = 502
+        mock_response.text = "bad gateway"
+        mock_response.json.return_value = {"detail": "gateway"}
+        mock_get.return_value = mock_response
+
+        client = CryptoBotClient("test_token")
+
+        with pytest.raises(CryptoBotError) as exc_info:
+            client.get_me()
+
+        assert exc_info.value.code == 502
+        assert exc_info.value.name.startswith("HTTPError:")
 
 
 class TestCryptoBotClientCreateInvoice:
@@ -302,6 +371,13 @@ class TestCryptoBotClientCreateInvoice:
 
         mock_post.assert_not_called()
 
+    @patch("httpx.Client.post")
+    def test_create_invoice_validates_amount(self, mock_post):
+        client = CryptoBotClient("test_token")
+        with pytest.raises(ValueError, match="Amount must be greater than 0"):
+            client.create_invoice(Asset.TON, 0)
+        mock_post.assert_not_called()
+
 
 class TestCryptoBotClientTransfer:
     """Tests for transfer method."""
@@ -362,6 +438,13 @@ class TestCryptoBotClientTransfer:
 
         error = exc_info.value
         assert error.name == "INSUFFICIENT_FUNDS"
+
+    @patch("httpx.Client.post")
+    def test_transfer_validates_amount(self, mock_post):
+        client = CryptoBotClient("test_token")
+        with pytest.raises(ValueError, match="Amount must be greater than 0"):
+            client.transfer(user_id=12345, asset=Asset.BTC, amount=0, spend_id="test_id")
+        mock_post.assert_not_called()
 
 
 class TestCryptoBotClientGetInvoices:
@@ -477,6 +560,15 @@ class TestCryptoBotClientGetInvoices:
         with pytest.raises(TypeError, match="invoice_ids must be a comma-separated string or list of integers"):
             client.get_invoices(invoice_ids=123)  # type: ignore[arg-type]
 
+    def test_get_invoices_validates_empty_invoice_ids(self):
+        client = CryptoBotClient("test_token")
+
+        with pytest.raises(ValueError, match="invoice_ids string cannot be empty"):
+            client.get_invoices(invoice_ids=" , ")
+
+        with pytest.raises(ValueError, match="invoice_ids list cannot be empty"):
+            client.get_invoices(invoice_ids=[])
+
 
 class TestCryptoBotClientInvoiceIterators:
     """Tests for paginated invoice helpers."""
@@ -532,6 +624,11 @@ class TestCryptoBotClientInvoiceIterators:
         invoice_ids = [invoice.invoice_id for invoice in client.iter_invoices(page_size=2)]
 
         assert invoice_ids == [10, 11]
+
+    def test_iter_invoice_pages_validates_start_offset(self):
+        client = CryptoBotClient("test_token")
+        with pytest.raises(ValueError, match="start_offset must be greater than or equal to 0"):
+            list(client.iter_invoice_pages(start_offset=-1))
 
 
 class TestCryptoBotClientGetBalances:

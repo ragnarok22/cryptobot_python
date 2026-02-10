@@ -1,760 +1,383 @@
 # Advanced Topics
 
-This guide covers advanced patterns, optimizations, and best practices for production deployments.
+This guide covers production patterns for CryptoBot Python, including retries, local throttling, caching, webhook processing, and persistence.
 
-## Connection Management
+## Environment Baseline
 
-### Custom HTTP Client Configuration
+Use environment variables for all tokens:
 
-Configure the underlying httpx client for production use:
+```python
+import os
+
+API_TOKEN = os.environ["CRYPTOBOT_API_TOKEN"]
+TESTNET_TOKEN = os.environ.get("CRYPTOBOT_TESTNET_TOKEN")
+```
+
+## Retry and Backoff Wrapper
+
+Use a wrapper to retry only transient failures (`429` and `5xx`):
+
+```python
+import time
+
+from cryptobot import CryptoBotClient
+from cryptobot.errors import CryptoBotError
+from cryptobot.models import Asset
+
+
+class ResilientCryptoBotClient:
+    def __init__(self, api_token: str, is_mainnet: bool = True, timeout: float = 5.0, max_retries: int = 3):
+        self.client = CryptoBotClient(api_token, is_mainnet=is_mainnet, timeout=timeout)
+        self.max_retries = max_retries
+
+    def _run(self, fn, *args, **kwargs):
+        for attempt in range(1, self.max_retries + 1):
+            try:
+                return fn(*args, **kwargs)
+            except CryptoBotError as exc:
+                is_retryable = exc.code == 429 or exc.code >= 500
+                if not is_retryable or attempt == self.max_retries:
+                    raise
+                delay = 0.5 * (2 ** (attempt - 1))
+                time.sleep(delay)
+
+    def create_invoice(self, **kwargs):
+        return self._run(self.client.create_invoice, **kwargs)
+
+    def transfer(self, **kwargs):
+        return self._run(self.client.transfer, **kwargs)
+
+
+resilient = ResilientCryptoBotClient(API_TOKEN)
+invoice = resilient.create_invoice(asset=Asset.USDT, amount=10, description="Retry-safe invoice")
+print(invoice.invoice_id)
+```
+
+## Tuned HTTPX Client
+
+If you need custom connection limits or transport configuration, replace the internal `httpx.Client` after initialization:
 
 ```python
 import httpx
+
 from cryptobot import CryptoBotClient
 
-# Create a custom client with connection pooling
-class ProductionCryptoBotClient(CryptoBotClient):
-    def __init__(self, api_token, is_mainnet=True, timeout=30.0, max_connections=100):
-        super().__init__(api_token, is_mainnet, timeout)
 
-        # Override the HTTP client with custom settings
-        self._CryptoBotClient__http_client = httpx.Client(
-            base_url=self._CryptoBotClient__base_url,
+class TunedCryptoBotClient(CryptoBotClient):
+    def __init__(self, api_token: str, is_mainnet: bool = True, timeout: float = 5.0, max_connections: int = 100):
+        super().__init__(api_token=api_token, is_mainnet=is_mainnet, timeout=timeout)
+
+        # Close the default client before replacing it.
+        self._http_client.close()
+
+        self._http_client = httpx.Client(
+            base_url=self._base_url,
             timeout=timeout,
             headers={"Crypto-Pay-API-Token": self.api_token},
             limits=httpx.Limits(
                 max_keepalive_connections=max_connections,
                 max_connections=max_connections,
-                keepalive_expiry=30.0
-            )
+            ),
         )
 
-# Usage
-client = ProductionCryptoBotClient(
-    "YOUR_API_TOKEN",
-    timeout=60.0,
-    max_connections=50
-)
+    def close(self):
+        self._http_client.close()
+
+
+client = TunedCryptoBotClient(API_TOKEN, timeout=10.0, max_connections=50)
+try:
+    print(client.get_me().name)
+finally:
+    client.close()
 ```
 
-### Retry Logic with Exponential Backoff
+## Local Rate Limiting
 
-Implement robust retry logic for transient failures:
-
-```python
-import time
-from cryptobot import CryptoBotClient
-from cryptobot.errors import CryptoBotError
-
-class ResilientClient:
-    def __init__(self, api_token, max_retries=3):
-        self.client = CryptoBotClient(api_token)
-        self.max_retries = max_retries
-
-    def _retry_with_backoff(self, func, *args, **kwargs):
-        """Execute function with exponential backoff retry"""
-        for attempt in range(self.max_retries):
-            try:
-                return func(*args, **kwargs)
-            except CryptoBotError as e:
-                # Only retry on server errors (5xx) or rate limits
-                if e.code >= 500 or e.code == 429:
-                    if attempt < self.max_retries - 1:
-                        wait_time = (2 ** attempt) + (0.1 * attempt)
-                        time.sleep(wait_time)
-                        continue
-                raise
-
-    def create_invoice(self, **kwargs):
-        """Create invoice with retry logic"""
-        return self._retry_with_backoff(
-            self.client.create_invoice,
-            **kwargs
-        )
-
-    def transfer(self, **kwargs):
-        """Transfer with retry logic"""
-        return self._retry_with_backoff(
-            self.client.transfer,
-            **kwargs
-        )
-
-# Usage
-resilient_client = ResilientClient("YOUR_API_TOKEN", max_retries=3)
-invoice = resilient_client.create_invoice(
-    asset=Asset.USDT,
-    amount=10.0,
-    description="Resilient invoice"
-)
-```
-
-## Rate Limiting
-
-### Token Bucket Rate Limiter
-
-Implement rate limiting to avoid API throttling:
+Use a token bucket in-process to smooth bursts:
 
 ```python
-import time
 import threading
+import time
+
 from cryptobot import CryptoBotClient
 from cryptobot.models import Asset
 
-class RateLimitedClient:
-    def __init__(self, api_token, requests_per_second=10):
-        self.client = CryptoBotClient(api_token)
-        self.requests_per_second = requests_per_second
-        self.tokens = requests_per_second
-        self.max_tokens = requests_per_second
-        self.last_update = time.time()
+
+class TokenBucket:
+    def __init__(self, rate_per_second: float, capacity: float):
+        self.rate = rate_per_second
+        self.capacity = capacity
+        self.tokens = capacity
+        self.last = time.monotonic()
         self.lock = threading.Lock()
 
-    def _acquire_token(self):
-        """Acquire a token using token bucket algorithm"""
-        with self.lock:
-            now = time.time()
-            elapsed = now - self.last_update
+    def acquire(self):
+        while True:
+            with self.lock:
+                now = time.monotonic()
+                elapsed = now - self.last
+                self.last = now
+                self.tokens = min(self.capacity, self.tokens + elapsed * self.rate)
 
-            # Add tokens based on elapsed time
-            self.tokens = min(
-                self.max_tokens,
-                self.tokens + elapsed * self.requests_per_second
-            )
-            self.last_update = now
+                if self.tokens >= 1:
+                    self.tokens -= 1
+                    return
 
-            if self.tokens < 1:
-                # Wait until we have a token
-                wait_time = (1 - self.tokens) / self.requests_per_second
-                time.sleep(wait_time)
-                self.tokens = 0
-            else:
-                self.tokens -= 1
+                wait_for = (1 - self.tokens) / self.rate
+            time.sleep(wait_for)
+
+
+class RateLimitedCryptoBotClient:
+    def __init__(self, api_token: str, requests_per_second: float = 5):
+        self.client = CryptoBotClient(api_token)
+        self.bucket = TokenBucket(rate_per_second=requests_per_second, capacity=requests_per_second)
 
     def create_invoice(self, **kwargs):
-        """Rate-limited invoice creation"""
-        self._acquire_token()
+        self.bucket.acquire()
         return self.client.create_invoice(**kwargs)
 
-    def get_invoices(self, **kwargs):
-        """Rate-limited invoice retrieval"""
-        self._acquire_token()
-        return self.client.get_invoices(**kwargs)
 
-# Usage
-rate_limited_client = RateLimitedClient("YOUR_API_TOKEN", requests_per_second=5)
-
-# Make multiple requests without overwhelming the API
-for i in range(20):
-    invoice = rate_limited_client.create_invoice(
-        asset=Asset.USDT,
-        amount=1.0,
-        description=f"Invoice {i}"
-    )
-    print(f"Created invoice {i}: {invoice.invoice_id}")
+limited = RateLimitedCryptoBotClient(API_TOKEN, requests_per_second=3)
+for i in range(5):
+    inv = limited.create_invoice(asset=Asset.USDT, amount=1, description=f"Burst #{i}")
+    print(inv.invoice_id)
 ```
 
-## Caching Strategies
+## Exchange-Rate Caching
 
-### Exchange Rate Caching
-
-Cache exchange rates to reduce API calls:
+Cache exchange rates with a TTL to reduce API calls:
 
 ```python
-from cryptobot import CryptoBotClient
 from datetime import datetime, timedelta
-import threading
+from threading import Lock
+from typing import List
 
-class CachedRatesClient:
-    def __init__(self, api_token, cache_ttl_seconds=300):
-        self.client = CryptoBotClient(api_token)
-        self.cache_ttl = timedelta(seconds=cache_ttl_seconds)
-        self._rates_cache = None
-        self._cache_timestamp = None
-        self._cache_lock = threading.Lock()
-
-    def get_exchange_rates(self, force_refresh=False):
-        """Get exchange rates with caching"""
-        with self._cache_lock:
-            now = datetime.now()
-
-            # Check if cache is valid
-            if (not force_refresh and
-                self._rates_cache is not None and
-                self._cache_timestamp is not None and
-                now - self._cache_timestamp < self.cache_ttl):
-                return self._rates_cache
-
-            # Fetch fresh rates
-            self._rates_cache = self.client.get_exchange_rates()
-            self._cache_timestamp = now
-            return self._rates_cache
-
-    def convert_amount(self, amount, from_asset, to_currency):
-        """Convert amount using cached rates"""
-        rates = self.get_exchange_rates()
-
-        for rate in rates:
-            if rate.source.name == from_asset and rate.target == to_currency:
-                return float(amount) * float(rate.rate)
-
-        return None
-
-# Usage
-cached_client = CachedRatesClient("YOUR_API_TOKEN", cache_ttl_seconds=300)
-
-# First call fetches from API
-rates1 = cached_client.get_exchange_rates()
-
-# Subsequent calls use cache (within TTL)
-rates2 = cached_client.get_exchange_rates()
-
-# Convert amounts using cached rates
-usd_amount = cached_client.convert_amount(1.0, "BTC", "USD")
-print(f"1 BTC = ${usd_amount} USD")
-```
-
-## Webhook Security
-
-### Enhanced Webhook Verification
-
-Implement comprehensive webhook security:
-
-```python
-from fastapi import FastAPI, Request, HTTPException, Header
-import hmac
-import hashlib
-import json
-import time
-from typing import Optional
-
-app = FastAPI()
-
-# Store processed webhook IDs to prevent replay attacks
-processed_webhooks = set()
-webhook_expiry_seconds = 300  # 5 minutes
-
-def verify_webhook_signature(
-    body: bytes,
-    signature: str,
-    secret: str
-) -> bool:
-    """Verify webhook signature using HMAC-SHA256"""
-    expected_signature = hmac.new(
-        secret.encode(),
-        body,
-        hashlib.sha256
-    ).hexdigest()
-
-    return hmac.compare_digest(signature, expected_signature)
-
-def check_replay_attack(webhook_id: str, timestamp: int) -> bool:
-    """Check if webhook is a replay attack"""
-    now = int(time.time())
-
-    # Check if webhook is too old
-    if now - timestamp > webhook_expiry_seconds:
-        return True
-
-    # Check if we've already processed this webhook
-    if webhook_id in processed_webhooks:
-        return True
-
-    return False
-
-@app.post("/webhook")
-async def secure_webhook_handler(
-    request: Request,
-    crypto_pay_api_signature: Optional[str] = Header(None)
-):
-    """Secure webhook handler with multiple security checks"""
-    # Check signature header exists
-    if not crypto_pay_api_signature:
-        raise HTTPException(status_code=401, detail="Missing signature")
-
-    # Read body
-    body = await request.body()
-
-    # Verify signature
-    webhook_secret = "YOUR_WEBHOOK_SECRET"
-    if not verify_webhook_signature(body, crypto_pay_api_signature, webhook_secret):
-        raise HTTPException(status_code=401, detail="Invalid signature")
-
-    # Parse payload
-    try:
-        payload = json.loads(body)
-    except json.JSONDecodeError:
-        raise HTTPException(status_code=400, detail="Invalid JSON")
-
-    # Extract webhook metadata
-    webhook_id = payload.get("update_id")
-    webhook_type = payload.get("update_type")
-
-    # Check for replay attack
-    timestamp = payload.get("request_date", int(time.time()))
-    if check_replay_attack(str(webhook_id), timestamp):
-        raise HTTPException(status_code=400, detail="Replay attack detected")
-
-    # Mark webhook as processed
-    processed_webhooks.add(str(webhook_id))
-
-    # Process webhook based on type
-    if webhook_type == "invoice_paid":
-        invoice_data = payload.get("payload")
-        # Process paid invoice
-        process_paid_invoice(invoice_data)
-
-    return {"status": "ok"}
-
-def process_paid_invoice(invoice_data):
-    """Process a paid invoice"""
-    invoice_id = invoice_data.get("invoice_id")
-    amount = invoice_data.get("amount")
-    asset = invoice_data.get("asset")
-
-    print(f"Invoice {invoice_id} paid: {amount} {asset}")
-    # Add your business logic here
-```
-
-### Webhook Queue Processing
-
-Use a queue for asynchronous webhook processing:
-
-```python
-from fastapi import FastAPI, Request, BackgroundTasks
-import asyncio
-from queue import Queue
-import threading
-import hmac
-import hashlib
-
-app = FastAPI()
-webhook_queue = Queue()
-
-def verify_signature(body: bytes, signature: str, secret: str) -> bool:
-    """Verify webhook signature"""
-    expected = hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
-    return hmac.compare_digest(signature, expected)
-
-def webhook_processor():
-    """Background worker to process webhooks"""
-    while True:
-        try:
-            webhook_data = webhook_queue.get(timeout=1)
-            # Process webhook
-            process_webhook(webhook_data)
-            webhook_queue.task_done()
-        except:
-            pass
-
-def process_webhook(data):
-    """Process webhook data"""
-    # Add your processing logic here
-    print(f"Processing webhook: {data}")
-
-# Start background worker
-worker_thread = threading.Thread(target=webhook_processor, daemon=True)
-worker_thread.start()
-
-@app.post("/webhook")
-async def webhook_handler(
-    request: Request,
-    background_tasks: BackgroundTasks
-):
-    """Webhook handler with queue processing"""
-    signature = request.headers.get("crypto-pay-api-signature")
-    body = await request.body()
-
-    # Quick signature verification
-    if not verify_signature(body, signature, "YOUR_SECRET"):
-        return {"error": "Invalid signature"}, 401
-
-    # Parse payload
-    import json
-    payload = json.loads(body)
-
-    # Add to queue for async processing
-    webhook_queue.put(payload)
-
-    # Return immediately
-    return {"status": "queued"}
-```
-
-## Database Integration
-
-### Invoice Tracking with SQLAlchemy
-
-Track invoices in a database:
-
-```python
-from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from datetime import datetime
 from cryptobot import CryptoBotClient
-from cryptobot.models import Asset, Status
+from cryptobot.models import ExchangeRate
+
+
+class ExchangeRateCache:
+    def __init__(self, client: CryptoBotClient, ttl_seconds: int = 60):
+        self.client = client
+        self.ttl = timedelta(seconds=ttl_seconds)
+        self._rates: List[ExchangeRate] = []
+        self._fetched_at: datetime | None = None
+        self._lock = Lock()
+
+    def get_rates(self, force_refresh: bool = False) -> List[ExchangeRate]:
+        with self._lock:
+            now = datetime.utcnow()
+            is_fresh = self._fetched_at and now - self._fetched_at < self.ttl
+            if self._rates and is_fresh and not force_refresh:
+                return self._rates
+
+            self._rates = self.client.get_exchange_rates()
+            self._fetched_at = now
+            return self._rates
+
+
+client = CryptoBotClient(API_TOKEN)
+cache = ExchangeRateCache(client, ttl_seconds=120)
+rates = cache.get_rates()
+print(len(rates))
+```
+
+## Webhook Queue Pattern
+
+Keep webhook HTTP handlers fast and push business work to a queue worker:
+
+```python
+import os
+from queue import Queue
+from threading import Thread
+
+from cryptobot.webhook import Listener
+
+
+queue: Queue[dict] = Queue(maxsize=1000)
+
+
+def process_update(update: dict):
+    if update.get("update_type") == "invoice_paid":
+        payload = update.get("payload", {})
+        print("Process paid invoice", payload.get("invoice_id"))
+
+
+def worker():
+    while True:
+        item = queue.get()
+        try:
+            process_update(item)
+        finally:
+            queue.task_done()
+
+
+def on_webhook(headers, data):
+    # Signature validation is already handled by Listener.
+    queue.put_nowait(data)
+
+
+Thread(target=worker, daemon=True).start()
+
+listener = Listener(
+    host="0.0.0.0",
+    callback=on_webhook,
+    api_token=os.environ["CRYPTOBOT_API_TOKEN"],
+    port=2203,
+    url="/webhook",
+    log_level="info",
+)
+listener.listen()
+```
+
+## Persisting Invoices with SQLAlchemy
+
+Persist created invoices and sync status from the API:
+
+```python
+from datetime import datetime
+
+from sqlalchemy import Column, DateTime, Integer, String, create_engine
+from sqlalchemy.orm import declarative_base, sessionmaker
+
+from cryptobot import CryptoBotClient
+from cryptobot.models import Asset
+
 
 Base = declarative_base()
 
+
 class InvoiceRecord(Base):
-    __tablename__ = "invoices"
+    __tablename__ = "invoice_records"
 
     id = Column(Integer, primary_key=True)
-    invoice_id = Column(Integer, unique=True, index=True)
-    user_id = Column(Integer, index=True)
-    asset = Column(String)
-    amount = Column(Float)
-    description = Column(String)
-    status = Column(String)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    paid_at = Column(DateTime, nullable=True)
+    invoice_id = Column(Integer, unique=True, nullable=False)
+    status = Column(String, nullable=False)
+    asset = Column(String, nullable=False)
+    amount = Column(String, nullable=False)
     payload = Column(String, nullable=True)
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow)
 
-class InvoiceManager:
-    def __init__(self, api_token, database_url):
+
+class InvoiceStore:
+    def __init__(self, api_token: str, db_url: str):
         self.client = CryptoBotClient(api_token)
-        self.engine = create_engine(database_url)
+        self.engine = create_engine(db_url)
         Base.metadata.create_all(self.engine)
         self.Session = sessionmaker(bind=self.engine)
 
-    def create_and_track_invoice(self, user_id, asset, amount, description, payload=None):
-        """Create invoice and save to database"""
-        # Create invoice via API
-        invoice = self.client.create_invoice(
-            asset=asset,
-            amount=amount,
-            description=description,
-            payload=payload
-        )
-
-        # Save to database
+    def create_invoice(self, asset: Asset, amount: float, payload: str):
+        invoice = self.client.create_invoice(asset=asset, amount=amount, payload=payload)
         session = self.Session()
         try:
-            record = InvoiceRecord(
-                invoice_id=invoice.invoice_id,
-                user_id=user_id,
-                asset=asset.name,
-                amount=amount,
-                description=description,
-                status=invoice.status.name,
-                payload=payload
+            session.add(
+                InvoiceRecord(
+                    invoice_id=invoice.invoice_id,
+                    status=invoice.status.name,
+                    asset=invoice.asset.name,
+                    amount=invoice.amount,
+                    payload=invoice.payload,
+                )
             )
-            session.add(record)
             session.commit()
         finally:
             session.close()
-
         return invoice
 
-    def update_invoice_status(self, invoice_id):
-        """Update invoice status from API"""
-        # Fetch from API
+    def sync_invoice(self, invoice_id: int):
         invoices = self.client.get_invoices(invoice_ids=str(invoice_id))
         if not invoices:
             return None
 
-        invoice = invoices[0]
-
-        # Update database
+        latest = invoices[0]
         session = self.Session()
         try:
-            record = session.query(InvoiceRecord).filter_by(
-                invoice_id=invoice_id
-            ).first()
-
-            if record:
-                record.status = invoice.status.name
-                if invoice.status == Status.paid:
-                    record.paid_at = datetime.utcnow()
+            row = session.query(InvoiceRecord).filter_by(invoice_id=invoice_id).first()
+            if row:
+                row.status = latest.status.name
+                row.updated_at = datetime.utcnow()
                 session.commit()
-                return record
+            return latest
         finally:
             session.close()
-
-    def get_user_invoices(self, user_id):
-        """Get all invoices for a user"""
-        session = self.Session()
-        try:
-            return session.query(InvoiceRecord).filter_by(
-                user_id=user_id
-            ).all()
-        finally:
-            session.close()
-
-# Usage
-manager = InvoiceManager(
-    "YOUR_API_TOKEN",
-    "sqlite:///invoices.db"
-)
-
-# Create and track invoice
-invoice = manager.create_and_track_invoice(
-    user_id=12345,
-    asset=Asset.USDT,
-    amount=10.0,
-    description="Test invoice",
-    payload="ORDER_123"
-)
-
-# Update status
-manager.update_invoice_status(invoice.invoice_id)
-
-# Get user's invoices
-user_invoices = manager.get_user_invoices(12345)
 ```
 
-## Logging and Monitoring
+## Structured Logging Wrapper
 
-### Comprehensive Logging
-
-Implement detailed logging for production:
+Log operations with request context and API error fields:
 
 ```python
 import logging
+
 from cryptobot import CryptoBotClient
 from cryptobot.errors import CryptoBotError
 from cryptobot.models import Asset
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('cryptobot.log'),
-        logging.StreamHandler()
-    ]
-)
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+logger = logging.getLogger("cryptobot")
+
 
 class LoggedCryptoBotClient:
-    def __init__(self, api_token, is_mainnet=True):
-        self.client = CryptoBotClient(api_token, is_mainnet)
-        self.logger = logging.getLogger('CryptoBot')
+    def __init__(self, api_token: str):
+        self.client = CryptoBotClient(api_token)
 
-    def create_invoice(self, **kwargs):
-        """Create invoice with logging"""
-        self.logger.info(f"Creating invoice: {kwargs}")
+    def create_invoice(self, *, asset: Asset, amount: float, description: str):
+        logger.info("create_invoice start asset=%s amount=%s", asset.name, amount)
         try:
-            invoice = self.client.create_invoice(**kwargs)
-            self.logger.info(
-                f"Invoice created successfully: {invoice.invoice_id}"
-            )
+            invoice = self.client.create_invoice(asset=asset, amount=amount, description=description)
+            logger.info("create_invoice ok invoice_id=%s status=%s", invoice.invoice_id, invoice.status.name)
             return invoice
-        except CryptoBotError as e:
-            self.logger.error(
-                f"Failed to create invoice: {e.code} - {e.name} - {e.description}"
-            )
+        except CryptoBotError as exc:
+            logger.error("create_invoice failed code=%s name=%s", exc.code, exc.name)
             raise
-
-    def transfer(self, **kwargs):
-        """Transfer with logging"""
-        self.logger.info(f"Initiating transfer: {kwargs}")
-        try:
-            transfer = self.client.transfer(**kwargs)
-            self.logger.info(
-                f"Transfer completed: {transfer.transfer_id}"
-            )
-            return transfer
-        except CryptoBotError as e:
-            self.logger.error(
-                f"Transfer failed: {e.code} - {e.name} - {e.description}"
-            )
-            raise
-
-# Usage
-logged_client = LoggedCryptoBotClient("YOUR_API_TOKEN")
-invoice = logged_client.create_invoice(
-    asset=Asset.USDT,
-    amount=10.0,
-    description="Logged invoice"
-)
 ```
 
-## Testing Strategies
+## Testing with MockTransport
 
-### Mock Client for Unit Tests
-
-Create a mock client for testing:
+For deterministic unit tests, replace the internal HTTP client transport:
 
 ```python
-from unittest.mock import Mock, patch
-from cryptobot.models import Invoice, Asset, Status, Balance
-import pytest
+import httpx
 
-class MockCryptoBotClient:
-    """Mock client for testing"""
-    def __init__(self, api_token, is_mainnet=True, timeout=5.0):
-        self.api_token = api_token
-        self.invoices = []
-        self.transfers = []
-
-    def create_invoice(self, asset, amount, **kwargs):
-        """Mock invoice creation"""
-        invoice = Invoice(
-            invoice_id=len(self.invoices) + 1,
-            status=Status.active,
-            hash="mock_hash",
-            amount=str(amount),
-            asset=asset,
-            bot_invoice_url="https://t.me/CryptoBot?start=mock",
-            **kwargs
-        )
-        self.invoices.append(invoice)
-        return invoice
-
-    def get_invoices(self, **kwargs):
-        """Mock get invoices"""
-        return self.invoices
-
-    def get_balances(self):
-        """Mock get balances"""
-        return [
-            Balance(currency_code="USDT", available="1000.0", onhold="0.0"),
-            Balance(currency_code="BTC", available="0.5", onhold="0.0")
-        ]
-
-# Usage in tests
-def test_invoice_creation():
-    client = MockCryptoBotClient("test_token")
-
-    invoice = client.create_invoice(
-        asset=Asset.USDT,
-        amount=10.0,
-        description="Test"
-    )
-
-    assert invoice.invoice_id == 1
-    assert invoice.amount == "10.0"
-    assert invoice.asset == Asset.USDT
-
-def test_get_invoices():
-    client = MockCryptoBotClient("test_token")
-
-    # Create some invoices
-    client.create_invoice(Asset.USDT, 10.0, description="Test 1")
-    client.create_invoice(Asset.BTC, 0.001, description="Test 2")
-
-    # Get invoices
-    invoices = client.get_invoices()
-
-    assert len(invoices) == 2
-    assert invoices[0].description == "Test 1"
-    assert invoices[1].description == "Test 2"
-```
-
-## Performance Optimization
-
-### Batch Operations
-
-Process multiple invoices efficiently:
-
-```python
 from cryptobot import CryptoBotClient
 from cryptobot.models import Asset
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
-class BatchProcessor:
-    def __init__(self, api_token, max_workers=10):
-        self.client = CryptoBotClient(api_token)
-        self.max_workers = max_workers
 
-    def create_invoices_batch(self, invoice_specs):
-        """Create multiple invoices in parallel"""
-        results = []
-        errors = []
-
-        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
-            # Submit all tasks
-            future_to_spec = {
-                executor.submit(
-                    self.client.create_invoice,
-                    **spec
-                ): spec
-                for spec in invoice_specs
-            }
-
-            # Collect results
-            for future in as_completed(future_to_spec):
-                spec = future_to_spec[future]
-                try:
-                    invoice = future.result()
-                    results.append(invoice)
-                except Exception as e:
-                    errors.append({"spec": spec, "error": str(e)})
-
-        return results, errors
-
-# Usage
-processor = BatchProcessor("YOUR_API_TOKEN", max_workers=5)
-
-# Create 100 invoices
-invoice_specs = [
-    {
-        "asset": Asset.USDT,
-        "amount": 10.0,
-        "description": f"Batch invoice {i}"
-    }
-    for i in range(100)
-]
-
-invoices, errors = processor.create_invoices_batch(invoice_specs)
-print(f"Created {len(invoices)} invoices")
-print(f"Failed {len(errors)} invoices")
-```
-
-## Environment-Specific Configuration
-
-### Configuration Management
-
-Manage different environments:
-
-```python
-import os
-from enum import Enum
-from cryptobot import CryptoBotClient
-
-class Environment(Enum):
-    DEVELOPMENT = "development"
-    STAGING = "staging"
-    PRODUCTION = "production"
-
-class Config:
-    def __init__(self, env: Environment):
-        self.env = env
-        self._load_config()
-
-    def _load_config(self):
-        """Load environment-specific configuration"""
-        if self.env == Environment.DEVELOPMENT:
-            self.api_token = os.getenv("CRYPTOBOT_DEV_TOKEN")
-            self.is_mainnet = False
-            self.timeout = 60.0
-            self.log_level = "DEBUG"
-        elif self.env == Environment.STAGING:
-            self.api_token = os.getenv("CRYPTOBOT_STAGING_TOKEN")
-            self.is_mainnet = False
-            self.timeout = 30.0
-            self.log_level = "INFO"
-        else:  # PRODUCTION
-            self.api_token = os.getenv("CRYPTOBOT_PROD_TOKEN")
-            self.is_mainnet = True
-            self.timeout = 30.0
-            self.log_level = "WARNING"
-
-    def create_client(self):
-        """Create client with environment-specific settings"""
-        return CryptoBotClient(
-            self.api_token,
-            is_mainnet=self.is_mainnet,
-            timeout=self.timeout
+def handler(request: httpx.Request) -> httpx.Response:
+    if request.url.path.endswith("/createInvoice"):
+        return httpx.Response(
+            200,
+            json={
+                "ok": True,
+                "result": {
+                    "invoice_id": 1,
+                    "status": "active",
+                    "hash": "mock_hash",
+                    "amount": "1",
+                    "asset": "USDT",
+                    "bot_invoice_url": "https://t.me/CryptoBot?start=mock",
+                },
+            },
         )
+    return httpx.Response(404, json={"ok": False, "error": {"code": 404, "name": "NOT_FOUND"}})
 
-# Usage
-env = Environment(os.getenv("APP_ENV", "development"))
-config = Config(env)
-client = config.create_client()
+
+transport = httpx.MockTransport(handler)
+client = CryptoBotClient("test_token")
+client._http_client.close()
+client._http_client = httpx.Client(
+    base_url=client._base_url,
+    headers={"Crypto-Pay-API-Token": client.api_token},
+    transport=transport,
+)
+
+invoice = client.create_invoice(asset=Asset.USDT, amount=1)
+assert invoice.invoice_id == 1
 ```
 
 ## Next Steps
 
-- Review the [Examples](examples) for practical implementations
-- Check the [Troubleshooting Guide](troubleshooting) for common issues
-- Explore the [API Reference](modules) for detailed documentation
+- Review [Examples](examples) for complete flows.
+- Read [Webhook Security](webhook_security) before production rollout.
+- Keep [Troubleshooting](troubleshooting) open while integrating.

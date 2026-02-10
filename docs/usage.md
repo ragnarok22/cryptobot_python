@@ -168,7 +168,7 @@ paid_invoices = client.get_invoices(
 By default, the client uses the mainnet environment. To target the testnet (with a testnet token), set `is_mainnet=False`:
 
 ```python
-client = CryptoBotClient("YOUR_TESTNET_TOKEN", is_mainnet=False)
+client = CryptoBotClient(os.environ["CRYPTOBOT_TESTNET_TOKEN"], is_mainnet=False)
 ```
 
 ### Custom Timeout
@@ -176,7 +176,7 @@ client = CryptoBotClient("YOUR_TESTNET_TOKEN", is_mainnet=False)
 Configure request timeout (default is 5 seconds):
 
 ```python
-client = CryptoBotClient("YOUR_API_TOKEN", timeout=60)
+client = CryptoBotClient(os.environ["CRYPTOBOT_API_TOKEN"], timeout=60)
 ```
 
 ### Swap Incoming Payments

@@ -1,43 +1,47 @@
 # Installation
 
-## Stable release
+## Requirements
 
-To install CryptoBot Python, run this command in your terminal:
+- Python 3.9.12+
+- pip (or Poetry for development)
 
-```console
-$ pip install cryptobot-python
+## Install from PyPI
+
+```bash
+pip install cryptobot-python
 ```
 
-This is the preferred method to install CryptoBot Python, as it will always install the most recent stable release.
+## Verify Installation
 
-If you don't have [pip](https://pip.pypa.io) installed, this [Python installation guide](http://docs.python-guide.org/en/latest/starting/installation/) can guide you through the process.
-
-## From sources
-
-The sources for CryptoBot Python can be downloaded from the [Github repo](https://github.com/ragnarok22/cryptobot_python).
-
-You can either clone the public repository:
-
-```console
-$ git clone git://github.com/ragnarok22/cryptobot_python
+```python
+from cryptobot import CryptoBotClient
+print(CryptoBotClient)
 ```
 
-Or download the [tarball](https://github.com/ragnarok22/cryptobot_python/tarball/master):
+## Install from Source
 
-```console
-$ curl -OJL https://github.com/ragnarok22/cryptobot_python/tarball/master
+```bash
+git clone https://github.com/ragnarok22/cryptobot_python.git
+cd cryptobot_python
+poetry install
 ```
 
-Once you have a copy of the source, you can install it with Poetry:
+For documentation tooling:
 
-```console
-$ cd cryptobot_python
-$ poetry install
+```bash
+poetry install --extras docs
 ```
 
-Or with pip:
+## Development Setup
 
-```console
-$ cd cryptobot_python
-$ pip install .
+```bash
+poetry install
+make lint
+make test
 ```
+
+## Common Pitfalls
+
+- Use `cryptobot-python` as the package name in `pip install`.
+- Keep mainnet and testnet tokens separate.
+- Store tokens in environment variables instead of source code.

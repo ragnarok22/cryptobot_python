@@ -1,5 +1,6 @@
-# This workflow will upload a Python Package using uv when a release is created
-# For more information see: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
+# This workflow will upload a Python Package to PyPI when a version tag is pushed.
+# It uses Trusted Publishing (OpenID Connect) — no API tokens needed.
+# Configure the trusted publisher at: https://pypi.org/manage/project/cryptobot-python/settings/publishing/
 
 name: Upload Python Package
 
@@ -9,11 +10,13 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   deploy:
 
     runs-on: ubuntu-latest
+    environment: pypi
 
     steps:
     - uses: actions/checkout@v6
@@ -28,6 +31,3 @@ jobs:
       run: uv build
     - name: Publish package
       uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_API_TOKEN }}

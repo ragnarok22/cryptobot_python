@@ -129,7 +129,7 @@ cryptobot/
 - Documentation: sphinx (7.1.2+), sphinx-rtd-theme (1.3.0+), watchdog (2.2.1+).
 - Formatting: black, isort via pre-commit hooks.
 - Fast linting: ruff with auto-fix capabilities.
-- Python support: 3.9.12+ to 3.13.
+- Python support: 3.9.12+ to 3.14.
 
 ### Extras
 ```bash
@@ -155,7 +155,7 @@ uv sync --extra docs           # Install documentation dependencies
 - Excludes: `__pycache__`, `.venv`, `.git`, `docs`, `dist`.
 
 ## CI/CD Integration
-- `python-tests.yml`: matrix across Python 3.9.12–3.13 with uv caching, flake8, pytest, Codecov.
+- `python-tests.yml`: matrix across Python 3.9.12–3.14 with uv caching, flake8, pytest, Codecov.
 - `python-publish.yml`: automated PyPI publishing on releases.
 - Dependabot manages dependency updates.
 - pre-commit.ci runs formatting and linting.

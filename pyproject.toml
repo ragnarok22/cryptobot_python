@@ -49,7 +49,7 @@ dev = [
     "myst-parser>=2.0.0,<4.0.0",
     "sphinx-intl>=2.1.0,<3.0.0",
     "watchdog>=2.2.1,<6.1.0",
-    "tox>=4.30.3",
+
     "twine>=6.2.0",
     "python-dotenv>=1.2.1",
     "uvicorn>=0.39.0",

@@ -1,5 +1,14 @@
 # History
 
+## 0.5.1 (2026-02-17)
+
+* Migrated from Poetry to uv for dependency management and virtual environments.
+* Switched build backend from poetry-core to hatchling.
+* Adopted PEP 735 dependency groups for dev dependencies.
+* Updated CI/CD workflows to use astral-sh/setup-uv.
+* Updated tox configuration with Python 3.14 support.
+* Removed legacy setup.py.
+
 ## 0.5.0 (2026-02-10)
 
 * Added async API client support alongside the synchronous client.

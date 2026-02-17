@@ -12,7 +12,7 @@
 - `uv sync` resolves runtime and dev dependencies pinned in `uv.lock`.
 - `uv run python -m cryptobot.webhook` starts the demo webhook for local validation.
 - `make lint` wraps `uv run flake8` to enforce style gates.
-- `make test` runs pytest with coverage; use `make test-all` for the tox matrix when touching cross-version code paths.
+- `make test` runs pytest with coverage; CI handles cross-version testing via its Python matrix.
 - `make docs` regenerates the Sphinx site (`docs/_build/html/index.html`).
 
 ## Coding Style & Naming Conventions
@@ -25,7 +25,7 @@
 - Tests use pytest; name files `tests/test_*.py` and functions `test_*`.
 - Maintain coverage near the existing ~90% target by extending fixtures and using httpx `MockTransport` for network
   isolation.
-- Execute `make test` before commits and `make test-all` when modifying compatibility-sensitive code.
+- Execute `make test` before commits; CI covers cross-version testing automatically.
 
 ## Commit & Pull Request Guidelines
 - Follow Conventional Commit prefixes used in history, e.g., `feat(sync): add transfer helper` or
@@ -55,7 +55,7 @@ uv sync --extra docs                       # Install with documentation extras
 ### Testing
 ```bash
 make test                               # Run pytest with coverage report and XML output
-make test-all                           # Run tests across all Python versions with tox
+
 make coverage                           # Generate HTML coverage report and open in browser
 uv run pytest                       # Direct pytest execution
 uv run coverage run -m pytest       # Run tests with coverage

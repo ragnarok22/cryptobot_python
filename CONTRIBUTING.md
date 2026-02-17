@@ -76,12 +76,6 @@ Ready to contribute? Here's how to set up `cryptobot_python` for local developme
    $ make test
    ```
 
-   To run tests across all Python versions with tox:
-
-   ```console
-   $ make test-all
-   ```
-
    To run integration tests (network + API token required):
 
    ```console

@@ -9,9 +9,9 @@
 - Build artifacts (`dist/`, `htmlcov/`) should remain untracked.
 
 ## Build, Test, and Development Commands
-- `poetry install` resolves runtime and dev dependencies pinned in `poetry.lock`.
-- `poetry run python -m cryptobot.webhook` starts the demo webhook for local validation.
-- `make lint` wraps `poetry run flake8` to enforce style gates.
+- `uv sync` resolves runtime and dev dependencies pinned in `uv.lock`.
+- `uv run python -m cryptobot.webhook` starts the demo webhook for local validation.
+- `make lint` wraps `uv run flake8` to enforce style gates.
 - `make test` runs pytest with coverage; use `make test-all` for the tox matrix when touching cross-version code paths.
 - `make docs` regenerates the Sphinx site (`docs/_build/html/index.html`).
 
@@ -19,7 +19,7 @@
 - Target Python 3.9+ with 4-space indentation and keep lines ≤127 characters.
 - Prefer snake_case for modules, functions, and variables; classes (especially in `models/`) use PascalCase matching
   CryptoBot entities.
-- Run `poetry run flake8 cryptobot tests` before submitting to catch import or complexity issues.
+- Run `uv run flake8 cryptobot tests` before submitting to catch import or complexity issues.
 
 ## Testing Guidelines
 - Tests use pytest; name files `tests/test_*.py` and functions `test_*`.
@@ -36,7 +36,7 @@
 ## Security & Configuration Tips
 - Store secrets in `.env` and load them via `python-dotenv`; never hard-code tokens.
 - After dependency bumps (FastAPI, Uvicorn, httpx), verify the webhook boots with
-  `poetry run uvicorn cryptobot.webhook:app --reload`.
+  `uv run uvicorn cryptobot.webhook:app --reload`.
 
 ## Project Overview
 CryptoBot Python is an unofficial Python client library for the Crypto Bot (Crypto Pay API) for Telegram. It enables
@@ -47,9 +47,9 @@ handling.
 
 ### Package Management
 ```bash
-poetry install                          # Install all dependencies including dev
-poetry install --no-dev                 # Install production dependencies only
-poetry install --extras docs            # Install with documentation extras
+uv sync                                    # Install all dependencies including dev
+uv sync --no-group dev                     # Install production dependencies only
+uv sync --extra docs                       # Install with documentation extras
 ```
 
 ### Testing
@@ -57,15 +57,15 @@ poetry install --extras docs            # Install with documentation extras
 make test                               # Run pytest with coverage report and XML output
 make test-all                           # Run tests across all Python versions with tox
 make coverage                           # Generate HTML coverage report and open in browser
-poetry run pytest                       # Direct pytest execution
-poetry run coverage run -m pytest       # Run tests with coverage
+uv run pytest                       # Direct pytest execution
+uv run coverage run -m pytest       # Run tests with coverage
 ```
 
 ### Code Quality
 ```bash
 make format                             # Format code with ruff (format + auto-fix)
 make lint                               # Run flake8 linting (max-line-length=127, max-complexity=10)
-poetry run flake8 cryptobot tests       # Direct flake8 execution
+uv run flake8 cryptobot tests       # Direct flake8 execution
 ```
 
 ### Documentation
@@ -78,13 +78,13 @@ make servedocs                          # Watch and rebuild docs on changes (req
 ```bash
 make dist                               # Clean build artifacts and create source/wheel packages
 make release                            # Build and publish to PyPI
-poetry build                            # Build with Poetry
-poetry publish                          # Publish to PyPI
+uv build                               # Build package
+uv publish                          # Publish to PyPI
 ```
 
 ### Webhook Development
 ```bash
-poetry run uvicorn cryptobot.webhook:app --reload    # Run webhook server with hot reload
+uv run uvicorn cryptobot.webhook:app --reload    # Run webhook server with hot reload
 ```
 
 ### Cleanup
@@ -131,9 +131,9 @@ cryptobot/
 - Fast linting: ruff with auto-fix capabilities.
 - Python support: 3.9.12+ to 3.13.
 
-### Poetry Extras
+### Extras
 ```bash
-poetry install --extras docs           # Install documentation dependencies
+uv sync --extra docs           # Install documentation dependencies
 ```
 
 ## Testing Framework
@@ -155,7 +155,7 @@ poetry install --extras docs           # Install documentation dependencies
 - Excludes: `__pycache__`, `.venv`, `.git`, `docs`, `dist`.
 
 ## CI/CD Integration
-- `python-tests.yml`: matrix across Python 3.9.12–3.13 with Poetry caching, flake8, pytest, Codecov.
+- `python-tests.yml`: matrix across Python 3.9.12–3.13 with uv caching, flake8, pytest, Codecov.
 - `python-publish.yml`: automated PyPI publishing on releases.
 - Dependabot manages dependency updates.
 - pre-commit.ci runs formatting and linting.

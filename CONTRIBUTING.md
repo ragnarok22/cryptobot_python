@@ -54,11 +54,11 @@ Ready to contribute? Here's how to set up `cryptobot_python` for local developme
    $ git clone git@github.com:your_name_here/cryptobot_python.git
    ```
 
-3. Install your local copy with Poetry. This is how you set up your fork for local development:
+3. Install your local copy with uv. This is how you set up your fork for local development:
 
    ```console
    $ cd cryptobot_python/
-   $ poetry install
+   $ uv sync
    ```
 
 4. Create a branch for local development:
@@ -119,10 +119,10 @@ $ pytest tests/test_specific.py
 A reminder for the maintainers on how to deploy. Make sure all your changes are committed (including an entry in HISTORY.md). Then run:
 
 ```console
-$ poetry version patch  # possible: major / minor / patch
+$ # Update version in pyproject.toml manually
 $ git add pyproject.toml
-$ git commit -m "Bump version to $(poetry version -s)"
-$ git tag "v$(poetry version -s)"
+$ git commit -m "Bump version to <new-version>"
+$ git tag "v<new-version>"
 $ git push
 $ git push --tags
 ```

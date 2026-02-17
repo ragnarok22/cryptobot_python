@@ -19,24 +19,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
         with:
           python-version: ${{ matrix.python-version }}
-      - uses: abatilo/actions-poetry@v3
-      - uses: actions/cache@v5
-        name: Define a cache for the virtual environment based on the dependencies lock file
-        with:
-          path: ./.venv
-          key: venv-${{ hashFiles('poetry.lock') }}
+          enable-cache: true
       - name: Install dependencies
-        run: poetry install
+        run: uv sync --all-extras
       - name: Lint with flake8
         run: make lint
       - name: Lint with Ruff
-        run: poetry run ruff check cryptobot tests
+        run: uv run ruff check cryptobot tests
       - name: Type check with mypy
-        run: poetry run mypy cryptobot
+        run: uv run mypy cryptobot
       - name: Test with pytest
         run: |
           make test

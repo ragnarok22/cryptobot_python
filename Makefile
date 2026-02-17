@@ -48,37 +48,37 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 lint/flake8: ## check style with flake8
-	poetry run flake8 cryptobot tests --count --show-source --max-complexity=10 --max-line-length=127 --exclude=.venv --statistics
+	uv run flake8 cryptobot tests --count --show-source --max-complexity=10 --max-line-length=127 --exclude=.venv --statistics
 
 lint/ruff: ## check style with ruff
-	poetry run ruff check cryptobot tests
+	uv run ruff check cryptobot tests
 
 lint/mypy: ## run static type checks
-	poetry run mypy cryptobot
+	uv run mypy cryptobot
 
 lint: lint/flake8 lint/ruff lint/mypy ## check style and typing
 
 format: ## format code with ruff
-	poetry run ruff format cryptobot tests
-	poetry run ruff check --fix cryptobot tests
+	uv run ruff format cryptobot tests
+	uv run ruff check --fix cryptobot tests
 
 test: ## run tests quickly with the default Python
-	poetry run coverage run -m pytest
-	poetry run coverage report
-	poetry run coverage xml
+	uv run coverage run -m pytest
+	uv run coverage report
+	uv run coverage xml
 test-all: ## run tests on every Python version with tox
 	tox
 
 coverage: ## check code coverage quickly with the default Python
-	poetry run coverage run -m pytest
-	poetry run coverage report -m
-	poetry run coverage html
+	uv run coverage run -m pytest
+	uv run coverage report -m
+	uv run coverage html
 	$(BROWSER) htmlcov/index.html
 
 docs: ## generate Sphinx HTML documentation, including API docs
 	rm -f docs/cryptobot.rst
 	rm -f docs/modules.rst
-	poetry run sphinx-apidoc -o docs/ cryptobot
+	uv run sphinx-apidoc -o docs/ cryptobot
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	$(BROWSER) docs/_build/html/index.html
@@ -95,11 +95,10 @@ servedocs: docs ## compile the docs watching for changes
 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
 
 release: dist ## package and upload a release
-	poetry publish
+	uv publish
 
 dist: clean ## builds source and wheel package
-	python3 -m pip install --upgrade pip setuptools wheel
-	poetry build
+	uv build
 
 install: clean ## install the package to the active Python's site-packages
-	python3 setup.py install
+	uv sync

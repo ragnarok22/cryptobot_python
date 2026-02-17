@@ -1,10 +1,5 @@
-# This workflow will upload a Python Package using Twine when a release is created
+# This workflow will upload a Python Package using uv when a release is created
 # For more information see: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
-
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
 
 name: Upload Python Package
 
@@ -22,20 +17,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v6
-    - name: Set up Python
-      uses: actions/setup-python@v6
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v7
       with:
         python-version: '3.x'
-    - uses: abatilo/actions-poetry@v3
-    - uses: actions/cache@v4
-      name: Define a cache for the virtual environment based on the dependencies lock file
-      with:
-        path: ./.venv
-        key: venv-${{ hashFiles('poetry.lock') }}
+        enable-cache: true
     - name: Install dependencies
-      run: poetry install
+      run: uv sync
     - name: Build package
-      run: make dist
+      run: uv build
     - name: Publish package
       uses: pypa/gh-action-pypi-publish@release/v1
       with:

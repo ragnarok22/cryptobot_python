@@ -17,7 +17,7 @@ Currently supported languages:
 Install documentation dependencies:
 
 ```bash
-poetry install --extras docs
+uv sync --extra docs
 ```
 
 Or directly:
@@ -287,7 +287,7 @@ make html-lang LANG=es
 
 **Error: `sphinx-intl` not found**
 ```bash
-poetry install --extras docs
+uv sync --extra docs
 # or
 pip install sphinx-intl
 ```

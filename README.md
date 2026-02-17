@@ -192,7 +192,7 @@ For custom webhook stacks, use `cryptobot.webhook.check_signature(...)` to verif
 ## Development
 
 ```bash
-poetry install
+uv sync
 make lint
 make test
 make docs

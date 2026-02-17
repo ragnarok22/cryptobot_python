@@ -3,7 +3,7 @@
 ## Requirements
 
 - Python 3.9.12+
-- pip (or Poetry for development)
+- pip (or [uv](https://docs.astral.sh/uv/) for development)
 
 ## Install from PyPI
 
@@ -30,25 +30,25 @@ print(CryptoBotClient)
 ```bash
 git clone https://github.com/ragnarok22/cryptobot_python.git
 cd cryptobot_python
-poetry install
+uv sync
 ```
 
 For documentation tooling:
 
 ```bash
-poetry install --extras docs
+uv sync --extra docs
 ```
 
 For local webhook development with FastAPI/Uvicorn:
 
 ```bash
-poetry install --extras webhook
+uv sync --extra webhook
 ```
 
 ## Development Setup
 
 ```bash
-poetry install
+uv sync
 make lint
 make test
 ```

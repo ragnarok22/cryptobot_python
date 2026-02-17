@@ -195,7 +195,7 @@ Thread(target=worker, daemon=True).start()
 
 ```bash
 # Start your own listener script (example filename)
-poetry run python listener.py
+uv run python listener.py
 ```
 
 ### 2. Expose local port with ngrok

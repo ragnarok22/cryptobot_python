@@ -6,9 +6,12 @@ import pytest
 
 from cryptobot.models import (
     App,
+    AppStats,
     Asset,
     Balance,
     ButtonName,
+    Check,
+    CheckStatus,
     Currency,
     ExchangeRate,
     Invoice,
@@ -48,7 +51,13 @@ class TestEnums:
         """Test ButtonName enum has correct values."""
         assert ButtonName.viewItem.value == "viewItem"
         assert ButtonName.openChannel.value == "openChannel"
+        assert ButtonName.openBot.value == "openBot"
         assert ButtonName.callback.value == "callback"
+
+    def test_check_status_enum_values(self):
+        """Test CheckStatus enum has correct values."""
+        assert CheckStatus.active.value == "active"
+        assert CheckStatus.activated.value == "activated"
 
     def test_enum_string_representation(self):
         """Test string representation of enums."""
@@ -133,6 +142,76 @@ class TestInvoice:
         assert invoice.allow_comments is False
         assert invoice.allow_anonymous is False
 
+    def test_invoice_fiat_creation(self):
+        """Test creating a fiat Invoice without asset."""
+        invoice = Invoice(
+            invoice_id=100,
+            status=Status.active,
+            hash="fiat100",
+            amount="10.00",
+            currency_type="fiat",
+            fiat="USD",
+            accepted_assets=[Asset.USDT, Asset.TON],
+        )
+        assert invoice.asset is None
+        assert invoice.currency_type == "fiat"
+        assert invoice.fiat == "USD"
+        assert invoice.accepted_assets == [Asset.USDT, Asset.TON]
+
+    def test_invoice_swap_fields(self):
+        """Test Invoice swap result fields."""
+        invoice = Invoice(
+            invoice_id=200,
+            status=Status.paid,
+            hash="swap200",
+            amount="5.00",
+            asset=Asset.TON,
+            swap_to="USDT",
+            is_swapped=True,
+            swapped_uid="swap_uid_123",
+            swapped_to="USDT",
+            swapped_rate="3.50",
+            swapped_output="17.50",
+            swapped_usd_amount="17.50",
+            swapped_usd_rate="1.00",
+        )
+        assert invoice.is_swapped is True
+        assert invoice.swapped_uid == "swap_uid_123"
+        assert invoice.swapped_to == "USDT"
+        assert invoice.swapped_rate == "3.50"
+        assert invoice.swapped_output == "17.50"
+        assert invoice.swapped_usd_amount == "17.50"
+        assert invoice.swapped_usd_rate == "1.00"
+
+    def test_invoice_swap_fields_default_none(self):
+        """Test Invoice swap fields default to None."""
+        invoice = Invoice(
+            invoice_id=201,
+            status=Status.active,
+            hash="noswap",
+            amount="1.00",
+        )
+        assert invoice.is_swapped is None
+        assert invoice.swapped_uid is None
+        assert invoice.swapped_to is None
+        assert invoice.swapped_rate is None
+        assert invoice.swapped_output is None
+
+    def test_invoice_url_fields(self):
+        """Test Invoice URL fields (mini_app and web_app are not deprecated)."""
+        invoice = Invoice(
+            invoice_id=300,
+            status=Status.active,
+            hash="urls300",
+            amount="1.00",
+            bot_invoice_url="https://t.me/CryptoBot?start=abc",
+            mini_app_invoice_url="https://mini.app/invoice/abc",
+            web_app_invoice_url="https://web.app/invoice/abc",
+        )
+        assert invoice.bot_invoice_url == "https://t.me/CryptoBot?start=abc"
+        assert invoice.mini_app_invoice_url == "https://mini.app/invoice/abc"
+        assert invoice.web_app_invoice_url == "https://web.app/invoice/abc"
+
     def test_invoice_deprecated_fields(self):
         """Test Invoice deprecated fields."""
         invoice = Invoice(
@@ -182,6 +261,31 @@ class TestTransfer:
             comment="Payment for services",
         )
         assert transfer.comment == "Payment for services"
+
+    def test_transfer_with_spend_id(self):
+        """Test creating Transfer with spend_id field."""
+        transfer = Transfer(
+            transfer_id=900,
+            user_id=202,
+            asset=Asset.TON,
+            amount="1.0",
+            status=TransferStatus.completed,
+            completed_at="2024-01-01T00:00:00Z",
+            spend_id="unique_spend_123",
+        )
+        assert transfer.spend_id == "unique_spend_123"
+
+    def test_transfer_spend_id_default_none(self):
+        """Test Transfer spend_id defaults to None."""
+        transfer = Transfer(
+            transfer_id=901,
+            user_id=203,
+            asset=Asset.BTC,
+            amount="0.01",
+            status=TransferStatus.completed,
+            completed_at="2024-01-01T00:00:00Z",
+        )
+        assert transfer.spend_id is None
 
 
 class TestBalance:
@@ -280,6 +384,92 @@ class TestCurrency:
         )
         assert currency.is_fiat is True
         assert currency.decimals == 2
+
+
+class TestCheck:
+    """Tests for Check dataclass."""
+
+    def test_check_creation(self):
+        """Test creating Check instance."""
+        check = Check(
+            check_id=100,
+            hash="check_hash",
+            asset=Asset.TON,
+            amount="5.0",
+            bot_check_url="https://t.me/CryptoBot?start=check_hash",
+            status=CheckStatus.active,
+            created_at="2024-01-01T00:00:00Z",
+        )
+        assert check.check_id == 100
+        assert check.hash == "check_hash"
+        assert check.asset == Asset.TON
+        assert check.amount == "5.0"
+        assert check.bot_check_url == "https://t.me/CryptoBot?start=check_hash"
+        assert check.status == CheckStatus.active
+        assert check.created_at == "2024-01-01T00:00:00Z"
+        assert check.activated_at is None
+
+    def test_check_activated(self):
+        """Test creating activated Check."""
+        check = Check(
+            check_id=101,
+            hash="activated_hash",
+            asset=Asset.USDT,
+            amount="10.0",
+            bot_check_url="https://t.me/CryptoBot?start=activated_hash",
+            status=CheckStatus.activated,
+            created_at="2024-01-01T00:00:00Z",
+            activated_at="2024-01-02T12:00:00Z",
+        )
+        assert check.status == CheckStatus.activated
+        assert check.activated_at == "2024-01-02T12:00:00Z"
+
+    def test_check_required_fields(self):
+        """Test Check requires all mandatory fields."""
+        with pytest.raises(TypeError):
+            Check(check_id=100)  # Missing required fields
+
+
+class TestAppStats:
+    """Tests for AppStats dataclass."""
+
+    def test_app_stats_creation(self):
+        """Test creating AppStats instance."""
+        stats = AppStats(
+            volume="1500.50",
+            conversion=0.45,
+            unique_users_count=120,
+            created_invoice_count=500,
+            paid_invoice_count=225,
+            start_at="2024-01-01T00:00:00Z",
+            end_at="2024-01-02T00:00:00Z",
+        )
+        assert stats.volume == "1500.50"
+        assert stats.conversion == 0.45
+        assert stats.unique_users_count == 120
+        assert stats.created_invoice_count == 500
+        assert stats.paid_invoice_count == 225
+        assert stats.start_at == "2024-01-01T00:00:00Z"
+        assert stats.end_at == "2024-01-02T00:00:00Z"
+
+    def test_app_stats_required_fields(self):
+        """Test AppStats requires all fields."""
+        with pytest.raises(TypeError):
+            AppStats(volume="100")  # Missing required fields
+
+    def test_app_stats_zero_values(self):
+        """Test AppStats with zero values."""
+        stats = AppStats(
+            volume="0",
+            conversion=0.0,
+            unique_users_count=0,
+            created_invoice_count=0,
+            paid_invoice_count=0,
+            start_at="2024-01-01T00:00:00Z",
+            end_at="2024-01-02T00:00:00Z",
+        )
+        assert stats.unique_users_count == 0
+        assert stats.conversion == 0.0
 
 
 class TestDataclassFeatures:

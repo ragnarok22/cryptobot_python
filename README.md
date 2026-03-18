@@ -170,11 +170,9 @@ client.delete_check(check_id=checks[0].check_id)
 ### App statistics
 
 ```python
-from datetime import datetime
-
 stats = client.get_stats(
-    start_at=datetime(2026, 1, 1),
-    end_at=datetime(2026, 3, 1),
+    start_at="2026-01-01T00:00:00Z",
+    end_at="2026-03-01T00:00:00Z",
 )
 print(stats.volume, stats.unique_users_count, stats.paid_invoice_count)
 ```
@@ -228,6 +226,7 @@ make docs
 - Docs: https://cryptobot-python.readthedocs.io/
 - API reference: https://cryptobot-python.readthedocs.io/en/latest/modules.html
 - Webhook security guide: https://cryptobot-python.readthedocs.io/en/latest/webhook_security.html
+- Crypto Pay API: https://help.send.tg/en/articles/10279948-crypto-pay-api
 
 ## Contributing
 

@@ -34,27 +34,29 @@ documentation = "https://cryptobot-python.readthedocs.io/en/latest"
 "Bug Tracker" = "https://github.com/ragnarok22/cryptobot_python/issues"
 
 [dependency-groups]
-dev = [
-    "flake8>=6.0.0,<7.4.0",
-    "coverage>=7.2.2,<7.11.0",
-    "pytest>=7.2.0,<8.5.0",
-    "pytest-mock>=3.10.0,<4.0.0",
-    "pytest-httpx>=0.28.0,<1.0.0",
-    "pytest-asyncio>=0.24.0,<2.0.0",
-    "pre-commit>=3.6.2,<5.0.0",
-    "ruff>=0.14.0",
-    "mypy>=1.18.2",
+docs = [
     "sphinx>=7.1.2,<8.0.0",
     "sphinx-rtd-theme>=1.3.0,<4.0.0",
     "myst-parser>=2.0.0,<4.0.0",
     "sphinx-intl>=2.1.0,<3.0.0",
     "watchdog>=2.2.1,<6.1.0",
-
-    "twine>=6.2.0",
-    "python-dotenv>=1.2.1",
+]
+webhook = [
+    "fastapi>=0.128.8",
     "uvicorn>=0.39.0",
     "colorama>=0.4.6",
-    "fastapi>=0.128.8",
+    "python-dotenv>=1.2.1",
+]
+dev = [
+    {include-group = "docs"},
+    {include-group = "webhook"},
+    "flake8>=6.0.0,<7.4.0",
+    "coverage>=7.2.2,<7.11.0",
+    "pytest>=7.2.0,<8.5.0",
+    "pytest-asyncio>=0.24.0,<2.0.0",
+    "pre-commit>=3.6.2,<5.0.0",
+    "ruff>=0.14.0",
+    "mypy>=1.18.2",
 ]
 
 [tool.coverage.run]

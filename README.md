@@ -8,7 +8,7 @@
 ![GitHub License](https://img.shields.io/github/license/ragnarok22/cryptobot_python)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/ragnarok22/cryptobot_python)
 
-Unofficial but friendly Python client for the [Crypto Bot](https://pay.crypt.bot/) API. It provides typed models, sane defaults,
+Unofficial but friendly Python client for the [Crypto Bot](http://t.me/CryptoBot?start=pay) API (v1.0 - stable). It provides typed models, sane defaults,
 and synchronous/async clients for invoices, transfers, checks, balances, exchange rates, statistics, and webhook handling.
 
 ## Features
@@ -239,8 +239,3 @@ make test
 ```
 
 See `CONTRIBUTING.md` and `AGENTS.md` for project workflow and coding standards.
-
-## Credits
-
-This project started with [Cookiecutter](https://github.com/audreyr/cookiecutter) and the
-[audreyr/cookiecutter-pypackage](https://github.com/audreyr/cookiecutter-pypackage) template.

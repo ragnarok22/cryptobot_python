@@ -1,5 +1,15 @@
 # History
 
+## 1.0.0 (2026-03-18)
+
+* First stable release.
+* Full support for all Crypto Pay API endpoints: invoices, transfers, checks, balances, exchange rates, currencies, and statistics.
+* Synchronous and async clients with retry and timeout configuration.
+* Pagination iterators for invoices, transfers, and checks.
+* FastAPI webhook listener with signature verification and replay protection.
+* Typed dataclass models for all API responses.
+* Python 3.9.12 through 3.14 support.
+
 ## 0.5.1 (2026-02-17)
 
 * Migrated from Poetry to uv for dependency management and virtual environments.

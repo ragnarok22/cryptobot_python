@@ -276,7 +276,7 @@ def smoke_test() -> bool:
 
 ## Getting Help
 
-1. [Crypto Bot API docs](https://help.crypt.bot/crypto-pay-api)
+1. [Crypto Pay API docs](https://help.send.tg/en/articles/10279948-crypto-pay-api)
 2. [Examples](examples)
 3. [Advanced Topics](advanced)
 4. [GitHub issues](https://github.com/ragnarok22/cryptobot_python/issues)

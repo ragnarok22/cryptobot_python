@@ -193,6 +193,76 @@ async with AsyncCryptoBotClient(api_token=os.environ["CRYPTOBOT_API_TOKEN"]) as 
     )
 ```
 
+### Deleting an Invoice
+
+Delete an active invoice that is no longer needed:
+
+```python
+deleted = client.delete_invoice(invoice_id=12345)
+print("Deleted:", deleted)
+```
+
+### Retrieving Transfers
+
+List outgoing transfers with optional filters:
+
+```python
+# Get all transfers
+transfers = client.get_transfers()
+
+# Filter by asset or specific IDs
+transfers = client.get_transfers(asset=Asset.TON, count=50)
+transfers = client.get_transfers(transfer_ids=[100, 101, 102])
+
+# Look up by spend_id
+transfers = client.get_transfers(spend_id="reward_2026_02_10_user_123456789")
+```
+
+### Crypto Checks
+
+Create a check that any Telegram user (or a pinned user) can activate:
+
+```python
+from cryptobot.models import Asset
+
+# Create an open check
+check = client.create_check(asset=Asset.USDT, amount=1.0)
+print(check.check_id, check.bot_check_url)
+
+# Pin a check to a specific user
+check = client.create_check(asset=Asset.TON, amount=0.25, pin_to_user_id=123456789)
+```
+
+Retrieve and manage checks:
+
+```python
+# List active checks
+checks = client.get_checks(asset=Asset.USDT, status="active")
+
+# Get specific checks by ID
+checks = client.get_checks(check_ids=[10, 11, 12])
+
+# Delete a check
+client.delete_check(check_id=checks[0].check_id)
+```
+
+### App Statistics
+
+Get aggregated statistics for your app:
+
+```python
+stats = client.get_stats(
+    start_at="2026-01-01T00:00:00Z",
+    end_at="2026-03-01T00:00:00Z",
+)
+print(f"Volume: {stats.volume}")
+print(f"Unique users: {stats.unique_users_count}")
+print(f"Paid invoices: {stats.paid_invoice_count}")
+print(f"Conversion: {stats.conversion}")
+```
+
+Both `start_at` and `end_at` are optional ISO 8601 strings. When omitted, `start_at` defaults to 24 hours ago and `end_at` defaults to now.
+
 ## Environment Configuration
 
 ### Testnet vs Mainnet
@@ -352,7 +422,9 @@ Asset.TRX     # TRON
 
 ### Pagination with iterators
 
-When dealing with many invoices, prefer the built-in paginated iterator helpers:
+When dealing with many records, prefer the built-in paginated iterator helpers. They are available for invoices, transfers, and checks.
+
+**Invoices:**
 
 ```python
 # Iterate by page
@@ -364,7 +436,21 @@ for invoice in client.iter_invoices(asset=Asset.USDT, status=Status.paid, page_s
     print(invoice.invoice_id, invoice.status)
 ```
 
-Async pagination with equivalent helpers:
+**Transfers:**
+
+```python
+for transfer in client.iter_transfers(asset=Asset.TON, page_size=100):
+    print(transfer.transfer_id, transfer.amount)
+```
+
+**Checks:**
+
+```python
+for check in client.iter_checks(asset=Asset.USDT, status="active", page_size=100):
+    print(check.check_id, check.bot_check_url)
+```
+
+Async pagination works with `async for`:
 
 ```python
 import os
@@ -390,7 +476,7 @@ async with AsyncCryptoBotClient(api_token=os.environ["CRYPTOBOT_API_TOKEN"]) as 
         print(invoice.invoice_id, invoice.status)
 ```
 
-Both iterator variants support `start_offset` and validate `page_size` in the same `1..1000` range.
+All iterator variants support `start_offset` and validate `page_size` in the `1..1000` range.
 
 ### Invoice Status Checking
 

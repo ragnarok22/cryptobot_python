@@ -9,7 +9,7 @@ import os
 
 from cryptobot import CryptoBotClient
 from cryptobot.errors import CryptoBotError
-from cryptobot.models import Asset, ButtonName, Status
+from cryptobot.models import Asset, ButtonName, CheckStatus, Status
 
 client = CryptoBotClient(api_token=os.environ["CRYPTOBOT_API_TOKEN"])
 ```
@@ -216,6 +216,97 @@ listener = Listener(
     log_level="info",
 )
 listener.listen()
+```
+
+## Airdrop with Crypto Checks
+
+Create checks for a batch of users and track activations.
+
+```python
+from cryptobot.models import Asset
+
+
+def airdrop_checks(client: CryptoBotClient, user_ids: list, amount: float, asset: Asset = Asset.USDT):
+    """Create pinned checks for a list of users."""
+    results = []
+    for user_id in user_ids:
+        try:
+            check = client.create_check(
+                asset=asset,
+                amount=amount,
+                pin_to_user_id=user_id,
+            )
+            results.append({"user_id": user_id, "check_id": check.check_id, "url": check.bot_check_url})
+        except CryptoBotError as exc:
+            results.append({"user_id": user_id, "error": f"{exc.code}: {exc.name}"})
+    return results
+
+
+def check_activations(client: CryptoBotClient, asset: Asset = Asset.USDT):
+    """Report activated vs active checks."""
+    checks = client.get_checks(asset=asset)
+    activated = [c for c in checks if c.activated_at is not None]
+    pending = [c for c in checks if c.activated_at is None]
+    return {"activated": len(activated), "pending": len(pending), "total": len(checks)}
+
+
+# Usage
+recipients = [111111, 222222, 333333]
+drops = airdrop_checks(client, recipients, amount=0.5, asset=Asset.TON)
+for drop in drops:
+    print(drop)
+
+print("Status:", check_activations(client, Asset.TON))
+```
+
+## App Stats Dashboard
+
+Pull statistics and display a summary report.
+
+```python
+def stats_report(client: CryptoBotClient, start_at: str = None, end_at: str = None):
+    """Print a summary of app statistics."""
+    stats = client.get_stats(start_at=start_at, end_at=end_at)
+    print(f"Volume:           {stats.volume}")
+    print(f"Conversion:       {stats.conversion}")
+    print(f"Unique users:     {stats.unique_users_count}")
+    print(f"Invoices created: {stats.created_invoice_count}")
+    print(f"Invoices paid:    {stats.paid_invoice_count}")
+    print(f"Period:           {stats.start_at} to {stats.end_at}")
+
+
+# Last 7 days
+stats_report(client, start_at="2026-03-11T00:00:00Z", end_at="2026-03-18T00:00:00Z")
+```
+
+## Transfer Ledger
+
+Scan outgoing transfers and build a local ledger.
+
+```python
+from decimal import Decimal
+
+
+def transfer_ledger(client: CryptoBotClient, asset: Asset = None):
+    """Build a ledger of all outgoing transfers."""
+    ledger = []
+    for transfer in client.iter_transfers(asset=asset, page_size=200):
+        ledger.append({
+            "id": transfer.transfer_id,
+            "user_id": transfer.user_id,
+            "asset": transfer.asset.name,
+            "amount": transfer.amount,
+            "status": transfer.status.name,
+            "spend_id": transfer.spend_id,
+            "completed_at": transfer.completed_at,
+        })
+
+    total = sum(Decimal(str(t["amount"])) for t in ledger)
+    return {"entries": ledger, "total": str(total), "count": len(ledger)}
+
+
+result = transfer_ledger(client, asset=Asset.TON)
+print(f"Total transferred: {result['total']} ({result['count']} transfers)")
 ```
 
 ## Testnet Smoke Check

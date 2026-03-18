@@ -255,6 +255,6 @@ def test_valid_signature():
 
 ## References
 
-- [Crypto Bot API docs](https://help.crypt.bot/crypto-pay-api)
+- [Crypto Pay API docs](https://help.send.tg/en/articles/10279948-crypto-pay-api)
 - [OWASP Webhook Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Webhook_Security_Cheat_Sheet.html)
 - [FastAPI security docs](https://fastapi.tiangolo.com/tutorial/security/)

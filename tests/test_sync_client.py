@@ -122,10 +122,18 @@ class TestCryptoBotSyncClient(unittest.TestCase):
         balances = self.client.get_balances()
         self.assertIsNotNone(balances)
 
+    @unittest.skipIf(SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)")
     def test_exchange_rates(self):
         """Get exchange rates"""
-        # rates = self.client.get_exchange_rates()
-        # self.assertEqual(len(rates), 84)  # 7 assets and 6 exchange rates
+        rates = self.client.get_exchange_rates()
+        self.assertIsNotNone(rates)
+        self.assertIsInstance(rates, list)
+        self.assertGreater(len(rates), 0)
+        for rate in rates:
+            self.assertIsInstance(rate.source, str)
+            self.assertIsInstance(rate.target, str)
+            self.assertIsInstance(rate.rate, str)
+            self.assertIsInstance(rate.is_valid, bool)
 
     @unittest.skipIf(SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)")
     def test_get_currencies(self):

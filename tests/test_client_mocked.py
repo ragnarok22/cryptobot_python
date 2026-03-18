@@ -695,7 +695,7 @@ class TestCryptoBotClientGetExchangeRates:
 
         assert len(rates) == 2
         assert all(isinstance(rate, ExchangeRate) for rate in rates)
-        assert rates[0].source == Asset.BTC
+        assert rates[0].source == "BTC"
         assert rates[0].target == "USD"
         assert rates[0].rate == "50000.00"
 

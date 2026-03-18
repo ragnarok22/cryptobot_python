@@ -165,7 +165,7 @@ class ExchangeRate:
     is_valid: bool
     is_crypto: bool
     is_fiat: bool
-    source: Asset
+    source: str
     target: str
     rate: str
 

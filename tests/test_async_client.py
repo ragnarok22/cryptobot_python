@@ -404,7 +404,7 @@ class TestAsyncCryptoBotClientMethods:
 
         assert len(rates) == 1
         assert isinstance(rates[0], ExchangeRate)
-        assert rates[0].source == Asset.BTC
+        assert rates[0].source == "BTC"
         await client.close()
 
     @pytest.mark.asyncio

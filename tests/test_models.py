@@ -314,16 +314,29 @@ class TestExchangeRate:
             is_valid=True,
             is_crypto=True,
             is_fiat=False,
-            source=Asset.BTC,
+            source="BTC",
             target="USD",
             rate="50000.00",
         )
         assert rate.is_valid is True
         assert rate.is_crypto is True
         assert rate.is_fiat is False
-        assert rate.source == Asset.BTC
+        assert rate.source == "BTC"
         assert rate.target == "USD"
         assert rate.rate == "50000.00"
+
+    def test_exchange_rate_fiat_source(self):
+        """Test ExchangeRate with a fiat source code."""
+        rate = ExchangeRate(
+            is_valid=True,
+            is_crypto=False,
+            is_fiat=True,
+            source="USD",
+            target="EUR",
+            rate="0.92",
+        )
+        assert rate.source == "USD"
+        assert rate.target == "EUR"
 
     def test_exchange_rate_invalid(self):
         """Test invalid ExchangeRate."""
@@ -331,7 +344,7 @@ class TestExchangeRate:
             is_valid=False,
             is_crypto=False,
             is_fiat=True,
-            source=Asset.ETH,
+            source="ETH",
             target="EUR",
             rate="0.00",
         )

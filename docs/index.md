@@ -70,6 +70,7 @@ contributing
 TRANSLATING
 authors
 history
+migration-1.0
 ```
 
 ## Indices and Tables

@@ -34,7 +34,8 @@ jobs:
         run: uv run mypy cryptobot
       - name: Test with pytest
         run: |
-          uv run coverage run -m pytest --run-integration
+          INTEGRATION_FLAG=${{ matrix.python-version == '3.14' && '--run-integration' || '' }}
+          uv run coverage run -m pytest $INTEGRATION_FLAG
           uv run coverage report
           uv run coverage xml
         env:

@@ -5,6 +5,7 @@
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/ragnarok22/cryptobot_python/main.svg)](https://results.pre-commit.ci/latest/github/ragnarok22/cryptobot_python/main)
 [![Documentation Status](https://readthedocs.org/projects/cryptobot-python/badge/?version=latest)](https://cryptobot-python.readthedocs.io/en/latest/?version=latest)
 [![codecov](https://codecov.io/gh/ragnarok22/cryptobot_python/graph/badge.svg?token=ZsuusfJ2NJ)](https://codecov.io/gh/ragnarok22/cryptobot_python)
+![GitHub License](https://img.shields.io/github/license/ragnarok22/cryptobot_python)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/ragnarok22/cryptobot_python)
 
 Unofficial but friendly Python client for the [Crypto Bot](https://pay.crypt.bot/) API. It provides typed models, sane defaults,

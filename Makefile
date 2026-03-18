@@ -62,13 +62,12 @@ format: ## format code with ruff
 	uv run ruff check --fix cryptobot tests
 
 test: ## run tests quickly with the default Python
-	uv run coverage run -m pytest
-	uv run coverage report
-	uv run coverage xml
+	uv run pytest
 
-coverage: ## check code coverage quickly with the default Python
+coverage: ## run tests with coverage report, XML output, and HTML browser view
 	uv run coverage run -m pytest
 	uv run coverage report -m
+	uv run coverage xml
 	uv run coverage html
 	$(BROWSER) htmlcov/index.html
 

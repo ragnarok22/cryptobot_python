@@ -1,4 +1,7 @@
+import os
+
 import pytest
+from dotenv import load_dotenv
 
 
 def pytest_addoption(parser):
@@ -19,6 +22,11 @@ def pytest_configure(config):
 
 def pytest_collection_modifyitems(config, items):
     if config.getoption("--run-integration"):
+        return
+
+    load_dotenv()
+    api_token = os.getenv("API_TOKEN")
+    if api_token and api_token.strip():
         return
 
     skip_integration = pytest.mark.skip(reason="integration tests are skipped by default; use --run-integration")

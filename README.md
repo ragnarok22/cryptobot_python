@@ -24,21 +24,35 @@ and synchronous/async clients for invoices, transfers, checks, balances, exchang
 
 ## Installation
 
-CryptoBot Python supports Python `>=3.10`.
+Requires **Python 3.10+**.
+
+### Using uv (recommended)
+
+```bash
+uv add cryptobot-python
+```
+
+### Using pip
 
 ```bash
 pip install cryptobot-python
 ```
 
-Install webhook server dependencies only when needed:
+### Extras
+
+Install webhook server dependencies (FastAPI + Uvicorn) only when needed:
 
 ```bash
+uv add "cryptobot-python[webhook]"
+# or
 pip install "cryptobot-python[webhook]"
 ```
 
-Install documentation tooling extras only when needed:
+Install documentation tooling extras:
 
 ```bash
+uv add "cryptobot-python[docs]"
+# or
 pip install "cryptobot-python[docs]"
 ```
 

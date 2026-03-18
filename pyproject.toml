@@ -1,7 +1,7 @@
 [project]
 name = "cryptobot-python"
 version = "1.0.0"
-description = "Non official, but friendly CryptoBot library for the Python language"
+description = "Unofficial but friendly Python client for the Crypto Bot (Crypto Pay) API"
 authors = [
     {name = "Reinier Hernández",email = "sasuke.reinier@gmail.com"}
 ]

@@ -1,4 +1,4 @@
-.PHONY: clean clean-build clean-pyc clean-test coverage dist docs help install lint lint/flake8 lint/ruff lint/mypy format
+.PHONY: clean clean-build clean-pyc clean-test coverage dist docs help install lint lint/flake8 lint/ruff lint/mypy format test test-all
 .DEFAULT_GOAL := help
 
 define BROWSER_PYSCRIPT
@@ -63,6 +63,9 @@ format: ## format code with ruff
 
 test: ## run tests quickly with the default Python
 	uv run pytest
+
+test-all: ## run tests including integration tests
+	uv run pytest --run-integration
 
 coverage: ## run tests with coverage report, XML output, and HTML browser view
 	uv run coverage run -m pytest

@@ -787,7 +787,7 @@ class TestAsyncCryptoBotClientNewMethods:
             200,
             {
                 "result": {
-                    "volume": "1500.50",
+                    "volume": 1500.50,
                     "conversion": 0.45,
                     "unique_users_count": 120,
                     "created_invoice_count": 500,
@@ -801,7 +801,7 @@ class TestAsyncCryptoBotClientNewMethods:
         stats = await client.get_stats()
 
         assert isinstance(stats, AppStats)
-        assert stats.volume == "1500.50"
+        assert stats.volume == 1500.50
         assert stats.conversion == 0.45
         assert stats.unique_users_count == 120
         await client.close()
@@ -813,7 +813,7 @@ class TestAsyncCryptoBotClientNewMethods:
             200,
             {
                 "result": {
-                    "volume": "500.00",
+                    "volume": 500.00,
                     "conversion": 0.30,
                     "unique_users_count": 50,
                     "created_invoice_count": 100,

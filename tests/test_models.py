@@ -436,7 +436,7 @@ class TestAppStats:
     def test_app_stats_creation(self):
         """Test creating AppStats instance."""
         stats = AppStats(
-            volume="1500.50",
+            volume=1500.50,
             conversion=0.45,
             unique_users_count=120,
             created_invoice_count=500,
@@ -444,7 +444,7 @@ class TestAppStats:
             start_at="2024-01-01T00:00:00Z",
             end_at="2024-01-02T00:00:00Z",
         )
-        assert stats.volume == "1500.50"
+        assert stats.volume == 1500.50
         assert stats.conversion == 0.45
         assert stats.unique_users_count == 120
         assert stats.created_invoice_count == 500
@@ -455,12 +455,12 @@ class TestAppStats:
     def test_app_stats_required_fields(self):
         """Test AppStats requires all fields."""
         with pytest.raises(TypeError):
-            AppStats(volume="100")  # Missing required fields
+            AppStats(volume=100)  # Missing required fields
 
     def test_app_stats_zero_values(self):
         """Test AppStats with zero values."""
         stats = AppStats(
-            volume="0",
+            volume=0,
             conversion=0.0,
             unique_users_count=0,
             created_invoice_count=0,

@@ -1411,7 +1411,7 @@ class TestCryptoBotClientGetStats:
         mock_response.status_code = 200
         mock_response.json.return_value = {
             "result": {
-                "volume": "1500.50",
+                "volume": 1500.50,
                 "conversion": 0.45,
                 "unique_users_count": 120,
                 "created_invoice_count": 500,
@@ -1426,7 +1426,7 @@ class TestCryptoBotClientGetStats:
         stats = client.get_stats()
 
         assert isinstance(stats, AppStats)
-        assert stats.volume == "1500.50"
+        assert stats.volume == 1500.50
         assert stats.conversion == 0.45
         assert stats.unique_users_count == 120
         assert stats.created_invoice_count == 500
@@ -1443,7 +1443,7 @@ class TestCryptoBotClientGetStats:
         mock_response.status_code = 200
         mock_response.json.return_value = {
             "result": {
-                "volume": "500.00",
+                "volume": 500.00,
                 "conversion": 0.30,
                 "unique_users_count": 50,
                 "created_invoice_count": 100,

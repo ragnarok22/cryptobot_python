@@ -140,7 +140,7 @@ class AppStats:
     docs: https://help.send.tg/en/articles/10279948-crypto-pay-api
     """
 
-    volume: str
+    volume: float
     conversion: float
     unique_users_count: int
     created_invoice_count: int

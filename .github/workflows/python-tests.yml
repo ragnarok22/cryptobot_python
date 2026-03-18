@@ -34,19 +34,11 @@ jobs:
         run: uv run mypy cryptobot
       - name: Test with pytest
         run: |
-          make test
+          uv run coverage run -m pytest --run-integration
+          uv run coverage report
+          uv run coverage xml
         env:
-          # Ensure API_TOKEN is passed to test environment
           API_TOKEN: ${{ secrets.API_TOKEN }}
-      - name: Check test results
-        if: always()
-        run: |
-          if [ -z "${{ secrets.API_TOKEN }}" ]; then
-            echo "⚠️ API_TOKEN not available - authenticated tests were skipped"
-            echo "This is expected for PRs from forks or automated bots"
-          else
-            echo "✅ Full test suite with authentication completed"
-          fi
       - name: Upload coverage reports to Codecov
         if: success() && matrix.python-version == '3.14'
         uses: codecov/codecov-action@v5

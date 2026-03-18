@@ -10,9 +10,12 @@ from ._utils import parse_json
 from .errors import CryptoBotError
 from .models import (
     App,
+    AppStats,
     Asset,
     Balance,
     ButtonName,
+    Check,
+    CheckStatus,
     Currency,
     ExchangeRate,
     Invoice,
@@ -142,32 +145,32 @@ class AsyncCryptoBotClient:
             raise ValueError("expires_in must be between 1 and 2678400 seconds")
 
     @staticmethod
-    def _normalize_invoice_ids(invoice_ids: Optional[Union[str, List[int]]]) -> Optional[str]:
-        if invoice_ids is None:
+    def _normalize_ids(ids: Optional[Union[str, List[int]]], name: str = "ids") -> Optional[str]:
+        if ids is None:
             return None
 
-        if isinstance(invoice_ids, str):
-            normalized = ",".join(part.strip() for part in invoice_ids.split(",") if part.strip())
+        if isinstance(ids, str):
+            normalized = ",".join(part.strip() for part in ids.split(",") if part.strip())
             if not normalized:
-                raise ValueError("invoice_ids string cannot be empty")
+                raise ValueError(f"{name} string cannot be empty")
 
             for part in normalized.split(","):
                 if not part.isdigit() or int(part) <= 0:
-                    raise ValueError("invoice_ids string must contain positive integer IDs")
+                    raise ValueError(f"{name} string must contain positive integer IDs")
             return normalized
 
-        if isinstance(invoice_ids, list):
-            if not invoice_ids:
-                raise ValueError("invoice_ids list cannot be empty")
+        if isinstance(ids, list):
+            if not ids:
+                raise ValueError(f"{name} list cannot be empty")
 
             normalized_parts = []
-            for invoice_id in invoice_ids:
-                if isinstance(invoice_id, bool) or not isinstance(invoice_id, int) or invoice_id <= 0:
-                    raise ValueError("invoice_ids list must contain positive integers")
-                normalized_parts.append(str(invoice_id))
+            for id_val in ids:
+                if isinstance(id_val, bool) or not isinstance(id_val, int) or id_val <= 0:
+                    raise ValueError(f"{name} list must contain positive integers")
+                normalized_parts.append(str(id_val))
             return ",".join(normalized_parts)
 
-        raise TypeError("invoice_ids must be a comma-separated string or list of integers")
+        raise TypeError(f"{name} must be a comma-separated string or list of integers")
 
     async def get_me(self) -> App:
         response = await self._execute_with_retry(self._http_client.get, "/getMe")
@@ -181,8 +184,11 @@ class AsyncCryptoBotClient:
 
     async def create_invoice(
         self,
-        asset: Asset,
         amount: float,
+        asset: Optional[Asset] = None,
+        currency_type: Optional[str] = None,
+        fiat: Optional[str] = None,
+        accepted_assets: Optional[str] = None,
         description: Optional[str] = None,
         hidden_message: Optional[str] = None,
         paid_btn_name: Optional[ButtonName] = None,
@@ -198,9 +204,11 @@ class AsyncCryptoBotClient:
         if expires_in is not None:
             self._validate_expires_in(expires_in)
 
-        data = {
-            "asset": asset.name,
+        data: dict[str, Any] = {
             "amount": str(amount),
+            "currency_type": currency_type,
+            "fiat": fiat,
+            "accepted_assets": accepted_assets,
             "description": description,
             "hidden_message": hidden_message,
             "paid_btn_url": paid_btn_url,
@@ -210,6 +218,9 @@ class AsyncCryptoBotClient:
             "expires_in": expires_in,
             "swap_to": swap_to,
         }
+
+        if asset is not None:
+            data["asset"] = asset.name
 
         for key, value in dict(data).items():
             if value is None:
@@ -246,6 +257,7 @@ class AsyncCryptoBotClient:
     async def get_invoices(
         self,
         asset: Optional[Asset] = None,
+        fiat: Optional[str] = None,
         invoice_ids: Optional[Union[str, List[int]]] = None,
         status: Optional[Status] = None,
         offset: int = 0,
@@ -254,11 +266,13 @@ class AsyncCryptoBotClient:
         if offset < 0:
             raise ValueError("offset must be greater than or equal to 0")
         self._validate_count(count)
-        normalized_invoice_ids = self._normalize_invoice_ids(invoice_ids)
+        normalized_invoice_ids = self._normalize_ids(invoice_ids, "invoice_ids")
 
         data: dict[str, Any] = {}
         if asset:
             data["asset"] = asset.name
+        if fiat:
+            data["fiat"] = fiat
         if normalized_invoice_ids is not None:
             data["invoice_ids"] = normalized_invoice_ids
         if status:
@@ -334,3 +348,209 @@ class AsyncCryptoBotClient:
         response = await self._execute_with_retry(self._http_client.get, "/getCurrencies")
         info = self._handle_response(response)
         return [parse_json(Currency, **i) for i in info]
+
+    async def delete_invoice(self, invoice_id: int) -> bool:
+        """Delete an invoice by ID."""
+        response = await self._execute_with_retry(self._http_client.post, "/deleteInvoice", json={"invoice_id": invoice_id})
+        result: bool = self._handle_response(response)
+        return result
+
+    async def create_check(
+        self,
+        asset: Asset,
+        amount: float,
+        pin_to_user_id: Optional[int] = None,
+        pin_to_username: Optional[str] = None,
+    ) -> Check:
+        """Create a new crypto check."""
+        if amount <= 0:
+            raise ValueError("Amount must be greater than 0")
+
+        data: dict[str, Any] = {
+            "asset": asset.name,
+            "amount": str(amount),
+        }
+        if pin_to_user_id is not None:
+            data["pin_to_user_id"] = pin_to_user_id
+        if pin_to_username is not None:
+            data["pin_to_username"] = pin_to_username
+
+        response = await self._execute_with_retry(self._http_client.post, "/createCheck", json=data)
+        info = self._handle_response(response)
+        return parse_json(Check, **info)
+
+    async def delete_check(self, check_id: int) -> bool:
+        """Delete a check by ID."""
+        response = await self._execute_with_retry(self._http_client.post, "/deleteCheck", json={"check_id": check_id})
+        result: bool = self._handle_response(response)
+        return result
+
+    async def get_transfers(
+        self,
+        asset: Optional[Asset] = None,
+        transfer_ids: Optional[Union[str, List[int]]] = None,
+        spend_id: Optional[str] = None,
+        offset: int = 0,
+        count: int = 100,
+    ) -> List[Transfer]:
+        """Get a list of transfers."""
+        if offset < 0:
+            raise ValueError("offset must be greater than or equal to 0")
+        self._validate_count(count)
+        normalized_ids = self._normalize_ids(transfer_ids, "transfer_ids")
+
+        data: dict[str, Any] = {}
+        if asset:
+            data["asset"] = asset.name
+        if normalized_ids is not None:
+            data["transfer_ids"] = normalized_ids
+        if spend_id is not None:
+            data["spend_id"] = spend_id
+        if offset:
+            data["offset"] = offset
+        data["count"] = count
+
+        response = await self._execute_with_retry(self._http_client.get, "/getTransfers", params=data)
+        info = self._handle_response(response)
+        return [parse_json(Transfer, **i) for i in info["items"]]
+
+    async def iter_transfer_pages(
+        self,
+        asset: Optional[Asset] = None,
+        transfer_ids: Optional[Union[str, List[int]]] = None,
+        spend_id: Optional[str] = None,
+        page_size: int = 100,
+        start_offset: int = 0,
+    ) -> AsyncIterator[List[Transfer]]:
+        """Iterate over transfer result pages."""
+        if start_offset < 0:
+            raise ValueError("start_offset must be greater than or equal to 0")
+        self._validate_count(page_size)
+
+        offset = start_offset
+        while True:
+            page = await self.get_transfers(
+                asset=asset,
+                transfer_ids=transfer_ids,
+                spend_id=spend_id,
+                offset=offset,
+                count=page_size,
+            )
+            if not page:
+                break
+            yield page
+            if len(page) < page_size:
+                break
+            offset += page_size
+
+    async def iter_transfers(
+        self,
+        asset: Optional[Asset] = None,
+        transfer_ids: Optional[Union[str, List[int]]] = None,
+        spend_id: Optional[str] = None,
+        page_size: int = 100,
+        start_offset: int = 0,
+    ) -> AsyncIterator[Transfer]:
+        """Iterate transfers item-by-item across paginated results."""
+        async for page in self.iter_transfer_pages(
+            asset=asset,
+            transfer_ids=transfer_ids,
+            spend_id=spend_id,
+            page_size=page_size,
+            start_offset=start_offset,
+        ):
+            for transfer in page:
+                yield transfer
+
+    async def get_checks(
+        self,
+        asset: Optional[Asset] = None,
+        check_ids: Optional[Union[str, List[int]]] = None,
+        status: Optional[CheckStatus] = None,
+        offset: int = 0,
+        count: int = 100,
+    ) -> List[Check]:
+        """Get a list of checks."""
+        if offset < 0:
+            raise ValueError("offset must be greater than or equal to 0")
+        self._validate_count(count)
+        normalized_ids = self._normalize_ids(check_ids, "check_ids")
+
+        data: dict[str, Any] = {}
+        if asset:
+            data["asset"] = asset.name
+        if normalized_ids is not None:
+            data["check_ids"] = normalized_ids
+        if status:
+            data["status"] = status.name
+        if offset:
+            data["offset"] = offset
+        data["count"] = count
+
+        response = await self._execute_with_retry(self._http_client.get, "/getChecks", params=data)
+        info = self._handle_response(response)
+        return [parse_json(Check, **i) for i in info["items"]]
+
+    async def iter_check_pages(
+        self,
+        asset: Optional[Asset] = None,
+        check_ids: Optional[Union[str, List[int]]] = None,
+        status: Optional[CheckStatus] = None,
+        page_size: int = 100,
+        start_offset: int = 0,
+    ) -> AsyncIterator[List[Check]]:
+        """Iterate over check result pages."""
+        if start_offset < 0:
+            raise ValueError("start_offset must be greater than or equal to 0")
+        self._validate_count(page_size)
+
+        offset = start_offset
+        while True:
+            page = await self.get_checks(
+                asset=asset,
+                check_ids=check_ids,
+                status=status,
+                offset=offset,
+                count=page_size,
+            )
+            if not page:
+                break
+            yield page
+            if len(page) < page_size:
+                break
+            offset += page_size
+
+    async def iter_checks(
+        self,
+        asset: Optional[Asset] = None,
+        check_ids: Optional[Union[str, List[int]]] = None,
+        status: Optional[CheckStatus] = None,
+        page_size: int = 100,
+        start_offset: int = 0,
+    ) -> AsyncIterator[Check]:
+        """Iterate checks item-by-item across paginated results."""
+        async for page in self.iter_check_pages(
+            asset=asset,
+            check_ids=check_ids,
+            status=status,
+            page_size=page_size,
+            start_offset=start_offset,
+        ):
+            for check in page:
+                yield check
+
+    async def get_stats(
+        self,
+        start_at: Optional[str] = None,
+        end_at: Optional[str] = None,
+    ) -> AppStats:
+        """Get app statistics."""
+        data: dict[str, Any] = {}
+        if start_at is not None:
+            data["start_at"] = start_at
+        if end_at is not None:
+            data["end_at"] = end_at
+
+        response = await self._execute_with_retry(self._http_client.get, "/getStats", params=data)
+        info = self._handle_response(response)
+        return parse_json(AppStats, **info)

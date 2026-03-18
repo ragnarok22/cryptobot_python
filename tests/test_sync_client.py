@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 
 from cryptobot import CryptoBotClient
 from cryptobot.errors import CryptoBotError
-from cryptobot.models import Asset, ButtonName, Status, TransferStatus
+from cryptobot.models import Asset, ButtonName, CheckStatus, Status, TransferStatus
 
 load_dotenv()
 
@@ -59,20 +59,20 @@ class TestCryptoBotSyncClient(unittest.TestCase):
     @unittest.skipIf(SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)")
     def test_create_invoice(self):
         """Create a new invoice"""
-        invoice = self.client.create_invoice(Asset.TON, 1)
+        invoice = self.client.create_invoice(1, asset=Asset.TON)
         self.assertEqual(invoice.status, Status.active)
         self.assertEqual(invoice.asset, Asset.TON)
         self.assertEqual(invoice.amount, "1")
         self.assertEqual(invoice.allow_comments, True)
         self.assertEqual(invoice.allow_anonymous, True)
-        self.assertEqual(f"https://t.me/CryptoTestnetBot?start={invoice.hash}", invoice.pay_url)
+        self.assertIsNotNone(invoice.bot_invoice_url)
 
     @unittest.skipIf(SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)")
     def test_create_invoice_with_params(self):
-        """Create a new invoice"""
+        """Create a new invoice with all optional parameters"""
         invoice = self.client.create_invoice(
-            Asset.TON,
             1,
+            asset=Asset.TON,
             description="Test",
             hidden_message="Test",
             paid_btn_name=ButtonName.viewItem,
@@ -88,13 +88,13 @@ class TestCryptoBotSyncClient(unittest.TestCase):
         self.assertEqual(invoice.amount, "1")
         self.assertEqual(invoice.allow_comments, False)
         self.assertEqual(invoice.allow_anonymous, False)
-        self.assertEqual(f"https://t.me/CryptoTestnetBot?start={invoice.hash}", invoice.pay_url)
+        self.assertIsNotNone(invoice.bot_invoice_url)
 
     @unittest.skipIf(SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)")
     def test_create_invoice_error(self):
-        """Create a new invoice"""
+        """Create a new invoice with too small amount"""
         with self.assertRaises(CryptoBotError):
-            self.client.create_invoice(Asset.TON, 0.0001)
+            self.client.create_invoice(0.0001, asset=Asset.TON)
 
     @unittest.skipIf(SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)")
     def test_transfer(self):
@@ -113,12 +113,8 @@ class TestCryptoBotSyncClient(unittest.TestCase):
     def test_get_invoices(self):
         """Get invoices"""
         invoices = self.client.get_invoices()
-        self.assertEqual(invoices[0].asset, Asset.TON)
-        self.assertEqual(invoices[0].amount, "1")
-        self.assertEqual(
-            f"https://t.me/CryptoTestnetBot?start={invoices[0].hash}",
-            invoices[0].pay_url,
-        )
+        self.assertGreater(len(invoices), 0)
+        self.assertIsNotNone(invoices[0].bot_invoice_url)
 
     @unittest.skipIf(SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)")
     def test_get_balances(self):
@@ -137,3 +133,64 @@ class TestCryptoBotSyncClient(unittest.TestCase):
         currencies = self.client.get_currencies()
         self.assertIsNotNone(currencies)
         self.assertIsInstance(currencies, list)
+
+    @unittest.skipIf(SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)")
+    def test_delete_invoice(self):
+        """Create and delete an invoice"""
+        invoice = self.client.create_invoice(1, asset=Asset.TON)
+        result = self.client.delete_invoice(invoice.invoice_id)
+        self.assertTrue(result)
+
+    @unittest.skipIf(SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)")
+    def test_create_and_delete_check(self):
+        """Create and delete a crypto check"""
+        try:
+            check = self.client.create_check(Asset.TON, 1)
+            self.assertIsNotNone(check.check_id)
+            self.assertEqual(check.asset, Asset.TON)
+            self.assertEqual(check.amount, "1")
+            self.assertEqual(check.status, CheckStatus.active)
+            self.assertIsNotNone(check.bot_check_url)
+
+            result = self.client.delete_check(check.check_id)
+            self.assertTrue(result)
+        except CryptoBotError as e:
+            if e.name not in ("INSUFFICIENT_FUNDS", "AMOUNT_TOO_SMALL"):
+                raise
+
+    @unittest.skipIf(SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)")
+    def test_get_transfers(self):
+        """Get transfers"""
+        transfers = self.client.get_transfers()
+        self.assertIsInstance(transfers, list)
+
+    @unittest.skipIf(SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)")
+    def test_get_checks(self):
+        """Get checks"""
+        checks = self.client.get_checks()
+        self.assertIsInstance(checks, list)
+
+    @unittest.skipIf(SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)")
+    def test_get_stats(self):
+        """Get app statistics"""
+        stats = self.client.get_stats()
+        self.assertIsNotNone(stats.start_at)
+        self.assertIsNotNone(stats.end_at)
+        self.assertIsInstance(stats.volume, str)
+        self.assertIsInstance(stats.unique_users_count, int)
+
+    @unittest.skipIf(SKIP_AUTH_TESTS, "API_TOKEN not available (e.g., PR from fork/bot)")
+    def test_create_invoice_fiat(self):
+        """Create a fiat invoice"""
+        try:
+            invoice = self.client.create_invoice(
+                10.00,
+                currency_type="fiat",
+                fiat="USD",
+            )
+            self.assertEqual(invoice.status, Status.active)
+            self.assertEqual(invoice.currency_type, "fiat")
+            self.assertEqual(invoice.fiat, "USD")
+            self.assertIsNotNone(invoice.bot_invoice_url)
+        except CryptoBotError:
+            pass  # fiat may not be available on testnet

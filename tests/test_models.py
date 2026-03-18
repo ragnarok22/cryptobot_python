@@ -26,9 +26,9 @@ class TestEnums:
         assert Asset.BTC.value == "BTC"
         assert Asset.TON.value == "TON"
         assert Asset.ETH.value == "ETH"
+        assert Asset.LTC.value == "LTC"
         assert Asset.USDT.value == "USDT"
         assert Asset.USDC.value == "USDC"
-        assert Asset.BUSD.value == "BUSD"
         assert Asset.BNB.value == "BNB"
         assert Asset.TRX.value == "TRX"
 

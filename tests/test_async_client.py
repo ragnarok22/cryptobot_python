@@ -249,10 +249,10 @@ class TestAsyncCryptoBotClientMethods:
         client = AsyncCryptoBotClient("test_token")
 
         with pytest.raises(ValueError, match="expires_in must be between 1 and 2678400 seconds"):
-            await client.create_invoice(Asset.TON, 1, expires_in=0)
+            await client.create_invoice(1, asset=Asset.TON, expires_in=0)
 
         with pytest.raises(ValueError, match="expires_in must be between 1 and 2678400 seconds"):
-            await client.create_invoice(Asset.TON, 1, expires_in=2678401)
+            await client.create_invoice(1, asset=Asset.TON, expires_in=2678401)
 
         mock_post.assert_not_awaited()
         await client.close()
@@ -291,7 +291,7 @@ class TestAsyncCryptoBotClientMethods:
     async def test_create_invoice_validates_amount(self):
         client = AsyncCryptoBotClient("test_token")
         with pytest.raises(ValueError, match="Amount must be greater than 0"):
-            await client.create_invoice(Asset.USDT, 0)
+            await client.create_invoice(0, asset=Asset.USDT)
         await client.close()
 
     @pytest.mark.asyncio

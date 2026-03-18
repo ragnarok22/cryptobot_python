@@ -14,9 +14,9 @@ class Asset(Enum):
     BTC = "BTC"
     TON = "TON"
     ETH = "ETH"
+    LTC = "LTC"
     USDT = "USDT"
     USDC = "USDC"
-    BUSD = "BUSD"
     BNB = "BNB"
     TRX = "TRX"
 
@@ -34,20 +34,26 @@ class TransferStatus(Enum):
 class ButtonName(Enum):
     viewItem = "viewItem"
     openChannel = "openChannel"
+    openBot = "openBot"
     callback = "callback"
+
+
+class CheckStatus(Enum):
+    active = "active"
+    activated = "activated"
 
 
 @dataclass
 class Invoice:
     """Invoice
-    docs: https://help.crypt.bot/crypto-pay-api#Invoice
+    docs: https://help.send.tg/en/articles/10279948-crypto-pay-api
     """
 
     invoice_id: int
     status: Status
     hash: str
     amount: str
-    asset: Asset
+    asset: Optional[Asset] = None
 
     currency_type: Optional[str] = None
     description: Optional[str] = None
@@ -75,24 +81,31 @@ class Invoice:
     paid_btn_url: Optional[str] = None
 
     bot_invoice_url: Optional[str] = None
+    mini_app_invoice_url: Optional[str] = None
+    web_app_invoice_url: Optional[str] = None
 
     allow_comments: bool = True
     allow_anonymous: bool = True
 
     swap_to: Optional[str] = None
+    is_swapped: Optional[bool] = None
+    swapped_uid: Optional[str] = None
+    swapped_to: Optional[str] = None
+    swapped_rate: Optional[str] = None
+    swapped_output: Optional[str] = None
+    swapped_usd_amount: Optional[str] = None
+    swapped_usd_rate: Optional[str] = None
 
-    # deprecated
+    # deprecated: use fee_amount, bot_invoice_url, paid_usd_rate instead
     fee: Optional[str] = None
     pay_url: Optional[str] = None
     usd_rate: Optional[str] = None
-    mini_app_invoice_url: Optional[str] = None
-    web_app_invoice_url: Optional[str] = None
 
 
 @dataclass
 class Transfer:
     """Transfer
-    docs: https://telegra.ph/Crypto-Pay-API-11-25#Transfer
+    docs: https://help.send.tg/en/articles/10279948-crypto-pay-api
     """
 
     transfer_id: int
@@ -101,7 +114,39 @@ class Transfer:
     amount: str
     status: TransferStatus
     completed_at: str
+    spend_id: Optional[str] = None
     comment: Optional[str] = None
+
+
+@dataclass
+class Check:
+    """Check
+    docs: https://help.send.tg/en/articles/10279948-crypto-pay-api
+    """
+
+    check_id: int
+    hash: str
+    asset: Asset
+    amount: str
+    bot_check_url: str
+    status: CheckStatus
+    created_at: str
+    activated_at: Optional[str] = None
+
+
+@dataclass
+class AppStats:
+    """AppStats
+    docs: https://help.send.tg/en/articles/10279948-crypto-pay-api
+    """
+
+    volume: str
+    conversion: float
+    unique_users_count: int
+    created_invoice_count: int
+    paid_invoice_count: int
+    start_at: str
+    end_at: str
 
 
 @dataclass

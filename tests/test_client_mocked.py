@@ -271,7 +271,7 @@ class TestCryptoBotClientCreateInvoice:
         mock_post.return_value = mock_response
 
         client = CryptoBotClient("test_token")
-        invoice = client.create_invoice(Asset.USDT, 10.50)
+        invoice = client.create_invoice(10.50, asset=Asset.USDT)
 
         assert isinstance(invoice, Invoice)
         assert invoice.invoice_id == 123
@@ -353,7 +353,7 @@ class TestCryptoBotClientCreateInvoice:
         client = CryptoBotClient("test_token")
 
         with pytest.raises(CryptoBotError) as exc_info:
-            client.create_invoice(Asset.BTC, 0.00001)  # Too small amount
+            client.create_invoice(0.00001, asset=Asset.BTC)  # Too small amount
 
         error = exc_info.value
         assert error.code == 400
@@ -364,10 +364,10 @@ class TestCryptoBotClientCreateInvoice:
         client = CryptoBotClient("test_token")
 
         with pytest.raises(ValueError, match="expires_in must be between 1 and 2678400 seconds"):
-            client.create_invoice(Asset.TON, 1, expires_in=0)
+            client.create_invoice(1, asset=Asset.TON, expires_in=0)
 
         with pytest.raises(ValueError, match="expires_in must be between 1 and 2678400 seconds"):
-            client.create_invoice(Asset.TON, 1, expires_in=2678401)
+            client.create_invoice(1, asset=Asset.TON, expires_in=2678401)
 
         mock_post.assert_not_called()
 
@@ -375,7 +375,7 @@ class TestCryptoBotClientCreateInvoice:
     def test_create_invoice_validates_amount(self, mock_post):
         client = CryptoBotClient("test_token")
         with pytest.raises(ValueError, match="Amount must be greater than 0"):
-            client.create_invoice(Asset.TON, 0)
+            client.create_invoice(0, asset=Asset.TON)
         mock_post.assert_not_called()
 
 
@@ -759,7 +759,7 @@ class TestCryptoBotClientErrorHandling:
         client = CryptoBotClient("test_token")
 
         with pytest.raises(httpx.TimeoutException):
-            client.create_invoice(Asset.BTC, 1.0)
+            client.create_invoice(1.0, asset=Asset.BTC)
 
     @patch("httpx.Client.get")
     def test_json_decode_error(self, mock_get):

@@ -10,9 +10,12 @@ from .._utils import parse_json
 from ..errors import CryptoBotError
 from ..models import (
     App,
+    AppStats,
     Asset,
     Balance,
     ButtonName,
+    Check,
+    CheckStatus,
     Currency,
     ExchangeRate,
     Invoice,
@@ -166,34 +169,34 @@ class CryptoBotClient:
             raise ValueError("expires_in must be between 1 and 2678400 seconds")
 
     @staticmethod
-    def _normalize_invoice_ids(invoice_ids: Optional[Union[str, List[int]]]) -> Optional[str]:
-        if invoice_ids is None:
+    def _normalize_ids(ids: Optional[Union[str, List[int]]], name: str = "ids") -> Optional[str]:
+        if ids is None:
             return None
 
-        if isinstance(invoice_ids, str):
-            normalized = ",".join(part.strip() for part in invoice_ids.split(",") if part.strip())
+        if isinstance(ids, str):
+            normalized = ",".join(part.strip() for part in ids.split(",") if part.strip())
             if not normalized:
-                raise ValueError("invoice_ids string cannot be empty")
+                raise ValueError(f"{name} string cannot be empty")
 
             for part in normalized.split(","):
                 if not part.isdigit() or int(part) <= 0:
-                    raise ValueError("invoice_ids string must contain positive integer IDs")
+                    raise ValueError(f"{name} string must contain positive integer IDs")
 
             return normalized
 
-        if isinstance(invoice_ids, list):
-            if not invoice_ids:
-                raise ValueError("invoice_ids list cannot be empty")
+        if isinstance(ids, list):
+            if not ids:
+                raise ValueError(f"{name} list cannot be empty")
 
             normalized_parts = []
-            for invoice_id in invoice_ids:
-                if isinstance(invoice_id, bool) or not isinstance(invoice_id, int) or invoice_id <= 0:
-                    raise ValueError("invoice_ids list must contain positive integers")
-                normalized_parts.append(str(invoice_id))
+            for id_val in ids:
+                if isinstance(id_val, bool) or not isinstance(id_val, int) or id_val <= 0:
+                    raise ValueError(f"{name} list must contain positive integers")
+                normalized_parts.append(str(id_val))
 
             return ",".join(normalized_parts)
 
-        raise TypeError("invoice_ids must be a comma-separated string or list of integers")
+        raise TypeError(f"{name} must be a comma-separated string or list of integers")
 
     def get_me(self) -> App:
         """Get basic information about your Crypto Bot application.
@@ -223,8 +226,11 @@ class CryptoBotClient:
 
     def create_invoice(
         self,
-        asset: Asset,
         amount: float,
+        asset: Optional[Asset] = None,
+        currency_type: Optional[str] = None,
+        fiat: Optional[str] = None,
+        accepted_assets: Optional[str] = None,
         description: Optional[str] = None,
         hidden_message: Optional[str] = None,
         paid_btn_name: Optional[ButtonName] = None,
@@ -235,11 +241,14 @@ class CryptoBotClient:
         expires_in: Optional[int] = None,
         swap_to: Optional[str] = None,
     ) -> Invoice:
-        """Create a new cryptocurrency payment invoice.
+        """Create a new payment invoice.
 
         Args:
-            asset: Cryptocurrency asset (e.g., Asset.BTC, Asset.TON, Asset.ETH).
-            amount: Invoice amount in the specified cryptocurrency.
+            amount: Invoice amount (e.g., 125.50).
+            asset: Cryptocurrency asset. Required if currency_type is "crypto" (default).
+            currency_type: "crypto" or "fiat". Default: "crypto".
+            fiat: Fiat currency code (e.g., "USD"). Required if currency_type is "fiat".
+            accepted_assets: Comma-separated crypto codes accepted for fiat invoices.
             description: Optional description shown to the customer (up to 1024 chars).
             hidden_message: Optional message shown after successful payment (up to 2048 chars).
             paid_btn_name: Optional name of the button shown after payment (ButtonName enum).
@@ -257,43 +266,29 @@ class CryptoBotClient:
             ValueError: If amount is less than or equal to 0.
             CryptoBotError: If the API request fails.
 
-        Note:
-            Amount limits roughly correspond to 1-25,000 USD equivalent for each asset.
-            Use get_exchange_rates() to convert amounts between currencies.
-
         Examples:
-            Simple invoice:
-                >>> invoice = client.create_invoice(Asset.TON, 1.5)
+            Crypto invoice:
+                >>> invoice = client.create_invoice(1.5, asset=Asset.TON)
                 >>> print(invoice.bot_invoice_url)
 
-            Invoice with description and custom button:
+            Fiat invoice:
                 >>> invoice = client.create_invoice(
-                ...     asset=Asset.BTC,
-                ...     amount=0.0001,
-                ...     description="Premium Membership",
-                ...     hidden_message="Thank you for your purchase!",
-                ...     paid_btn_name=ButtonName.viewItem,
-                ...     paid_btn_url="https://example.com/premium"
-                ... )
-                >>> print(f"Invoice ID: {invoice.invoice_id}")
-
-            Invoice that expires in 1 hour:
-                >>> invoice = client.create_invoice(
-                ...     asset=Asset.USDT,
-                ...     amount=10,
-                ...     description="Limited time offer",
-                ...     expires_in=3600  # 1 hour
+                ...     amount=10.00,
+                ...     currency_type="fiat",
+                ...     fiat="USD",
+                ...     accepted_assets="USDT,TON,BTC",
                 ... )
         """
-        # Validate amount
         if amount <= 0:
             raise ValueError("Amount must be greater than 0")
         if expires_in is not None:
             self._validate_expires_in(expires_in)
 
-        data = {
-            "asset": asset.name,
+        data: dict[str, Any] = {
             "amount": str(amount),
+            "currency_type": currency_type,
+            "fiat": fiat,
+            "accepted_assets": accepted_assets,
             "description": description,
             "hidden_message": hidden_message,
             "paid_btn_url": paid_btn_url,
@@ -303,6 +298,9 @@ class CryptoBotClient:
             "expires_in": expires_in,
             "swap_to": swap_to,
         }
+
+        if asset is not None:
+            data["asset"] = asset.name
 
         # remove None values
         for key, value in dict(data).items():
@@ -381,6 +379,7 @@ class CryptoBotClient:
     def get_invoices(
         self,
         asset: Optional[Asset] = None,
+        fiat: Optional[str] = None,
         invoice_ids: Optional[Union[str, List[int]]] = None,
         status: Optional[Status] = None,
         offset: int = 0,
@@ -390,6 +389,7 @@ class CryptoBotClient:
 
         Args:
             asset: Filter by cryptocurrency asset (e.g., Asset.BTC). Default: all assets.
+            fiat: Filter by fiat currency code (e.g., "USD"). Default: all.
             invoice_ids: Comma-separated IDs string or list of invoice IDs to retrieve.
             status: Filter by invoice status (Status.active, Status.paid, Status.expired).
             offset: Number of invoices to skip. Default: 0.
@@ -404,30 +404,23 @@ class CryptoBotClient:
         Examples:
             Get all invoices:
                 >>> invoices = client.get_invoices()
-                >>> for invoice in invoices:
-                ...     print(f"{invoice.invoice_id}: {invoice.status}")
 
             Get only paid TON invoices:
-                >>> paid_invoices = client.get_invoices(
-                ...     asset=Asset.TON,
-                ...     status=Status.paid
-                ... )
+                >>> paid_invoices = client.get_invoices(asset=Asset.TON, status=Status.paid)
 
-            Get specific invoices by ID:
-                >>> invoices = client.get_invoices(invoice_ids="123,456,789")
-
-            Pagination example:
-                >>> page1 = client.get_invoices(count=50, offset=0)
-                >>> page2 = client.get_invoices(count=50, offset=50)
+            Get fiat invoices:
+                >>> usd_invoices = client.get_invoices(fiat="USD")
         """
         if offset < 0:
             raise ValueError("offset must be greater than or equal to 0")
         self._validate_count(count)
-        normalized_invoice_ids = self._normalize_invoice_ids(invoice_ids)
+        normalized_invoice_ids = self._normalize_ids(invoice_ids, "invoice_ids")
 
         data: dict[str, Any] = {}
         if asset:
             data["asset"] = asset.name
+        if fiat:
+            data["fiat"] = fiat
         if normalized_invoice_ids is not None:
             data["invoice_ids"] = normalized_invoice_ids
         if status:
@@ -560,3 +553,282 @@ class CryptoBotClient:
         response = self._execute_with_retry(self._http_client.get, "/getCurrencies")
         info = self._handle_response(response)
         return [parse_json(Currency, **i) for i in info]
+
+    def delete_invoice(self, invoice_id: int) -> bool:
+        """Delete an invoice by ID.
+
+        Args:
+            invoice_id: The invoice ID to delete.
+
+        Returns:
+            True on success.
+
+        Raises:
+            CryptoBotError: If the API request fails.
+        """
+        response = self._execute_with_retry(self._http_client.post, "/deleteInvoice", json={"invoice_id": invoice_id})
+        result: bool = self._handle_response(response)
+        return result
+
+    def create_check(
+        self,
+        asset: Asset,
+        amount: float,
+        pin_to_user_id: Optional[int] = None,
+        pin_to_username: Optional[str] = None,
+    ) -> Check:
+        """Create a new crypto check.
+
+        Args:
+            asset: Cryptocurrency asset for the check.
+            amount: Check amount in the specified cryptocurrency.
+            pin_to_user_id: Optional Telegram user ID who can activate the check.
+            pin_to_username: Optional Telegram username who can activate the check.
+
+        Returns:
+            Check object with activation URL and details.
+
+        Raises:
+            ValueError: If amount is less than or equal to 0.
+            CryptoBotError: If the API request fails.
+        """
+        if amount <= 0:
+            raise ValueError("Amount must be greater than 0")
+
+        data: dict[str, Any] = {
+            "asset": asset.name,
+            "amount": str(amount),
+        }
+        if pin_to_user_id is not None:
+            data["pin_to_user_id"] = pin_to_user_id
+        if pin_to_username is not None:
+            data["pin_to_username"] = pin_to_username
+
+        response = self._execute_with_retry(self._http_client.post, "/createCheck", json=data)
+        info = self._handle_response(response)
+        return parse_json(Check, **info)
+
+    def delete_check(self, check_id: int) -> bool:
+        """Delete a check by ID.
+
+        Args:
+            check_id: The check ID to delete.
+
+        Returns:
+            True on success.
+
+        Raises:
+            CryptoBotError: If the API request fails.
+        """
+        response = self._execute_with_retry(self._http_client.post, "/deleteCheck", json={"check_id": check_id})
+        result: bool = self._handle_response(response)
+        return result
+
+    def get_transfers(
+        self,
+        asset: Optional[Asset] = None,
+        transfer_ids: Optional[Union[str, List[int]]] = None,
+        spend_id: Optional[str] = None,
+        offset: int = 0,
+        count: int = 100,
+    ) -> List[Transfer]:
+        """Get a list of transfers.
+
+        Args:
+            asset: Filter by cryptocurrency asset. Default: all.
+            transfer_ids: Comma-separated IDs or list of transfer IDs.
+            spend_id: Filter by unique spend_id string.
+            offset: Number of transfers to skip. Default: 0.
+            count: Number of transfers to return (1-1000). Default: 100.
+
+        Returns:
+            List of Transfer objects.
+
+        Raises:
+            CryptoBotError: If the API request fails.
+        """
+        if offset < 0:
+            raise ValueError("offset must be greater than or equal to 0")
+        self._validate_count(count)
+        normalized_ids = self._normalize_ids(transfer_ids, "transfer_ids")
+
+        data: dict[str, Any] = {}
+        if asset:
+            data["asset"] = asset.name
+        if normalized_ids is not None:
+            data["transfer_ids"] = normalized_ids
+        if spend_id is not None:
+            data["spend_id"] = spend_id
+        if offset:
+            data["offset"] = offset
+        data["count"] = count
+
+        response = self._execute_with_retry(self._http_client.get, "/getTransfers", params=data)
+        info = self._handle_response(response)
+        return [parse_json(Transfer, **i) for i in info["items"]]
+
+    def iter_transfer_pages(
+        self,
+        asset: Optional[Asset] = None,
+        transfer_ids: Optional[Union[str, List[int]]] = None,
+        spend_id: Optional[str] = None,
+        page_size: int = 100,
+        start_offset: int = 0,
+    ) -> Iterator[List[Transfer]]:
+        """Iterate over transfer result pages."""
+        if start_offset < 0:
+            raise ValueError("start_offset must be greater than or equal to 0")
+        self._validate_count(page_size)
+
+        offset = start_offset
+        while True:
+            page = self.get_transfers(
+                asset=asset,
+                transfer_ids=transfer_ids,
+                spend_id=spend_id,
+                offset=offset,
+                count=page_size,
+            )
+            if not page:
+                break
+            yield page
+            if len(page) < page_size:
+                break
+            offset += page_size
+
+    def iter_transfers(
+        self,
+        asset: Optional[Asset] = None,
+        transfer_ids: Optional[Union[str, List[int]]] = None,
+        spend_id: Optional[str] = None,
+        page_size: int = 100,
+        start_offset: int = 0,
+    ) -> Iterator[Transfer]:
+        """Iterate transfers item-by-item across paginated results."""
+        for page in self.iter_transfer_pages(
+            asset=asset,
+            transfer_ids=transfer_ids,
+            spend_id=spend_id,
+            page_size=page_size,
+            start_offset=start_offset,
+        ):
+            for transfer in page:
+                yield transfer
+
+    def get_checks(
+        self,
+        asset: Optional[Asset] = None,
+        check_ids: Optional[Union[str, List[int]]] = None,
+        status: Optional[CheckStatus] = None,
+        offset: int = 0,
+        count: int = 100,
+    ) -> List[Check]:
+        """Get a list of checks.
+
+        Args:
+            asset: Filter by cryptocurrency asset. Default: all.
+            check_ids: Comma-separated IDs or list of check IDs.
+            status: Filter by check status. Default: all.
+            offset: Number of checks to skip. Default: 0.
+            count: Number of checks to return (1-1000). Default: 100.
+
+        Returns:
+            List of Check objects.
+
+        Raises:
+            CryptoBotError: If the API request fails.
+        """
+        if offset < 0:
+            raise ValueError("offset must be greater than or equal to 0")
+        self._validate_count(count)
+        normalized_ids = self._normalize_ids(check_ids, "check_ids")
+
+        data: dict[str, Any] = {}
+        if asset:
+            data["asset"] = asset.name
+        if normalized_ids is not None:
+            data["check_ids"] = normalized_ids
+        if status:
+            data["status"] = status.name
+        if offset:
+            data["offset"] = offset
+        data["count"] = count
+
+        response = self._execute_with_retry(self._http_client.get, "/getChecks", params=data)
+        info = self._handle_response(response)
+        return [parse_json(Check, **i) for i in info["items"]]
+
+    def iter_check_pages(
+        self,
+        asset: Optional[Asset] = None,
+        check_ids: Optional[Union[str, List[int]]] = None,
+        status: Optional[CheckStatus] = None,
+        page_size: int = 100,
+        start_offset: int = 0,
+    ) -> Iterator[List[Check]]:
+        """Iterate over check result pages."""
+        if start_offset < 0:
+            raise ValueError("start_offset must be greater than or equal to 0")
+        self._validate_count(page_size)
+
+        offset = start_offset
+        while True:
+            page = self.get_checks(
+                asset=asset,
+                check_ids=check_ids,
+                status=status,
+                offset=offset,
+                count=page_size,
+            )
+            if not page:
+                break
+            yield page
+            if len(page) < page_size:
+                break
+            offset += page_size
+
+    def iter_checks(
+        self,
+        asset: Optional[Asset] = None,
+        check_ids: Optional[Union[str, List[int]]] = None,
+        status: Optional[CheckStatus] = None,
+        page_size: int = 100,
+        start_offset: int = 0,
+    ) -> Iterator[Check]:
+        """Iterate checks item-by-item across paginated results."""
+        for page in self.iter_check_pages(
+            asset=asset,
+            check_ids=check_ids,
+            status=status,
+            page_size=page_size,
+            start_offset=start_offset,
+        ):
+            for check in page:
+                yield check
+
+    def get_stats(
+        self,
+        start_at: Optional[str] = None,
+        end_at: Optional[str] = None,
+    ) -> AppStats:
+        """Get app statistics.
+
+        Args:
+            start_at: Start date in ISO 8601 format. Default: 24 hours ago.
+            end_at: End date in ISO 8601 format. Default: now.
+
+        Returns:
+            AppStats object with volume, conversion, and invoice counts.
+
+        Raises:
+            CryptoBotError: If the API request fails.
+        """
+        data: dict[str, Any] = {}
+        if start_at is not None:
+            data["start_at"] = start_at
+        if end_at is not None:
+            data["end_at"] = end_at
+
+        response = self._execute_with_retry(self._http_client.get, "/getStats", params=data)
+        info = self._handle_response(response)
+        return parse_json(AppStats, **info)

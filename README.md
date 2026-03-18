@@ -8,24 +8,18 @@
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/ragnarok22/cryptobot_python)
 
 Unofficial but friendly Python client for the [Crypto Bot](https://pay.crypt.bot/) API. It provides typed models, sane defaults,
-and synchronous/async clients for invoices, transfers, balances, exchange rates, and webhook handling.
+and synchronous/async clients for invoices, transfers, checks, balances, exchange rates, statistics, and webhook handling.
 
 ## Features
 
 - Synchronous `httpx`-based API client (`CryptoBotClient`)
 - Async `httpx`-based API client (`AsyncCryptoBotClient`)
-- Dataclass models for API responses (`Invoice`, `Transfer`, `Balance`, `ExchangeRate`, `Currency`)
-- Enum guard rails for assets, statuses, and paid button names
+- Dataclass models for API responses (`Invoice`, `Transfer`, `Check`, `Balance`, `ExchangeRate`, `Currency`, `AppStats`)
+- Enum guard rails for assets, statuses, check statuses, and paid button names
 - Mainnet/testnet support with configurable timeouts and retries
+- Pagination iterators for invoices, transfers, and checks
 - FastAPI-powered webhook listener with signature verification and optional replay protection
 - Custom exception model (`CryptoBotError`) with API code/name fields
-
-## What's New in 0.5.0
-
-- Added `AsyncCryptoBotClient` with method parity and async invoice iterators
-- Added invoice pagination helpers: `iter_invoice_pages(...)` and `iter_invoices(...)`
-- Added configurable retries/backoff (`max_retries`, `retry_backoff`, `retryable_status_codes`)
-- Added webhook replay protection (`replay_store`, `replay_ttl_seconds`, `replay_key_resolver`)
 
 ## Installation
 
@@ -119,23 +113,24 @@ asyncio.run(main())
 
 `CryptoBotClient` methods:
 
-- `get_me()`
-- `create_invoice(...)`
-- `get_invoices(...)`
-- `transfer(...)`
-- `get_balances()`
-- `get_exchange_rates()`
-- `get_currencies()`
-- `iter_invoice_pages(...)`
-- `iter_invoices(...)`
+| Category | Methods |
+|---|---|
+| App | `get_me()` |
+| Invoices | `create_invoice(...)`, `get_invoices(...)`, `delete_invoice(...)` |
+| Transfers | `transfer(...)`, `get_transfers(...)` |
+| Checks | `create_check(...)`, `get_checks(...)`, `delete_check(...)` |
+| Balance & Rates | `get_balances()`, `get_exchange_rates()`, `get_currencies()` |
+| Statistics | `get_stats(...)` |
+| Pagination | `iter_invoice_pages(...)`, `iter_invoices(...)`, `iter_transfer_pages(...)`, `iter_transfers(...)`, `iter_check_pages(...)`, `iter_checks(...)` |
 
 `AsyncCryptoBotClient` provides the same methods with `await`, plus async iterators for
-`iter_invoice_pages(...)` and `iter_invoices(...)`.
+all pagination helpers.
 
-`get_invoices(...)` accepts `invoice_ids` as a comma-separated string (`"1,2,3"`) or `list[int]` (`[1, 2, 3]`).
+List methods like `get_invoices(...)`, `get_transfers(...)`, and `get_checks(...)` accept IDs as a
+comma-separated string (`"1,2,3"`) or `list[int]` (`[1, 2, 3]`).
 Iterator helpers accept `page_size` and `start_offset` to support controlled pagination scans.
 
-Example transfer with idempotency via `spend_id`:
+### Transfer with idempotency
 
 ```python
 from cryptobot.errors import CryptoBotError
@@ -152,6 +147,36 @@ try:
     print(transfer.transfer_id, transfer.status)
 except CryptoBotError as exc:
     print(exc.code, exc.name)
+```
+
+### Crypto checks
+
+Create a check that any user (or a specific user) can activate:
+
+```python
+from cryptobot.models import Asset
+
+check = client.create_check(asset=Asset.USDT, amount=1.0)
+print(check.check_id, check.bot_check_url)
+
+# Pin a check to a specific user
+check = client.create_check(asset=Asset.TON, amount=0.25, pin_to_user_id=123456789)
+
+# List and delete checks
+checks = client.get_checks(asset=Asset.USDT, status="active")
+client.delete_check(check_id=checks[0].check_id)
+```
+
+### App statistics
+
+```python
+from datetime import datetime
+
+stats = client.get_stats(
+    start_at=datetime(2026, 1, 1),
+    end_at=datetime(2026, 3, 1),
+)
+print(stats.volume, stats.unique_users_count, stats.paid_invoice_count)
 ```
 
 ## Webhooks

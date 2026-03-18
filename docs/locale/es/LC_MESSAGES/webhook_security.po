@@ -1,0 +1,595 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2022, Reinier Hernández
+# This file is distributed under the same license as the CryptoBot Python
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: CryptoBot Python 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-18 16:06-0300\n"
+"PO-Revision-Date: 2026-03-18 10:30-0300\n"
+"Last-Translator: Claude <noreply@anthropic.com>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../webhook_security.md:1
+msgid "Webhook Security Guide"
+msgstr "Guía de Seguridad de Webhooks"
+
+#: ../../webhook_security.md:3
+msgid ""
+"This guide explains how to safely receive Crypto Bot webhook events in "
+"production."
+msgstr ""
+"Esta guía explica cómo recibir de forma segura los eventos de webhook de "
+"Crypto Bot en producción."
+
+#: ../../webhook_security.md:5
+msgid "Threat Model"
+msgstr "Modelo de Amenazas"
+
+#: ../../webhook_security.md:7
+msgid ""
+"A webhook endpoint is a public HTTP surface. Without verification and "
+"controls, attackers can:"
+msgstr ""
+"Un endpoint de webhook es una superficie HTTP pública. Sin verificación y "
+"controles, los atacantes pueden:"
+
+#: ../../webhook_security.md:9
+msgid "Forge payment notifications"
+msgstr "Falsificar notificaciones de pago"
+
+#: ../../webhook_security.md:10
+msgid "Replay old updates"
+msgstr "Reproducir actualizaciones antiguas"
+
+#: ../../webhook_security.md:11
+msgid "Exhaust worker capacity with burst traffic"
+msgstr "Agotar la capacidad de los workers con tráfico en ráfagas"
+
+#: ../../webhook_security.md:13
+msgid "Signature Verification"
+msgstr "Verificación de Firma"
+
+#: ../../webhook_security.md:15
+msgid "Crypto Bot signs each request with:"
+msgstr "Crypto Bot firma cada solicitud con:"
+
+#: ../../webhook_security.md:17
+msgid "HMAC-SHA256(SHA256(api_token), raw_request_body)\n"
+msgstr "HMAC-SHA256(SHA256(api_token), raw_request_body)\n"
+
+#: ../../webhook_security.md:21
+msgid "The signature arrives in the `crypto-pay-api-signature` header."
+msgstr "La firma llega en el encabezado `crypto-pay-api-signature`."
+
+#: ../../webhook_security.md:23
+msgid "Recommended: Use `Listener`"
+msgstr "Recomendado: Usar `Listener`"
+
+#: ../../webhook_security.md:25
+msgid "`Listener` verifies signatures before executing your callback."
+msgstr "`Listener` verifica las firmas antes de ejecutar su callback."
+
+#: ../../webhook_security.md:27
+#, python-brace-format
+msgid ""
+"import os\n"
+"\n"
+"from cryptobot.webhook import InMemoryReplayKeyStore, Listener\n"
+"\n"
+"\n"
+"def handle_webhook(headers, data):\n"
+"    if data.get(\"update_type\") == \"invoice_paid\":\n"
+"        payload = data.get(\"payload\", {})\n"
+"        print(\"Verified payment for invoice\", "
+"payload.get(\"invoice_id\"))\n"
+"\n"
+"\n"
+"listener = Listener(\n"
+"    host=\"127.0.0.1\",  # Prefer localhost behind reverse proxy\n"
+"    callback=handle_webhook,\n"
+"    api_token=os.environ[\"CRYPTOBOT_API_TOKEN\"],\n"
+"    replay_store=InMemoryReplayKeyStore(),\n"
+"    replay_ttl_seconds=3600,\n"
+"    port=2203,\n"
+"    url=\"/webhook\",\n"
+"    log_level=\"info\",\n"
+")\n"
+"listener.listen()\n"
+msgstr ""
+"import os\n"
+"\n"
+"from cryptobot.webhook import InMemoryReplayKeyStore, Listener\n"
+"\n"
+"\n"
+"def handle_webhook(headers, data):\n"
+"    if data.get(\"update_type\") == \"invoice_paid\":\n"
+"        payload = data.get(\"payload\", {})\n"
+"        print(\"Verified payment for invoice\", "
+"payload.get(\"invoice_id\"))\n"
+"\n"
+"\n"
+"listener = Listener(\n"
+"    host=\"127.0.0.1\",  # Preferir localhost detrás de proxy reverso\n"
+"    callback=handle_webhook,\n"
+"    api_token=os.environ[\"CRYPTOBOT_API_TOKEN\"],\n"
+"    replay_store=InMemoryReplayKeyStore(),\n"
+"    replay_ttl_seconds=3600,\n"
+"    port=2203,\n"
+"    url=\"/webhook\",\n"
+"    log_level=\"info\",\n"
+")\n"
+"listener.listen()\n"
+
+#: ../../webhook_security.md:52
+msgid "`callback` can be synchronous (`def`) or asynchronous (`async def`)."
+msgstr "`callback` puede ser síncrono (`def`) o asíncrono (`async def`)."
+
+#: ../../webhook_security.md:54
+msgid "Manual Verification (Custom FastAPI App)"
+msgstr "Verificación Manual (Aplicación FastAPI Personalizada)"
+
+#: ../../webhook_security.md:56
+msgid ""
+"If you manage your own FastAPI route, verify against the **raw body "
+"string**."
+msgstr ""
+"Si gestiona su propia ruta FastAPI, verifique contra el **cuerpo crudo "
+"de la solicitud**."
+
+#: ../../webhook_security.md:58
+#, python-brace-format
+msgid ""
+"import json\n"
+"import os\n"
+"\n"
+"from fastapi import FastAPI, HTTPException, Request\n"
+"\n"
+"from cryptobot.webhook import check_signature\n"
+"\n"
+"app = FastAPI()\n"
+"api_token = os.environ[\"CRYPTOBOT_API_TOKEN\"]\n"
+"\n"
+"\n"
+"@app.post(\"/webhook\")\n"
+"async def webhook(request: Request):\n"
+"    raw = await request.body()\n"
+"    raw_str = raw.decode(\"utf-8\")\n"
+"\n"
+"    if not check_signature(api_token, raw_str, request.headers):\n"
+"        raise HTTPException(status_code=400, detail=\"Invalid "
+"signature\")\n"
+"\n"
+"    data = json.loads(raw_str)\n"
+"    # Handle verified data...\n"
+"    return {\"ok\": True}\n"
+msgstr ""
+"import json\n"
+"import os\n"
+"\n"
+"from fastapi import FastAPI, HTTPException, Request\n"
+"\n"
+"from cryptobot.webhook import check_signature\n"
+"\n"
+"app = FastAPI()\n"
+"api_token = os.environ[\"CRYPTOBOT_API_TOKEN\"]\n"
+"\n"
+"\n"
+"@app.post(\"/webhook\")\n"
+"async def webhook(request: Request):\n"
+"    raw = await request.body()\n"
+"    raw_str = raw.decode(\"utf-8\")\n"
+"\n"
+"    if not check_signature(api_token, raw_str, request.headers):\n"
+"        raise HTTPException(status_code=400, detail=\"Invalid "
+"signature\")\n"
+"\n"
+"    data = json.loads(raw_str)\n"
+"    # Procesar datos verificados...\n"
+"    return {\"ok\": True}\n"
+
+#: ../../webhook_security.md:83
+msgid "Replay Protection"
+msgstr "Protección contra Repetición"
+
+#: ../../webhook_security.md:85
+msgid ""
+"`Listener` supports pluggable replay protection via `replay_store`. For "
+"production, prefer a shared store (e.g., Redis) implementing:"
+msgstr ""
+"`Listener` soporta protección contra repetición extensible a través de "
+"`replay_store`. Para producción, prefiera un almacén compartido (por ejemplo, "
+"Redis) que implemente:"
+
+#: ../../webhook_security.md:88
+msgid "`put_if_absent(key: str, ttl_seconds: int | None) -> bool`"
+msgstr "`put_if_absent(key: str, ttl_seconds: int | None) -> bool`"
+
+#: ../../webhook_security.md:89
+msgid "`remove(key: str) -> None`"
+msgstr "`remove(key: str) -> None`"
+
+#: ../../webhook_security.md:91
+msgid "Built-in in-memory replay protection:"
+msgstr "Protección contra repetición en memoria integrada:"
+
+#: ../../webhook_security.md:93
+msgid ""
+"import os\n"
+"\n"
+"from cryptobot.webhook import InMemoryReplayKeyStore, Listener\n"
+"\n"
+"listener = Listener(\n"
+"    host=\"127.0.0.1\",\n"
+"    callback=handle_webhook,\n"
+"    api_token=os.environ[\"CRYPTOBOT_API_TOKEN\"],\n"
+"    replay_store=InMemoryReplayKeyStore(),\n"
+"    replay_ttl_seconds=3600,\n"
+")\n"
+msgstr ""
+"import os\n"
+"\n"
+"from cryptobot.webhook import InMemoryReplayKeyStore, Listener\n"
+"\n"
+"listener = Listener(\n"
+"    host=\"127.0.0.1\",\n"
+"    callback=handle_webhook,\n"
+"    api_token=os.environ[\"CRYPTOBOT_API_TOKEN\"],\n"
+"    replay_store=InMemoryReplayKeyStore(),\n"
+"    replay_ttl_seconds=3600,\n"
+")\n"
+
+#: ../../webhook_security.md:107
+msgid ""
+"In production, store this in Redis or your database instead of process "
+"memory."
+msgstr ""
+"En producción, almacene esto en Redis o su base de datos en lugar de la "
+"memoria del proceso."
+
+#: ../../webhook_security.md:109
+msgid "Custom Replay Keys"
+msgstr "Claves de Repetición Personalizadas"
+
+#: ../../webhook_security.md:111
+msgid ""
+"If your integration has a stable business identifier, use "
+"`replay_key_resolver`:"
+msgstr ""
+"Si su integración tiene un identificador de negocio estable, use "
+"`replay_key_resolver`:"
+
+#: ../../webhook_security.md:113
+#, python-brace-format
+msgid ""
+"import os\n"
+"\n"
+"from cryptobot.webhook import InMemoryReplayKeyStore, Listener\n"
+"\n"
+"\n"
+"def replay_key_resolver(data, raw_body, headers):\n"
+"    payload = data.get(\"payload\", {})\n"
+"    invoice_id = payload.get(\"invoice_id\")\n"
+"    if invoice_id is not None:\n"
+"        return f\"invoice_paid:{invoice_id}\"\n"
+"    return None\n"
+"\n"
+"\n"
+"listener = Listener(\n"
+"    host=\"127.0.0.1\",\n"
+"    callback=handle_webhook,\n"
+"    api_token=os.environ[\"CRYPTOBOT_API_TOKEN\"],\n"
+"    replay_store=InMemoryReplayKeyStore(),\n"
+"    replay_ttl_seconds=3600,\n"
+"    replay_key_resolver=replay_key_resolver,\n"
+")\n"
+msgstr ""
+"import os\n"
+"\n"
+"from cryptobot.webhook import InMemoryReplayKeyStore, Listener\n"
+"\n"
+"\n"
+"def replay_key_resolver(data, raw_body, headers):\n"
+"    payload = data.get(\"payload\", {})\n"
+"    invoice_id = payload.get(\"invoice_id\")\n"
+"    if invoice_id is not None:\n"
+"        return f\"invoice_paid:{invoice_id}\"\n"
+"    return None\n"
+"\n"
+"\n"
+"listener = Listener(\n"
+"    host=\"127.0.0.1\",\n"
+"    callback=handle_webhook,\n"
+"    api_token=os.environ[\"CRYPTOBOT_API_TOKEN\"],\n"
+"    replay_store=InMemoryReplayKeyStore(),\n"
+"    replay_ttl_seconds=3600,\n"
+"    replay_key_resolver=replay_key_resolver,\n"
+")\n"
+
+#: ../../webhook_security.md:137
+msgid "Deployment Hardening"
+msgstr "Endurecimiento del Despliegue"
+
+#: ../../webhook_security.md:139
+msgid "Use HTTPS at the public edge."
+msgstr "Use HTTPS en el borde público."
+
+#: ../../webhook_security.md:140
+msgid "Bind app to `127.0.0.1` behind Nginx/Caddy/ingress when possible."
+msgstr "Vincule la aplicación a `127.0.0.1` detrás de Nginx/Caddy/ingress cuando sea posible."
+
+#: ../../webhook_security.md:141
+msgid "Apply request limits and upstream timeouts."
+msgstr "Aplique límites de solicitudes y timeouts del upstream."
+
+#: ../../webhook_security.md:142
+msgid "Keep webhook handler fast; queue expensive work."
+msgstr "Mantenga el manejador de webhook rápido; encole el trabajo costoso."
+
+#: ../../webhook_security.md:143
+msgid "Never log secrets or full raw payloads in production."
+msgstr "Nunca registre secretos o payloads crudos completos en producción."
+
+#: ../../webhook_security.md:145
+msgid "Reverse Proxy Example (Nginx)"
+msgstr "Ejemplo de Proxy Reverso (Nginx)"
+
+#: ../../webhook_security.md:147
+msgid ""
+"server {\n"
+"    listen 443 ssl http2;\n"
+"    server_name pay.example.com;\n"
+"\n"
+"    ssl_certificate /etc/letsencrypt/live/pay.example.com/fullchain.pem;\n"
+"    ssl_certificate_key "
+"/etc/letsencrypt/live/pay.example.com/privkey.pem;\n"
+"\n"
+"    location /webhook {\n"
+"        proxy_pass http://127.0.0.1:2203/webhook;\n"
+"        proxy_set_header Host $host;\n"
+"        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n"
+"        proxy_set_header X-Forwarded-Proto $scheme;\n"
+"    }\n"
+"}\n"
+msgstr ""
+"server {\n"
+"    listen 443 ssl http2;\n"
+"    server_name pay.example.com;\n"
+"\n"
+"    ssl_certificate /etc/letsencrypt/live/pay.example.com/fullchain.pem;\n"
+"    ssl_certificate_key "
+"/etc/letsencrypt/live/pay.example.com/privkey.pem;\n"
+"\n"
+"    location /webhook {\n"
+"        proxy_pass http://127.0.0.1:2203/webhook;\n"
+"        proxy_set_header Host $host;\n"
+"        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n"
+"        proxy_set_header X-Forwarded-Proto $scheme;\n"
+"    }\n"
+"}\n"
+
+#: ../../webhook_security.md:164
+msgid "Queue-Based Processing"
+msgstr "Procesamiento Basado en Cola"
+
+#: ../../webhook_security.md:166
+msgid "Move non-trivial business logic off the request thread."
+msgstr "Mueva la lógica de negocio no trivial fuera del hilo de la solicitud."
+
+#: ../../webhook_security.md:168
+msgid ""
+"from queue import Queue\n"
+"from threading import Thread\n"
+"\n"
+"work_q: Queue[dict] = Queue(maxsize=1000)\n"
+"\n"
+"\n"
+"def worker():\n"
+"    while True:\n"
+"        update = work_q.get()\n"
+"        try:\n"
+"            # Process invoice_paid, transfer_completed, etc.\n"
+"            pass\n"
+"        finally:\n"
+"            work_q.task_done()\n"
+"\n"
+"\n"
+"def handle_webhook(headers, data):\n"
+"    work_q.put_nowait(data)\n"
+"\n"
+"\n"
+"Thread(target=worker, daemon=True).start()\n"
+msgstr ""
+"from queue import Queue\n"
+"from threading import Thread\n"
+"\n"
+"work_q: Queue[dict] = Queue(maxsize=1000)\n"
+"\n"
+"\n"
+"def worker():\n"
+"    while True:\n"
+"        update = work_q.get()\n"
+"        try:\n"
+"            # Procesar invoice_paid, transfer_completed, etc.\n"
+"            pass\n"
+"        finally:\n"
+"            work_q.task_done()\n"
+"\n"
+"\n"
+"def handle_webhook(headers, data):\n"
+"    work_q.put_nowait(data)\n"
+"\n"
+"\n"
+"Thread(target=worker, daemon=True).start()\n"
+
+#: ../../webhook_security.md:192
+msgid "Local Testing"
+msgstr "Pruebas Locales"
+
+#: ../../webhook_security.md:194
+msgid "1. Run listener locally"
+msgstr "1. Ejecutar el listener localmente"
+
+#: ../../webhook_security.md:196
+msgid ""
+"# Start your own listener script (example filename)\n"
+"uv run python listener.py\n"
+msgstr ""
+"# Iniciar su propio script de listener (nombre de archivo de ejemplo)\n"
+"uv run python listener.py\n"
+
+#: ../../webhook_security.md:201
+msgid "2. Expose local port with ngrok"
+msgstr "2. Exponer el puerto local con ngrok"
+
+#: ../../webhook_security.md:203
+msgid "ngrok http 2203\n"
+msgstr "ngrok http 2203\n"
+
+#: ../../webhook_security.md:207
+msgid "3. Set webhook URL in Crypto Bot"
+msgstr "3. Configurar la URL del webhook en Crypto Bot"
+
+#: ../../webhook_security.md:209
+msgid "Use the HTTPS URL from ngrok plus `/webhook`."
+msgstr "Use la URL HTTPS de ngrok más `/webhook`."
+
+#: ../../webhook_security.md:211
+msgid "Pytest Signature Test"
+msgstr "Prueba de Firma con Pytest"
+
+#: ../../webhook_security.md:213
+#, python-brace-format
+msgid ""
+"import hashlib\n"
+"import hmac\n"
+"import json\n"
+"\n"
+"from fastapi.testclient import TestClient\n"
+"\n"
+"from cryptobot.webhook import Listener\n"
+"\n"
+"\n"
+"def sign(token: str, raw_body: str) -> str:\n"
+"    secret = hashlib.sha256(token.encode()).digest()\n"
+"    return hmac.new(secret, raw_body.encode(\"utf-8\"), "
+"hashlib.sha256).hexdigest()\n"
+"\n"
+"\n"
+"def test_valid_signature():\n"
+"    received = {}\n"
+"\n"
+"    def callback(headers, data):\n"
+"        received.update(data)\n"
+"\n"
+"    listener = Listener(host=\"127.0.0.1\", callback=callback, api_token"
+"=\"test-token\")\n"
+"    client = TestClient(listener.app)\n"
+"\n"
+"    body = {\"update_id\": 1, \"update_type\": \"invoice_paid\", "
+"\"payload\": {\"invoice_id\": 123}}\n"
+"    raw = json.dumps(body)\n"
+"    signature = sign(\"test-token\", raw)\n"
+"\n"
+"    resp = client.post(\"/webhook\", content=raw, headers={\"crypto-pay-"
+"api-signature\": signature})\n"
+"\n"
+"    assert resp.status_code == 200\n"
+"    assert received[\"update_id\"] == 1\n"
+msgstr ""
+"import hashlib\n"
+"import hmac\n"
+"import json\n"
+"\n"
+"from fastapi.testclient import TestClient\n"
+"\n"
+"from cryptobot.webhook import Listener\n"
+"\n"
+"\n"
+"def sign(token: str, raw_body: str) -> str:\n"
+"    secret = hashlib.sha256(token.encode()).digest()\n"
+"    return hmac.new(secret, raw_body.encode(\"utf-8\"), "
+"hashlib.sha256).hexdigest()\n"
+"\n"
+"\n"
+"def test_valid_signature():\n"
+"    received = {}\n"
+"\n"
+"    def callback(headers, data):\n"
+"        received.update(data)\n"
+"\n"
+"    listener = Listener(host=\"127.0.0.1\", callback=callback, api_token"
+"=\"test-token\")\n"
+"    client = TestClient(listener.app)\n"
+"\n"
+"    body = {\"update_id\": 1, \"update_type\": \"invoice_paid\", "
+"\"payload\": {\"invoice_id\": 123}}\n"
+"    raw = json.dumps(body)\n"
+"    signature = sign(\"test-token\", raw)\n"
+"\n"
+"    resp = client.post(\"/webhook\", content=raw, headers={\"crypto-pay-"
+"api-signature\": signature})\n"
+"\n"
+"    assert resp.status_code == 200\n"
+"    assert received[\"update_id\"] == 1\n"
+
+#: ../../webhook_security.md:247
+msgid "Security Checklist"
+msgstr "Lista de Verificación de Seguridad"
+
+#: ../../webhook_security.md:249
+msgid "Signature verification enabled (`Listener` or `check_signature`)"
+msgstr "Verificación de firma habilitada (`Listener` o `check_signature`)"
+
+#: ../../webhook_security.md:250
+msgid "HTTPS termination configured"
+msgstr "Terminación HTTPS configurada"
+
+#: ../../webhook_security.md:251
+msgid "Token comes from environment/secrets manager"
+msgstr "El token proviene de variables de entorno/gestor de secretos"
+
+#: ../../webhook_security.md:252
+msgid "Replay protection in place"
+msgstr "Protección contra repetición implementada"
+
+#: ../../webhook_security.md:253
+msgid "Slow/background operations moved to workers"
+msgstr "Operaciones lentas/en segundo plano movidas a workers"
+
+#: ../../webhook_security.md:254
+msgid "Request logging redacts sensitive fields"
+msgstr "El registro de solicitudes oculta campos sensibles"
+
+#: ../../webhook_security.md:256
+msgid "References"
+msgstr "Referencias"
+
+#: ../../webhook_security.md:258
+msgid ""
+"[Crypto Pay API docs](https://help.send.tg/en/articles/10279948-crypto-"
+"pay-api)"
+msgstr ""
+"[Documentación de Crypto Pay API](https://help.send.tg/en/articles/10279948-crypto-"
+"pay-api)"
+
+#: ../../webhook_security.md:259
+msgid ""
+"[OWASP Webhook Security Cheat "
+"Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Webhook_Security_Cheat_Sheet.html)"
+msgstr ""
+"[Hoja de Referencia de Seguridad de Webhooks de "
+"OWASP](https://cheatsheetseries.owasp.org/cheatsheets/Webhook_Security_Cheat_Sheet.html)"
+
+#: ../../webhook_security.md:260
+msgid "[FastAPI security docs](https://fastapi.tiangolo.com/tutorial/security/)"
+msgstr "[Documentación de seguridad de FastAPI](https://fastapi.tiangolo.com/tutorial/security/)"

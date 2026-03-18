@@ -1,0 +1,256 @@
+# Guía de migración de CryptoBot Python 0.5.x a 1.0.0.
+# Copyright (C) 2022, Reinier Hernández
+# This file is distributed under the same license as the CryptoBot Python
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: CryptoBot Python 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-18 16:06-0300\n"
+"PO-Revision-Date: 2026-03-18 16:06-0300\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../migration-1.0.md:1
+msgid "Migrating from 0.5.x to 1.0.0"
+msgstr "Migración de 0.5.x a 1.0.0"
+
+#: ../../migration-1.0.md:3
+msgid ""
+"This guide covers the breaking changes introduced in v1.0.0 and how to "
+"update your code."
+msgstr ""
+"Esta guía cubre los cambios incompatibles introducidos en v1.0.0 y cómo "
+"actualizar tu código."
+
+#: ../../migration-1.0.md:6
+msgid "`create_invoice()` signature change"
+msgstr "Cambio en la firma de `create_invoice()`"
+
+#: ../../migration-1.0.md:8
+msgid ""
+"The `asset` parameter is no longer the first positional argument and is "
+"now optional. `amount` is the first positional argument."
+msgstr ""
+"El parámetro `asset` ya no es el primer argumento posicional y ahora es "
+"opcional. `amount` es el primer argumento posicional."
+
+#: ../../migration-1.0.md:11 ../../migration-1.0.md:52
+msgid "**Before (0.5.x):**"
+msgstr "**Antes (0.5.x):**"
+
+#: ../../migration-1.0.md:13
+msgid ""
+"invoice = client.create_invoice(Asset.TON, 1.5)\n"
+"\n"
+"# or with keyword arguments\n"
+"invoice = client.create_invoice(asset=Asset.TON, amount=1.5)\n"
+msgstr ""
+"invoice = client.create_invoice(Asset.TON, 1.5)\n"
+"\n"
+"# o con argumentos con nombre\n"
+"invoice = client.create_invoice(asset=Asset.TON, amount=1.5)\n"
+
+#: ../../migration-1.0.md:20 ../../migration-1.0.md:59
+msgid "**After (1.0.0):**"
+msgstr "**Después (1.0.0):**"
+
+#: ../../migration-1.0.md:22
+msgid ""
+"invoice = client.create_invoice(1.5, asset=Asset.TON)\n"
+"\n"
+"# keyword-only style still works, but asset must come after amount\n"
+"invoice = client.create_invoice(amount=1.5, asset=Asset.TON)\n"
+msgstr ""
+"invoice = client.create_invoice(1.5, asset=Asset.TON)\n"
+"\n"
+"# el estilo solo con argumentos con nombre sigue funcionando, pero asset debe ir después de amount\n"
+"invoice = client.create_invoice(amount=1.5, asset=Asset.TON)\n"
+
+#: ../../migration-1.0.md:29
+msgid ""
+"If you were already using `asset=` and `amount=` as keyword arguments, "
+"the only change is that `asset` is now optional (required only for crypto"
+" invoices)."
+msgstr ""
+"Si ya estabas usando `asset=` y `amount=` como argumentos con nombre, "
+"el único cambio es que `asset` ahora es opcional (requerido solo para "
+"facturas de criptomonedas)."
+
+#: ../../migration-1.0.md:32
+msgid "Fiat invoices"
+msgstr "Facturas en moneda fiat"
+
+#: ../../migration-1.0.md:34
+msgid ""
+"The signature change enables the new fiat invoice support. To create a "
+"fiat invoice, omit `asset` and pass `currency_type`, `fiat`, and "
+"`accepted_assets` instead:"
+msgstr ""
+"El cambio en la firma habilita el nuevo soporte para facturas en moneda "
+"fiat. Para crear una factura fiat, omite `asset` y pasa `currency_type`, "
+"`fiat` y `accepted_assets` en su lugar:"
+
+#: ../../migration-1.0.md:38
+msgid ""
+"invoice = client.create_invoice(\n"
+"    amount=10.00,\n"
+"    currency_type=\"fiat\",\n"
+"    fiat=\"USD\",\n"
+"    accepted_assets=\"USDT,TON,BTC\",\n"
+")\n"
+msgstr ""
+"invoice = client.create_invoice(\n"
+"    amount=10.00,\n"
+"    currency_type=\"fiat\",\n"
+"    fiat=\"USD\",\n"
+"    accepted_assets=\"USDT,TON,BTC\",\n"
+")\n"
+
+#: ../../migration-1.0.md:47
+msgid "`ExchangeRate.source` is now a `str`"
+msgstr "`ExchangeRate.source` ahora es un `str`"
+
+#: ../../migration-1.0.md:49
+msgid ""
+"`ExchangeRate.source` changed from the `Asset` enum to a plain `str` "
+"because the API can return fiat currency codes that are not members of "
+"`Asset`."
+msgstr ""
+"`ExchangeRate.source` cambió del enum `Asset` a un `str` simple "
+"porque la API puede devolver códigos de moneda fiat que no son miembros de "
+"`Asset`."
+
+#: ../../migration-1.0.md:54
+msgid ""
+"rates = client.get_exchange_rates()\n"
+"btc_usd = next(r for r in rates if r.source == Asset.BTC and r.target == "
+"\"USD\")\n"
+msgstr ""
+"rates = client.get_exchange_rates()\n"
+"btc_usd = next(r for r in rates if r.source == Asset.BTC and r.target == "
+"\"USD\")\n"
+
+#: ../../migration-1.0.md:61
+msgid ""
+"rates = client.get_exchange_rates()\n"
+"btc_usd = next(r for r in rates if r.source == \"BTC\" and r.target == "
+"\"USD\")\n"
+msgstr ""
+"rates = client.get_exchange_rates()\n"
+"btc_usd = next(r for r in rates if r.source == \"BTC\" and r.target == "
+"\"USD\")\n"
+
+#: ../../migration-1.0.md:66
+msgid "Validation error messages"
+msgstr "Mensajes de error de validación"
+
+#: ../../migration-1.0.md:68
+msgid ""
+"Internal validation was generalized to support checks and transfers. If "
+"your code matches on exception messages from `create_invoice` or "
+"`get_invoices`, update accordingly:"
+msgstr ""
+"La validación interna se generalizó para soportar cheques y transferencias. "
+"Si tu código compara mensajes de excepción de `create_invoice` o "
+"`get_invoices`, actualízalo de la siguiente manera:"
+
+#: ../../migration-1.0.md
+msgid "0.5.x message"
+msgstr "Mensaje en 0.5.x"
+
+#: ../../migration-1.0.md
+msgid "1.0.0 message"
+msgstr "Mensaje en 1.0.0"
+
+#: ../../migration-1.0.md
+msgid "`\"invoice_ids string cannot be empty\"`"
+msgstr "`\"invoice_ids string cannot be empty\"`"
+
+#: ../../migration-1.0.md
+msgid "`\"ids string cannot be empty\"`"
+msgstr "`\"ids string cannot be empty\"`"
+
+#: ../../migration-1.0.md
+msgid "`\"invoice_ids list cannot be empty\"`"
+msgstr "`\"invoice_ids list cannot be empty\"`"
+
+#: ../../migration-1.0.md
+msgid "`\"ids list cannot be empty\"`"
+msgstr "`\"ids list cannot be empty\"`"
+
+#: ../../migration-1.0.md
+msgid "`\"invoice_ids string must contain positive integer IDs\"`"
+msgstr "`\"invoice_ids string must contain positive integer IDs\"`"
+
+#: ../../migration-1.0.md
+msgid "`\"ids string must contain positive integer IDs\"`"
+msgstr "`\"ids string must contain positive integer IDs\"`"
+
+#: ../../migration-1.0.md
+msgid "`\"invoice_ids list must contain positive integers\"`"
+msgstr "`\"invoice_ids list must contain positive integers\"`"
+
+#: ../../migration-1.0.md
+msgid "`\"ids list must contain positive integers\"`"
+msgstr "`\"ids list must contain positive integers\"`"
+
+#: ../../migration-1.0.md
+msgid "`\"invoice_ids must be a comma-separated string or list of integers\"`"
+msgstr "`\"invoice_ids must be a comma-separated string or list of integers\"`"
+
+#: ../../migration-1.0.md
+msgid "`\"ids must be a comma-separated string or list of integers\"`"
+msgstr "`\"ids must be a comma-separated string or list of integers\"`"
+
+#: ../../migration-1.0.md:80
+msgid "New endpoints"
+msgstr "Nuevos endpoints"
+
+#: ../../migration-1.0.md:82
+msgid "These are additive and do not break existing code, but are worth noting:"
+msgstr "Estos son aditivos y no rompen el código existente, pero vale la pena mencionarlos:"
+
+#: ../../migration-1.0.md:84
+msgid "`delete_invoice(invoice_id)`"
+msgstr "`delete_invoice(invoice_id)`"
+
+#: ../../migration-1.0.md:85
+msgid "`create_check(asset, amount, ...)` / `delete_check(check_id)`"
+msgstr "`create_check(asset, amount, ...)` / `delete_check(check_id)`"
+
+#: ../../migration-1.0.md:86
+msgid "`get_checks(...)` with `iter_checks()` and `iter_check_pages()` pagination"
+msgstr "`get_checks(...)` con paginación mediante `iter_checks()` e `iter_check_pages()`"
+
+#: ../../migration-1.0.md:87
+msgid ""
+"`get_transfers(...)` with `iter_transfers()` and `iter_transfer_pages()` "
+"pagination"
+msgstr ""
+"`get_transfers(...)` con paginación mediante `iter_transfers()` e "
+"`iter_transfer_pages()`"
+
+#: ../../migration-1.0.md:88
+msgid "`get_stats(start_at, end_at)`"
+msgstr "`get_stats(start_at, end_at)`"
+
+#: ../../migration-1.0.md:89
+msgid "`fiat` filter parameter on `get_invoices()`"
+msgstr "Parámetro de filtro `fiat` en `get_invoices()`"
+
+#: ../../migration-1.0.md:91
+msgid ""
+"All new endpoints are available on both `CryptoBotClient` and "
+"`AsyncCryptoBotClient`."
+msgstr ""
+"Todos los nuevos endpoints están disponibles tanto en `CryptoBotClient` como "
+"en `AsyncCryptoBotClient`."

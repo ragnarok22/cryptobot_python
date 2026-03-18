@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CryptoBot Python 0.1.6\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-18 10:28-0300\n"
-"PO-Revision-Date: 2025-11-18 10:30-0300\n"
+"POT-Creation-Date: 2026-03-18 16:06-0300\n"
+"PO-Revision-Date: 2026-03-18 10:30-0300\n"
 "Last-Translator: Claude <noreply@anthropic.com>\n"
 "Language: es\n"
 "Language-Team: es <LL@li.org>\n"
@@ -17,196 +17,355 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.17.0\n"
+"Generated-By: Babel 2.18.0\n"
 
 #: ../../../HISTORY.md:2
 msgid "History"
 msgstr "Historial"
 
 #: ../../../HISTORY.md:4
-msgid "0.2.3 (2024-12-19)"
-msgstr "0.2.3 (2024-12-19)"
+msgid "1.1.0 (2026-03-18)"
+msgstr "1.1.0 (2026-03-18)"
 
 #: ../../../HISTORY.md:6
-msgid "Build and documentation improvements"
-msgstr "Mejoras en la compilación y documentación"
+msgid "Dropped Python 3.9 support; minimum version is now 3.10."
+msgstr "Eliminado el soporte para Python 3.9; la versión mínima ahora es 3.10."
 
 #: ../../../HISTORY.md:7
-msgid "Enhanced test coverage and error handling"
-msgstr "Cobertura de pruebas mejorada y manejo de errores"
+msgid ""
+"Fixed `ExchangeRate.source` type from `Asset` enum to `str` to match the "
+"API, which can return fiat currency codes."
+msgstr ""
+"Corregido el tipo de `ExchangeRate.source` de enum `Asset` a `str` para "
+"coincidir con la API, que puede devolver códigos de moneda fiat."
 
-#: ../../../HISTORY.md:8 ../../../HISTORY.md:64
+#: ../../../HISTORY.md:9
+msgid "1.0.0 (2026-03-18)"
+msgstr "1.0.0 (2026-03-18)"
+
+#: ../../../HISTORY.md:11
+msgid "First stable release."
+msgstr "Primer lanzamiento estable."
+
+#: ../../../HISTORY.md:12
+msgid ""
+"Full support for all Crypto Pay API endpoints: invoices, transfers, "
+"checks, balances, exchange rates, currencies, and statistics."
+msgstr ""
+"Soporte completo para todos los endpoints de la API de Crypto Pay: facturas, "
+"transferencias, checks, saldos, tasas de cambio, monedas y estadísticas."
+
+#: ../../../HISTORY.md:13
+msgid "Synchronous and async clients with retry and timeout configuration."
+msgstr "Clientes síncronos y asíncronos con configuración de reintentos y timeout."
+
+#: ../../../HISTORY.md:14
+msgid "Pagination iterators for invoices, transfers, and checks."
+msgstr "Iteradores de paginación para facturas, transferencias y checks."
+
+#: ../../../HISTORY.md:15
+msgid ""
+"FastAPI webhook listener with signature verification and replay "
+"protection."
+msgstr ""
+"Listener de webhook FastAPI con verificación de firma y protección contra "
+"repetición."
+
+#: ../../../HISTORY.md:16
+msgid "Typed dataclass models for all API responses."
+msgstr "Modelos dataclass tipados para todas las respuestas de la API."
+
+#: ../../../HISTORY.md:17
+msgid "Python 3.10 through 3.14 support."
+msgstr "Soporte para Python 3.10 a 3.14."
+
+#: ../../../HISTORY.md:19
+msgid "0.5.1 (2026-02-17)"
+msgstr "0.5.1 (2026-02-17)"
+
+#: ../../../HISTORY.md:21
+msgid ""
+"Migrated from Poetry to uv for dependency management and virtual "
+"environments."
+msgstr ""
+"Migración de Poetry a uv para gestión de dependencias y entornos virtuales."
+
+#: ../../../HISTORY.md:22
+msgid "Switched build backend from poetry-core to hatchling."
+msgstr "Cambio del backend de compilación de poetry-core a hatchling."
+
+#: ../../../HISTORY.md:23
+msgid "Adopted PEP 735 dependency groups for dev dependencies."
+msgstr "Adoptados los grupos de dependencias PEP 735 para dependencias de desarrollo."
+
+#: ../../../HISTORY.md:24
+msgid "Updated CI/CD workflows to use astral-sh/setup-uv."
+msgstr "Actualizados los workflows de CI/CD para usar astral-sh/setup-uv."
+
+#: ../../../HISTORY.md:25
+msgid "Updated tox configuration with Python 3.14 support."
+msgstr "Actualizada la configuración de tox con soporte para Python 3.14."
+
+#: ../../../HISTORY.md:26
+msgid "Removed legacy setup.py."
+msgstr "Eliminado el setup.py heredado."
+
+#: ../../../HISTORY.md:28
+msgid "0.5.0 (2026-02-10)"
+msgstr "0.5.0 (2026-02-10)"
+
+#: ../../../HISTORY.md:30
+msgid "Added async API client support alongside the synchronous client."
+msgstr "Agregado soporte de cliente API asíncrono junto con el cliente síncrono."
+
+#: ../../../HISTORY.md:31
+msgid "Added invoice pagination helpers and iterator utilities."
+msgstr "Agregados ayudantes de paginación de facturas y utilidades de iteración."
+
+#: ../../../HISTORY.md:32
+msgid ""
+"Added webhook replay protection and strengthened signature "
+"validation/error handling."
+msgstr ""
+"Agregada protección contra repetición de webhook y fortalecida la validación "
+"de firma/manejo de errores."
+
+#: ../../../HISTORY.md:33
+msgid "Improved response parsing, retry configurability, and type hint coverage."
+msgstr "Mejorado el análisis de respuestas, configurabilidad de reintentos y cobertura de type hints."
+
+#: ../../../HISTORY.md:34
+msgid ""
+"Expanded tests and refreshed documentation examples and troubleshooting "
+"guidance."
+msgstr ""
+"Ampliadas las pruebas y actualizados los ejemplos de documentación y la "
+"guía de solución de problemas."
+
+#: ../../../HISTORY.md:36
+msgid "0.4.1 (2026-01-20)"
+msgstr "0.4.1 (2026-01-20)"
+
+#: ../../../HISTORY.md:38
+msgid "Bug fixes and stability improvements"
+msgstr "Corrección de errores y mejoras de estabilidad"
+
+#: ../../../HISTORY.md:39 ../../../HISTORY.md:55 ../../../HISTORY.md:111
 msgid "Updated dependencies and development tools"
 msgstr "Dependencias y herramientas de desarrollo actualizadas"
 
-#: ../../../HISTORY.md:10
+#: ../../../HISTORY.md:41
+msgid "0.3.0 (2025-11-18)"
+msgstr "0.3.0 (2025-11-18)"
+
+#: ../../../HISTORY.md:43
+msgid "Added Spanish documentation support with complete translations"
+msgstr "Agregado soporte de documentación en español con traducciones completas"
+
+#: ../../../HISTORY.md:44
+msgid "Implemented internationalization (i18n) infrastructure using sphinx-intl"
+msgstr "Implementada la infraestructura de internacionalización (i18n) usando sphinx-intl"
+
+#: ../../../HISTORY.md:45
+msgid "Created comprehensive translation guide (TRANSLATING.md)"
+msgstr "Creada la guía completa de traducción (TRANSLATING.md)"
+
+#: ../../../HISTORY.md:46
+msgid "Added new Make commands for documentation translation workflow"
+msgstr "Agregados nuevos comandos Make para el flujo de trabajo de traducción de documentación"
+
+#: ../../../HISTORY.md:47
+msgid "Updated Read the Docs configuration for multi-language documentation"
+msgstr "Actualizada la configuración de Read the Docs para documentación multilingüe"
+
+#: ../../../HISTORY.md:48
+msgid "Added Spanish translation of all documentation pages"
+msgstr "Agregada la traducción al español de todas las páginas de documentación"
+
+#: ../../../HISTORY.md:49
+msgid "Enhanced documentation build system with multi-language support"
+msgstr "Mejorado el sistema de compilación de documentación con soporte multilingüe"
+
+#: ../../../HISTORY.md:51
+msgid "0.2.3 (2024-12-19)"
+msgstr "0.2.3 (2024-12-19)"
+
+#: ../../../HISTORY.md:53
+msgid "Build and documentation improvements"
+msgstr "Mejoras en la compilación y documentación"
+
+#: ../../../HISTORY.md:54
+msgid "Enhanced test coverage and error handling"
+msgstr "Cobertura de pruebas mejorada y manejo de errores"
+
+#: ../../../HISTORY.md:57
 msgid "0.2.2 (2024-10-15)"
 msgstr "0.2.2 (2024-10-15)"
 
-#: ../../../HISTORY.md:12
+#: ../../../HISTORY.md:59
 msgid "Fixed swap_to parameter handling in Invoice class"
 msgstr "Corrección del manejo del parámetro swap_to en la clase Invoice"
 
-#: ../../../HISTORY.md:13
+#: ../../../HISTORY.md:60
 msgid "Improved test coverage for invoice creation"
 msgstr "Cobertura de pruebas mejorada para creación de facturas"
 
-#: ../../../HISTORY.md:15
+#: ../../../HISTORY.md:62
 msgid "0.2.1 (2024-10-14)"
 msgstr "0.2.1 (2024-10-14)"
 
-#: ../../../HISTORY.md:17
+#: ../../../HISTORY.md:64
 msgid "Added swap_to parameter to create_invoice method"
 msgstr "Agregado parámetro swap_to al método create_invoice"
 
-#: ../../../HISTORY.md:18
+#: ../../../HISTORY.md:65
 msgid "Enhanced invoice functionality with currency conversion support"
 msgstr "Funcionalidad de facturas mejorada con soporte de conversión de moneda"
 
-#: ../../../HISTORY.md:20
+#: ../../../HISTORY.md:67
 msgid "0.2.0 (2024-09-25)"
 msgstr "0.2.0 (2024-09-25)"
 
-#: ../../../HISTORY.md:22
+#: ../../../HISTORY.md:69
 msgid "Updated Python version support (3.9.12+ to 3.13)"
 msgstr "Soporte de versión de Python actualizado (3.9.12+ a 3.13)"
 
-#: ../../../HISTORY.md:23
+#: ../../../HISTORY.md:70
 msgid "Upgraded Poetry dependency management"
 msgstr "Gestión de dependencias de Poetry actualizada"
 
-#: ../../../HISTORY.md:24
+#: ../../../HISTORY.md:71
 msgid "Enhanced CI/CD pipeline with Python 3.13 support"
 msgstr "Pipeline CI/CD mejorado con soporte para Python 3.13"
 
-#: ../../../HISTORY.md:25
+#: ../../../HISTORY.md:72
 msgid "Improved code formatting and linting configuration"
 msgstr "Configuración de formato de código y linting mejorada"
 
-#: ../../../HISTORY.md:26
+#: ../../../HISTORY.md:73
 msgid "Updated development dependencies and tools"
 msgstr "Dependencias y herramientas de desarrollo actualizadas"
 
-#: ../../../HISTORY.md:28
+#: ../../../HISTORY.md:75
 msgid "0.1.9 (2024-09-20)"
 msgstr "0.1.9 (2024-09-20)"
 
-#: ../../../HISTORY.md:30
+#: ../../../HISTORY.md:77
 msgid "Added .DS_Store to gitignore"
 msgstr "Agregado .DS_Store a gitignore"
 
-#: ../../../HISTORY.md:31
+#: ../../../HISTORY.md:78
 msgid "Updated dependencies including h11, pip, and pydantic-core"
 msgstr "Dependencias actualizadas incluyendo h11, pip y pydantic-core"
 
-#: ../../../HISTORY.md:32
+#: ../../../HISTORY.md:79
 msgid "Improved package management and build process"
 msgstr "Gestión de paquetes y proceso de compilación mejorados"
 
-#: ../../../HISTORY.md:34
+#: ../../../HISTORY.md:81
 msgid "0.1.8 (2024-09-10)"
 msgstr "0.1.8 (2024-09-10)"
 
-#: ../../../HISTORY.md:36
+#: ../../../HISTORY.md:83
 msgid "Updated dependencies and improved stability"
 msgstr "Dependencias actualizadas y estabilidad mejorada"
 
-#: ../../../HISTORY.md:37
+#: ../../../HISTORY.md:84
 msgid "Enhanced development tooling and configuration"
 msgstr "Herramientas de desarrollo y configuración mejoradas"
 
-#: ../../../HISTORY.md:39
+#: ../../../HISTORY.md:86
 msgid "0.1.7 (2024-09-05)"
 msgstr "0.1.7 (2024-09-05)"
 
-#: ../../../HISTORY.md:41
+#: ../../../HISTORY.md:88
 msgid "Dependency updates including twine, fastapi, and pip"
 msgstr "Actualizaciones de dependencias incluyendo twine, fastapi y pip"
 
-#: ../../../HISTORY.md:42
+#: ../../../HISTORY.md:89
 msgid "Improved build and release process"
 msgstr "Proceso de compilación y lanzamiento mejorado"
 
-#: ../../../HISTORY.md:44
+#: ../../../HISTORY.md:91
 msgid "0.1.6 (2024-08-30)"
 msgstr "0.1.6 (2024-08-30)"
 
-#: ../../../HISTORY.md:46
+#: ../../../HISTORY.md:93
 msgid "Fixed build system with proper egg file removal"
 msgstr "Sistema de compilación corregido con eliminación adecuada de archivos egg"
 
-#: ../../../HISTORY.md:47
+#: ../../../HISTORY.md:94
 msgid "Updated dependencies and improved development workflow"
 msgstr "Dependencias actualizadas y flujo de trabajo de desarrollo mejorado"
 
-#: ../../../HISTORY.md:49
+#: ../../../HISTORY.md:96
 msgid "0.1.5 (2024-07-15)"
 msgstr "0.1.5 (2024-07-15)"
 
-#: ../../../HISTORY.md:51
+#: ../../../HISTORY.md:98
 msgid "Hotfix for Invoice dataclass initialization"
 msgstr "Corrección rápida para inicialización del dataclass Invoice"
 
-#: ../../../HISTORY.md:52
+#: ../../../HISTORY.md:99
 msgid "Dependency updates and improvements"
 msgstr "Actualizaciones de dependencias y mejoras"
 
-#: ../../../HISTORY.md:54
+#: ../../../HISTORY.md:101
 msgid "0.1.4 (2024-07-10)"
 msgstr "0.1.4 (2024-07-10)"
 
-#: ../../../HISTORY.md:56
+#: ../../../HISTORY.md:103
 msgid "Enhanced webhook functionality and error handling"
 msgstr "Funcionalidad de webhook mejorada y manejo de errores"
 
-#: ../../../HISTORY.md:57
+#: ../../../HISTORY.md:104
 msgid "Improved test coverage and code quality"
 msgstr "Cobertura de pruebas y calidad de código mejoradas"
 
-#: ../../../HISTORY.md:58
+#: ../../../HISTORY.md:105
 msgid "Updated documentation and development guidelines"
 msgstr "Documentación y guías de desarrollo actualizadas"
 
-#: ../../../HISTORY.md:60
+#: ../../../HISTORY.md:107
 msgid "0.1.3 (2024-06-20)"
 msgstr "0.1.3 (2024-06-20)"
 
-#: ../../../HISTORY.md:62
+#: ../../../HISTORY.md:109
 msgid "Added comprehensive test suite improvements"
 msgstr "Mejoras integrales agregadas a la suite de pruebas"
 
-#: ../../../HISTORY.md:63
+#: ../../../HISTORY.md:110
 msgid "Enhanced error handling and client functionality"
 msgstr "Manejo de errores y funcionalidad del cliente mejorados"
 
-#: ../../../HISTORY.md:66
+#: ../../../HISTORY.md:113
 msgid "0.1.2 (2024-05-15)"
 msgstr "0.1.2 (2024-05-15)"
 
-#: ../../../HISTORY.md:68
+#: ../../../HISTORY.md:115
 msgid "Added support for additional cryptocurrencies"
 msgstr "Agregado soporte para criptomonedas adicionales"
 
-#: ../../../HISTORY.md:69
+#: ../../../HISTORY.md:116
 msgid "Improved API client functionality"
 msgstr "Funcionalidad del cliente API mejorada"
 
-#: ../../../HISTORY.md:70
+#: ../../../HISTORY.md:117
 msgid "Enhanced documentation and examples"
 msgstr "Documentación y ejemplos mejorados"
 
-#: ../../../HISTORY.md:72
+#: ../../../HISTORY.md:119
 msgid "0.1.1 (2023-08-09)"
 msgstr "0.1.1 (2023-08-09)"
 
-#: ../../../HISTORY.md:74
+#: ../../../HISTORY.md:121
 msgid "Added `BNB` and `TRX` assets."
 msgstr "Agregados activos `BNB` y `TRX`."
 
-#: ../../../HISTORY.md:76
+#: ../../../HISTORY.md:123
 msgid "0.1.0 (2022-07-05)"
 msgstr "0.1.0 (2022-07-05)"
 
-#: ../../../HISTORY.md:78
+#: ../../../HISTORY.md:125
 msgid "First release on PyPI."
 msgstr "Primer lanzamiento en PyPI."

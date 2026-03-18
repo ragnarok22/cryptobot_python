@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CryptoBot Python 0.1.6\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-18 10:28-0300\n"
-"PO-Revision-Date: 2025-11-18 10:30-0300\n"
+"POT-Creation-Date: 2026-03-18 16:06-0300\n"
+"PO-Revision-Date: 2026-03-18 10:30-0300\n"
 "Last-Translator: Claude <noreply@anthropic.com>\n"
 "Language: es\n"
 "Language-Team: es <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.17.0\n"
+"Generated-By: Babel 2.18.0\n"
 
 #: ../../cryptobot.rst:2
 msgid "cryptobot package"
@@ -32,6 +32,59 @@ msgid "Submodules"
 msgstr "Submódulos"
 
 #: ../../cryptobot.rst:16
+msgid "cryptobot.client module"
+msgstr "módulo cryptobot.client"
+
+#: cryptobot.client.AsyncCryptoBotClient:1
+#: cryptobot.webhook.InMemoryReplayKeyStore:1 cryptobot.webhook.Listener:1 of
+msgid "Bases: :py:class:`object`"
+msgstr "Bases: :py:class:`object`"
+
+#: cryptobot.client.AsyncCryptoBotClient:1 of
+msgid "Async Crypto Bot API client for modern service workloads."
+msgstr "Cliente asíncrono de la API de Crypto Bot para cargas de trabajo de servicios modernos."
+
+#: cryptobot.client.AsyncCryptoBotClient.create_check:1 of
+msgid "Create a new crypto check."
+msgstr "Crear un nuevo check criptográfico."
+
+#: cryptobot.client.AsyncCryptoBotClient.delete_check:1 of
+msgid "Delete a check by ID."
+msgstr "Eliminar un check por ID."
+
+#: cryptobot.client.AsyncCryptoBotClient.delete_invoice:1 of
+msgid "Delete an invoice by ID."
+msgstr "Eliminar una factura por ID."
+
+#: cryptobot.client.AsyncCryptoBotClient.get_checks:1 of
+msgid "Get a list of checks."
+msgstr "Obtener una lista de checks."
+
+#: cryptobot.client.AsyncCryptoBotClient.get_stats:1 of
+msgid "Get app statistics."
+msgstr "Obtener estadísticas de la aplicación."
+
+#: cryptobot.client.AsyncCryptoBotClient.get_transfers:1 of
+msgid "Get a list of transfers."
+msgstr "Obtener una lista de transferencias."
+
+#: cryptobot.client.AsyncCryptoBotClient.iter_check_pages:1 of
+msgid "Iterate over check result pages."
+msgstr "Iterar sobre las páginas de resultados de checks."
+
+#: cryptobot.client.AsyncCryptoBotClient.iter_checks:1 of
+msgid "Iterate checks item-by-item across paginated results."
+msgstr "Iterar checks elemento por elemento a través de resultados paginados."
+
+#: cryptobot.client.AsyncCryptoBotClient.iter_transfer_pages:1 of
+msgid "Iterate over transfer result pages."
+msgstr "Iterar sobre las páginas de resultados de transferencias."
+
+#: cryptobot.client.AsyncCryptoBotClient.iter_transfers:1 of
+msgid "Iterate transfers item-by-item across paginated results."
+msgstr "Iterar transferencias elemento por elemento a través de resultados paginados."
+
+#: ../../cryptobot.rst:24
 msgid "cryptobot.errors module"
 msgstr "módulo cryptobot.errors"
 
@@ -39,15 +92,208 @@ msgstr "módulo cryptobot.errors"
 msgid "Bases: :py:class:`Exception`"
 msgstr "Bases: :py:class:`Exception`"
 
-#: ../../cryptobot.rst:24
+#: ../../cryptobot.rst:32
 msgid "cryptobot.webhook module"
 msgstr "módulo cryptobot.webhook"
 
-#: cryptobot.webhook.Listener:1 of
-msgid "Bases: :py:class:`object`"
-msgstr "Bases: :py:class:`object`"
+#: cryptobot.webhook.InMemoryReplayKeyStore:1 of
+msgid "Thread-safe in-memory replay key store with optional TTL eviction."
+msgstr "Almacén de claves de repetición en memoria, thread-safe, con evicción opcional por TTL."
 
-#: ../../cryptobot.rst:32
+#: cryptobot.webhook.Listener:1 of
+msgid "FastAPI-based webhook listener for Crypto Bot payment notifications."
+msgstr "Listener de webhook basado en FastAPI para notificaciones de pago de Crypto Bot."
+
+#: cryptobot.webhook.Listener:3 of
+msgid ""
+"This class creates an HTTP server that receives and validates webhook "
+"notifications from Crypto Bot when invoices are paid or other events "
+"occur. It automatically verifies request signatures to ensure "
+"authenticity."
+msgstr ""
+"Esta clase crea un servidor HTTP que recibe y valida notificaciones de "
+"webhook de Crypto Bot cuando se pagan facturas u ocurren otros eventos. "
+"Verifica automáticamente las firmas de las solicitudes para asegurar "
+"la autenticidad."
+
+#: ../../cryptobot.rst cryptobot.webhook.check_signature of
+msgid "Parameters"
+msgstr "Parámetros"
+
+#: cryptobot.webhook.Listener:7 of
+msgid "Hostname or IP address to bind to (e.g., \"0.0.0.0\", \"localhost\")."
+msgstr "Nombre de host o dirección IP a la cual vincular (por ejemplo, \"0.0.0.0\", \"localhost\")."
+
+#: cryptobot.webhook.Listener:8 of
+msgid ""
+"Function called when a valid webhook is received. Signature: "
+"callback(headers: dict, data: dict) -> None"
+msgstr ""
+"Función llamada cuando se recibe un webhook válido. Firma: "
+"callback(headers: dict, data: dict) -> None"
+
+#: cryptobot.webhook.Listener:10 of
+msgid "Your Crypto Bot API token for signature verification."
+msgstr "Su token de API de Crypto Bot para verificación de firma."
+
+#: cryptobot.webhook.Listener:11 of
+msgid "Port number to listen on. Default: 2203."
+msgstr "Número de puerto en el que escuchar. Predeterminado: 2203."
+
+#: cryptobot.webhook.Listener:12 of
+msgid "Webhook endpoint path. Default: \"/webhook\"."
+msgstr "Ruta del endpoint de webhook. Predeterminado: \"/webhook\"."
+
+#: cryptobot.webhook.Listener:13 of
+msgid ""
+"Uvicorn logging level (\"critical\", \"error\", \"warning\", \"info\", "
+"\"debug\"). Default: \"error\"."
+msgstr ""
+"Nivel de logging de Uvicorn (\"critical\", \"error\", \"warning\", \"info\", "
+"\"debug\"). Predeterminado: \"error\"."
+
+#: cryptobot.webhook.Listener:16 of
+msgid "Security:"
+msgstr "Seguridad:"
+
+#: cryptobot.webhook.Listener:17 of
+msgid "All incoming webhooks are verified using HMAC-SHA256 signatures"
+msgstr "Todos los webhooks entrantes se verifican usando firmas HMAC-SHA256"
+
+#: cryptobot.webhook.Listener:18 of
+msgid "Invalid signatures are rejected with a 400 error"
+msgstr "Las firmas inválidas se rechazan con un error 400"
+
+#: cryptobot.webhook.Listener:19 of
+msgid "Never expose your API token in logs or responses"
+msgstr "Nunca exponga su token de API en logs o respuestas"
+
+#: cryptobot.webhook.Listener:22 of
+msgid "Examples"
+msgstr "Ejemplos"
+
+#: cryptobot.webhook.Listener:23 of
+msgid "Basic webhook listener:"
+msgstr "Listener de webhook básico:"
+
+#: cryptobot.webhook.Listener:36 of
+msgid "Custom port and path:"
+msgstr "Puerto y ruta personalizados:"
+
+#: cryptobot.webhook.Listener:47 of
+msgid "Production deployment with ngrok/reverse proxy:"
+msgstr "Despliegue en producción con ngrok/proxy reverso:"
+
+#: cryptobot.webhook.Listener.listen:1 of
+msgid "Start the webhook server and listen for incoming requests."
+msgstr "Iniciar el servidor de webhook y escuchar solicitudes entrantes."
+
+#: cryptobot.webhook.Listener.listen:3 of
+msgid ""
+"This method starts a uvicorn server that listens for webhook "
+"notifications. It will block until the server is stopped (Ctrl+C)."
+msgstr ""
+"Este método inicia un servidor uvicorn que escucha notificaciones de "
+"webhook. Bloqueará hasta que el servidor sea detenido (Ctrl+C)."
+
+#: cryptobot.webhook.Listener.listen:6 of
+msgid "This is a blocking call. The server will run until interrupted."
+msgstr "Esta es una llamada bloqueante. El servidor se ejecutará hasta ser interrumpido."
+
+#: cryptobot.webhook.Listener.listen:9 cryptobot.webhook.check_signature:22 of
+msgid "Example"
+msgstr "Ejemplo"
+
+#: cryptobot.webhook.ReplayKeyStore:1 of
+msgid "Bases: :py:class:`~typing.Protocol`"
+msgstr "Bases: :py:class:`~typing.Protocol`"
+
+#: cryptobot.webhook.ReplayKeyStore:1 of
+msgid "Storage contract for webhook replay-protection keys."
+msgstr "Contrato de almacenamiento para claves de protección contra repetición de webhook."
+
+#: cryptobot.webhook.ReplayKeyStore.put_if_absent:1 of
+msgid "Atomically store key if absent."
+msgstr "Almacenar la clave atómicamente si está ausente."
+
+#: ../../cryptobot.rst cryptobot.webhook.check_signature of
+msgid "Returns"
+msgstr "Retorna"
+
+#: cryptobot.webhook.ReplayKeyStore.put_if_absent:3 of
+msgid ""
+"True when key is accepted and stored. False when key already exists "
+"(replay detected)."
+msgstr ""
+"True cuando la clave es aceptada y almacenada. False cuando la clave ya "
+"existe (repetición detectada)."
+
+#: cryptobot.webhook.ReplayKeyStore.remove:1 of
+msgid "Remove a previously stored key."
+msgstr "Eliminar una clave previamente almacenada."
+
+#: cryptobot.webhook.ReplayKeyStore.remove:3 of
+msgid "Implementations may use this to roll back reservation when callback fails."
+msgstr "Las implementaciones pueden usar esto para revertir la reserva cuando el callback falla."
+
+#: cryptobot.webhook.check_signature:1 of
+msgid "Verify webhook signature using HMAC-SHA256."
+msgstr "Verificar la firma del webhook usando HMAC-SHA256."
+
+#: cryptobot.webhook.check_signature:3 of
+msgid ""
+"This function validates that webhook requests are genuinely from Crypto "
+"Bot by comparing the HMAC-SHA256 signature in the request headers with a "
+"computed signature based on your API token and the request body."
+msgstr ""
+"Esta función valida que las solicitudes de webhook provienen genuinamente "
+"de Crypto Bot comparando la firma HMAC-SHA256 en los encabezados de la "
+"solicitud con una firma calculada basada en su token de API y el cuerpo "
+"de la solicitud."
+
+#: cryptobot.webhook.check_signature:7 of
+msgid "Your Crypto Bot API token."
+msgstr "Su token de API de Crypto Bot."
+
+#: cryptobot.webhook.check_signature:8 of
+msgid "The raw webhook request body as a string (unparsed JSON) or bytes."
+msgstr "El cuerpo crudo de la solicitud de webhook como cadena (JSON sin analizar) o bytes."
+
+#: cryptobot.webhook.check_signature:9 of
+msgid "The request headers containing the signature."
+msgstr "Los encabezados de la solicitud que contienen la firma."
+
+#: cryptobot.webhook.check_signature:11 of
+msgid "True if the signature is valid, False otherwise."
+msgstr "True si la firma es válida, False en caso contrario."
+
+#: cryptobot.webhook.check_signature:13 of
+msgid "Security Note:"
+msgstr "Nota de Seguridad:"
+
+#: cryptobot.webhook.check_signature:14 of
+msgid ""
+"Always verify webhook signatures to prevent unauthorized access. The "
+"signature is computed as: HMAC-SHA256(SHA256(api_token), "
+"raw_request_body)"
+msgstr ""
+"Siempre verifique las firmas de webhook para prevenir acceso no autorizado. "
+"La firma se calcula como: HMAC-SHA256(SHA256(api_token), "
+"raw_request_body)"
+
+#: cryptobot.webhook.check_signature:17 of
+msgid ""
+"IMPORTANT: The body must be the raw, unparsed JSON string as received "
+"from the request, not a re-serialized dictionary. JSON serialization "
+"order and formatting must match exactly for signature verification to "
+"succeed."
+msgstr ""
+"IMPORTANTE: El cuerpo debe ser la cadena JSON cruda y sin analizar tal como "
+"se recibió de la solicitud, no un diccionario re-serializado. El orden de "
+"serialización JSON y el formato deben coincidir exactamente para que la "
+"verificación de firma sea exitosa."
+
+#: ../../cryptobot.rst:40
 msgid "Module contents"
 msgstr "Contenido del módulo"
 

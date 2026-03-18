@@ -1,0 +1,736 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2022, Reinier Hernández
+# This file is distributed under the same license as the CryptoBot Python
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: CryptoBot Python 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-18 16:06-0300\n"
+"PO-Revision-Date: 2026-03-18 10:30-0300\n"
+"Last-Translator: Claude <noreply@anthropic.com>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../TRANSLATING.md:1
+msgid "Documentation Translation Guide"
+msgstr "Guía de Traducción de la Documentación"
+
+#: ../../TRANSLATING.md:3
+msgid ""
+"This guide explains how to translate the CryptoBot Python documentation "
+"into different languages."
+msgstr ""
+"Esta guía explica cómo traducir la documentación de CryptoBot Python "
+"a diferentes idiomas."
+
+#: ../../TRANSLATING.md:5
+msgid "Overview"
+msgstr "Descripción General"
+
+#: ../../TRANSLATING.md:7
+msgid ""
+"The documentation uses Sphinx's internationalization (i18n) support with "
+"`sphinx-intl` for managing translations. Translation files are stored in "
+"`.po` (Portable Object) format under "
+"`docs/locale/<language>/LC_MESSAGES/`."
+msgstr ""
+"La documentación utiliza el soporte de internacionalización (i18n) de Sphinx "
+"con `sphinx-intl` para gestionar las traducciones. Los archivos de traducción "
+"se almacenan en formato `.po` (Portable Object) bajo "
+"`docs/locale/<language>/LC_MESSAGES/`."
+
+#: ../../TRANSLATING.md:9
+msgid "Available Languages"
+msgstr "Idiomas Disponibles"
+
+#: ../../TRANSLATING.md:11
+msgid "Currently supported languages:"
+msgstr "Idiomas actualmente soportados:"
+
+#: ../../TRANSLATING.md:12
+msgid "**English** (en) - Default"
+msgstr "**Inglés** (en) - Predeterminado"
+
+#: ../../TRANSLATING.md:13
+msgid "**Spanish** (es) - Complete translation"
+msgstr "**Español** (es) - Traducción completa"
+
+#: ../../TRANSLATING.md:15
+msgid "Prerequisites"
+msgstr "Requisitos Previos"
+
+#: ../../TRANSLATING.md:17
+msgid "Install documentation dependencies:"
+msgstr "Instale las dependencias de documentación:"
+
+#: ../../TRANSLATING.md:19
+msgid "uv sync --extra docs\n"
+msgstr "uv sync --extra docs\n"
+
+#: ../../TRANSLATING.md:23
+msgid "Or directly:"
+msgstr "O directamente:"
+
+#: ../../TRANSLATING.md:25
+msgid "pip install sphinx sphinx-intl sphinx-rtd-theme myst-parser\n"
+msgstr "pip install sphinx sphinx-intl sphinx-rtd-theme myst-parser\n"
+
+#: ../../TRANSLATING.md:29
+msgid "Quick Start: Adding a New Language"
+msgstr "Inicio Rápido: Agregar un Nuevo Idioma"
+
+#: ../../TRANSLATING.md:31
+msgid "1. Generate Translation Templates"
+msgstr "1. Generar Plantillas de Traducción"
+
+#: ../../TRANSLATING.md:33
+msgid "First, generate the `.pot` (Portable Object Template) files:"
+msgstr "Primero, genere los archivos `.pot` (Portable Object Template):"
+
+#: ../../TRANSLATING.md:35 ../../TRANSLATING.md:98 ../../TRANSLATING.md:176
+msgid ""
+"cd docs\n"
+"make gettext\n"
+msgstr ""
+"cd docs\n"
+"make gettext\n"
+
+#: ../../TRANSLATING.md:40
+msgid "This creates template files in `_build/gettext/`."
+msgstr "Esto crea archivos de plantilla en `_build/gettext/`."
+
+#: ../../TRANSLATING.md:42
+msgid "2. Create Translation Catalog"
+msgstr "2. Crear Catálogo de Traducción"
+
+#: ../../TRANSLATING.md:44
+msgid "Create `.po` files for your language (e.g., French):"
+msgstr "Cree archivos `.po` para su idioma (por ejemplo, francés):"
+
+#: ../../TRANSLATING.md:46
+msgid ""
+"cd docs\n"
+"make update-po LANG=fr\n"
+msgstr ""
+"cd docs\n"
+"make update-po LANG=fr\n"
+
+#: ../../TRANSLATING.md:51
+msgid "This creates `locale/fr/LC_MESSAGES/*.po` files."
+msgstr "Esto crea archivos `locale/fr/LC_MESSAGES/*.po`."
+
+#: ../../TRANSLATING.md:53
+msgid "3. Translate Content"
+msgstr "3. Traducir Contenido"
+
+#: ../../TRANSLATING.md:55
+msgid ""
+"Edit the `.po` files in `locale/fr/LC_MESSAGES/` and fill in the `msgstr`"
+" fields:"
+msgstr ""
+"Edite los archivos `.po` en `locale/fr/LC_MESSAGES/` y complete los campos "
+"`msgstr`:"
+
+#: ../../TRANSLATING.md:57
+msgid ""
+"#: ../../index.md:1\n"
+"msgid \"Welcome to CryptoBot Python's documentation!\"\n"
+"msgstr \"Bienvenue dans la documentation de CryptoBot Python!\"\n"
+msgstr ""
+"#: ../../index.md:1\n"
+"msgid \"Welcome to CryptoBot Python's documentation!\"\n"
+"msgstr \"Bienvenue dans la documentation de CryptoBot Python!\"\n"
+
+#: ../../TRANSLATING.md:63
+msgid "**Translation Guidelines:**"
+msgstr "**Directrices de Traducción:**"
+
+#: ../../TRANSLATING.md:64
+msgid "Translate only the `msgstr` fields"
+msgstr "Traduzca solo los campos `msgstr`"
+
+#: ../../TRANSLATING.md:65
+msgid "Keep code blocks, URLs, and technical identifiers unchanged"
+msgstr "Mantenga los bloques de código, URLs e identificadores técnicos sin cambios"
+
+#: ../../TRANSLATING.md:66
+msgid "Preserve markdown formatting"
+msgstr "Preserve el formato markdown"
+
+#: ../../TRANSLATING.md:67
+msgid "Maintain consistent terminology"
+msgstr "Mantenga una terminología consistente"
+
+#: ../../TRANSLATING.md:69
+msgid "4. Build Translated Documentation"
+msgstr "4. Compilar la Documentación Traducida"
+
+#: ../../TRANSLATING.md:71
+msgid "Build the documentation in your target language:"
+msgstr "Compile la documentación en su idioma de destino:"
+
+#: ../../TRANSLATING.md:73
+msgid ""
+"cd docs\n"
+"make html-lang LANG=fr\n"
+msgstr ""
+"cd docs\n"
+"make html-lang LANG=fr\n"
+
+#: ../../TRANSLATING.md:78
+msgid "The translated HTML will be in `_build/html/fr/`."
+msgstr "El HTML traducido estará en `_build/html/fr/`."
+
+#: ../../TRANSLATING.md:80
+msgid "Updating Existing Translations"
+msgstr "Actualizar Traducciones Existentes"
+
+#: ../../TRANSLATING.md:82
+msgid "When the English documentation changes, update translation files:"
+msgstr "Cuando la documentación en inglés cambie, actualice los archivos de traducción:"
+
+#: ../../TRANSLATING.md:84
+msgid ""
+"cd docs\n"
+"make update-po LANG=es\n"
+msgstr ""
+"cd docs\n"
+"make update-po LANG=es\n"
+
+#: ../../TRANSLATING.md:89
+msgid ""
+"This updates the `.po` files with new strings while preserving existing "
+"translations. Untranslated or updated strings will be marked as \"fuzzy\""
+" and need review."
+msgstr ""
+"Esto actualiza los archivos `.po` con nuevas cadenas preservando las "
+"traducciones existentes. Las cadenas sin traducir o actualizadas se marcarán "
+"como \"fuzzy\" y necesitarán revisión."
+
+#: ../../TRANSLATING.md:91
+msgid "Makefile Commands"
+msgstr "Comandos del Makefile"
+
+#: ../../TRANSLATING.md:93
+msgid "The `docs/Makefile` provides several translation commands:"
+msgstr "El `docs/Makefile` proporciona varios comandos de traducción:"
+
+#: ../../TRANSLATING.md:95
+msgid "`make gettext`"
+msgstr "`make gettext`"
+
+#: ../../TRANSLATING.md:96
+msgid "Generates `.pot` template files from source documentation."
+msgstr "Genera archivos de plantilla `.pot` a partir de la documentación fuente."
+
+#: ../../TRANSLATING.md:103
+msgid "`make update-po LANG=<language>`"
+msgstr "`make update-po LANG=<language>`"
+
+#: ../../TRANSLATING.md:104
+msgid "Updates or creates `.po` files for a specific language."
+msgstr "Actualiza o crea archivos `.po` para un idioma específico."
+
+#: ../../TRANSLATING.md:106
+msgid ""
+"cd docs\n"
+"make update-po LANG=es    # Update Spanish\n"
+"make update-po LANG=fr    # Update French\n"
+msgstr ""
+"cd docs\n"
+"make update-po LANG=es    # Actualizar español\n"
+"make update-po LANG=fr    # Actualizar francés\n"
+
+#: ../../TRANSLATING.md:112
+msgid "`make html-lang LANG=<language>`"
+msgstr "`make html-lang LANG=<language>`"
+
+#: ../../TRANSLATING.md:113
+msgid "Builds HTML documentation in a specific language."
+msgstr "Compila la documentación HTML en un idioma específico."
+
+#: ../../TRANSLATING.md:115
+msgid ""
+"cd docs\n"
+"make html-lang LANG=es    # Build Spanish docs\n"
+"make html-lang LANG=fr    # Build French docs\n"
+msgstr ""
+"cd docs\n"
+"make html-lang LANG=es    # Compilar docs en español\n"
+"make html-lang LANG=fr    # Compilar docs en francés\n"
+
+#: ../../TRANSLATING.md:121
+msgid "Output location: `_build/html/<language>/`"
+msgstr "Ubicación de salida: `_build/html/<language>/`"
+
+#: ../../TRANSLATING.md:123
+msgid "File Structure"
+msgstr "Estructura de Archivos"
+
+#: ../../TRANSLATING.md:125
+msgid ""
+"docs/\n"
+"├── locale/                    # Translation catalogs\n"
+"│   ├── es/                   # Spanish translations\n"
+"│   │   └── LC_MESSAGES/\n"
+"│   │       ├── index.po\n"
+"│   │       ├── installation.po\n"
+"│   │       ├── usage.po\n"
+"│   │       └── ...\n"
+"│   └── fr/                   # French translations (example)\n"
+"│       └── LC_MESSAGES/\n"
+"│           └── ...\n"
+"├── _build/\n"
+"│   ├── gettext/              # Generated .pot templates\n"
+"│   └── html/\n"
+"│       ├── en/               # English HTML (default)\n"
+"│       ├── es/               # Spanish HTML\n"
+"│       └── fr/               # French HTML (example)\n"
+"├── conf.py                    # Sphinx configuration\n"
+"└── Makefile                   # Build commands\n"
+msgstr ""
+"docs/\n"
+"├── locale/                    # Catálogos de traducción\n"
+"│   ├── es/                   # Traducciones al español\n"
+"│   │   └── LC_MESSAGES/\n"
+"│   │       ├── index.po\n"
+"│   │       ├── installation.po\n"
+"│   │       ├── usage.po\n"
+"│   │       └── ...\n"
+"│   └── fr/                   # Traducciones al francés (ejemplo)\n"
+"│       └── LC_MESSAGES/\n"
+"│           └── ...\n"
+"├── _build/\n"
+"│   ├── gettext/              # Plantillas .pot generadas\n"
+"│   └── html/\n"
+"│       ├── en/               # HTML en inglés (predeterminado)\n"
+"│       ├── es/               # HTML en español\n"
+"│       └── fr/               # HTML en francés (ejemplo)\n"
+"├── conf.py                    # Configuración de Sphinx\n"
+"└── Makefile                   # Comandos de compilación\n"
+
+#: ../../TRANSLATING.md:147
+msgid "Translation Workflow"
+msgstr "Flujo de Trabajo de Traducción"
+
+#: ../../TRANSLATING.md:149
+msgid "For New Translators"
+msgstr "Para Nuevos Traductores"
+
+#: ../../TRANSLATING.md:151
+msgid "**Fork the repository**"
+msgstr "**Haga un fork del repositorio**"
+
+#: ../../TRANSLATING.md:152
+msgid "**Create translation files:**"
+msgstr "**Cree los archivos de traducción:**"
+
+#: ../../TRANSLATING.md:153
+msgid ""
+"cd docs\n"
+"make update-po LANG=<your_language>\n"
+msgstr ""
+"cd docs\n"
+"make update-po LANG=<your_language>\n"
+
+#: ../../TRANSLATING.md:158
+msgid "**Translate:**"
+msgstr "**Traduzca:**"
+
+#: ../../TRANSLATING.md:159
+msgid "Edit `.po` files in `locale/<your_language>/LC_MESSAGES/`"
+msgstr "Edite los archivos `.po` en `locale/<your_language>/LC_MESSAGES/`"
+
+#: ../../TRANSLATING.md:160
+msgid "Use a `.po` editor like [Poedit](https://poedit.net/) or any text editor"
+msgstr "Use un editor de `.po` como [Poedit](https://poedit.net/) o cualquier editor de texto"
+
+#: ../../TRANSLATING.md:161
+msgid "Focus on `msgstr` fields"
+msgstr "Enfóquese en los campos `msgstr`"
+
+#: ../../TRANSLATING.md:163
+msgid "**Test your translation:**"
+msgstr "**Pruebe su traducción:**"
+
+#: ../../TRANSLATING.md:164
+msgid "make html-lang LANG=<your_language>\n"
+msgstr "make html-lang LANG=<your_language>\n"
+
+#: ../../TRANSLATING.md:167
+msgid "Open `_build/html/<your_language>/index.html` in a browser"
+msgstr "Abra `_build/html/<your_language>/index.html` en un navegador"
+
+#: ../../TRANSLATING.md:169
+msgid "**Submit a pull request** with your translations"
+msgstr "**Envíe un pull request** con sus traducciones"
+
+#: ../../TRANSLATING.md:171
+msgid "For Maintainers"
+msgstr "Para Mantenedores"
+
+#: ../../TRANSLATING.md:173
+msgid "When documentation is updated:"
+msgstr "Cuando se actualice la documentación:"
+
+#: ../../TRANSLATING.md:175
+msgid "**Regenerate templates:**"
+msgstr "**Regenere las plantillas:**"
+
+#: ../../TRANSLATING.md:181
+msgid "**Update all language catalogs:**"
+msgstr "**Actualice todos los catálogos de idiomas:**"
+
+#: ../../TRANSLATING.md:182
+msgid ""
+"make update-po LANG=es\n"
+"make update-po LANG=fr\n"
+"# ... for each language\n"
+msgstr ""
+"make update-po LANG=es\n"
+"make update-po LANG=fr\n"
+"# ... para cada idioma\n"
+
+#: ../../TRANSLATING.md:188
+msgid "**Review fuzzy translations:**"
+msgstr "**Revise las traducciones marcadas como fuzzy:**"
+
+#: ../../TRANSLATING.md:189
+msgid "Search for `#, fuzzy` in `.po` files"
+msgstr "Busque `#, fuzzy` en los archivos `.po`"
+
+#: ../../TRANSLATING.md:190
+msgid "Update or confirm these translations"
+msgstr "Actualice o confirme estas traducciones"
+
+#: ../../TRANSLATING.md:191
+msgid "Remove the `#, fuzzy` marker when done"
+msgstr "Elimine el marcador `#, fuzzy` cuando termine"
+
+#: ../../TRANSLATING.md:193
+msgid "**Build and verify all languages:**"
+msgstr "**Compile y verifique todos los idiomas:**"
+
+#: ../../TRANSLATING.md:194
+msgid ""
+"make html-lang LANG=es\n"
+"make html-lang LANG=fr\n"
+msgstr ""
+"make html-lang LANG=es\n"
+"make html-lang LANG=fr\n"
+
+#: ../../TRANSLATING.md:199
+msgid "Best Practices"
+msgstr "Mejores Prácticas"
+
+#: ../../TRANSLATING.md:201
+msgid "Translation Quality"
+msgstr "Calidad de Traducción"
+
+#: ../../TRANSLATING.md:203
+msgid "**Consistency:** Use consistent terminology throughout"
+msgstr "**Consistencia:** Use terminología consistente en todo momento"
+
+#: ../../TRANSLATING.md:204
+msgid "**Context:** Consider the technical context when translating"
+msgstr "**Contexto:** Considere el contexto técnico al traducir"
+
+#: ../../TRANSLATING.md:205
+msgid "**Natural language:** Translate meaning, not word-for-word"
+msgstr "**Lenguaje natural:** Traduzca el significado, no palabra por palabra"
+
+#: ../../TRANSLATING.md:206
+msgid "**Code preservation:** Never translate:"
+msgstr "**Preservación de código:** Nunca traduzca:"
+
+#: ../../TRANSLATING.md:207
+msgid "Python code"
+msgstr "Código Python"
+
+#: ../../TRANSLATING.md:208
+msgid "Variable/function names"
+msgstr "Nombres de variables/funciones"
+
+#: ../../TRANSLATING.md:209
+msgid "URLs"
+msgstr "URLs"
+
+#: ../../TRANSLATING.md:210
+msgid "Command-line instructions"
+msgstr "Instrucciones de línea de comandos"
+
+#: ../../TRANSLATING.md:211
+msgid "API endpoints"
+msgstr "Endpoints de la API"
+
+#: ../../TRANSLATING.md:213
+msgid "Common Patterns"
+msgstr "Patrones Comunes"
+
+#: ../../TRANSLATING.md:215
+msgid "**Code comments in examples:**"
+msgstr "**Comentarios de código en ejemplos:**"
+
+#: ../../TRANSLATING.md:216
+msgid ""
+"msgid \"# Create a client\"\n"
+"msgstr \"# Crear un cliente\"\n"
+msgstr ""
+"msgid \"# Create a client\"\n"
+"msgstr \"# Crear un cliente\"\n"
+
+#: ../../TRANSLATING.md:221
+msgid "**Mixed content (keep code unchanged):**"
+msgstr "**Contenido mixto (mantener código sin cambios):**"
+
+#: ../../TRANSLATING.md:222
+msgid ""
+"msgid \"Call `client.create_invoice()` to create invoices\"\n"
+"msgstr \"Llama a `client.create_invoice()` para crear facturas\"\n"
+msgstr ""
+"msgid \"Call `client.create_invoice()` to create invoices\"\n"
+"msgstr \"Llama a `client.create_invoice()` para crear facturas\"\n"
+
+#: ../../TRANSLATING.md:227
+msgid "**URLs and links:**"
+msgstr "**URLs y enlaces:**"
+
+#: ../../TRANSLATING.md:228
+msgid ""
+"msgid \"See [documentation](https://example.com) for details\"\n"
+"msgstr \"Ver [documentación](https://example.com) para detalles\"\n"
+msgstr ""
+"msgid \"See [documentation](https://example.com) for details\"\n"
+"msgstr \"Ver [documentación](https://example.com) para detalles\"\n"
+
+#: ../../TRANSLATING.md:233
+msgid "Tools"
+msgstr "Herramientas"
+
+#: ../../TRANSLATING.md:235
+msgid "Recommended .po Editors"
+msgstr "Editores de .po Recomendados"
+
+#: ../../TRANSLATING.md:237
+msgid "**[Poedit](https://poedit.net/)** - Cross-platform, user-friendly"
+msgstr "**[Poedit](https://poedit.net/)** - Multiplataforma, fácil de usar"
+
+#: ../../TRANSLATING.md:238
+msgid "**[Lokalize](https://apps.kde.org/lokalize/)** - KDE translation tool"
+msgstr "**[Lokalize](https://apps.kde.org/lokalize/)** - Herramienta de traducción de KDE"
+
+#: ../../TRANSLATING.md:239
+msgid ""
+"**[GTranslator](https://wiki.gnome.org/Apps/Gtranslator)** - GNOME "
+"translation tool"
+msgstr ""
+"**[GTranslator](https://wiki.gnome.org/Apps/Gtranslator)** - Herramienta "
+"de traducción de GNOME"
+
+#: ../../TRANSLATING.md:240
+msgid "**Text editors** - VS Code, vim, emacs with syntax highlighting"
+msgstr "**Editores de texto** - VS Code, vim, emacs con resaltado de sintaxis"
+
+#: ../../TRANSLATING.md:242
+msgid "Validation"
+msgstr "Validación"
+
+#: ../../TRANSLATING.md:244
+msgid "Check for errors in `.po` files:"
+msgstr "Verifique errores en los archivos `.po`:"
+
+#: ../../TRANSLATING.md:246
+msgid "msgfmt --check locale/es/LC_MESSAGES/index.po\n"
+msgstr "msgfmt --check locale/es/LC_MESSAGES/index.po\n"
+
+#: ../../TRANSLATING.md:250
+msgid "Read the Docs Integration"
+msgstr "Integración con Read the Docs"
+
+#: ../../TRANSLATING.md:252
+msgid ""
+"The project is configured to build multi-language documentation on Read "
+"the Docs:"
+msgstr ""
+"El proyecto está configurado para compilar documentación multilingüe en "
+"Read the Docs:"
+
+#: ../../TRANSLATING.md:254
+msgid "Configuration: `.readthedocs.yaml`"
+msgstr "Configuración: `.readthedocs.yaml`"
+
+#: ../../TRANSLATING.md:255
+msgid "Translation files are generated during the build process"
+msgstr "Los archivos de traducción se generan durante el proceso de compilación"
+
+#: ../../TRANSLATING.md:256
+msgid "Spanish documentation is automatically built and published"
+msgstr "La documentación en español se compila y publica automáticamente"
+
+#: ../../TRANSLATING.md:258
+msgid "Contributing Translations"
+msgstr "Contribuir con Traducciones"
+
+#: ../../TRANSLATING.md:260
+msgid "We welcome translations! Here's how to contribute:"
+msgstr "¡Las traducciones son bienvenidas! Así es como puede contribuir:"
+
+#: ../../TRANSLATING.md:262
+msgid "Check existing translations in the `locale/` directory"
+msgstr "Revise las traducciones existentes en el directorio `locale/`"
+
+#: ../../TRANSLATING.md:263
+msgid "Create an issue announcing your translation"
+msgstr "Cree un issue anunciando su traducción"
+
+#: ../../TRANSLATING.md:264
+msgid "Follow the workflow above"
+msgstr "Siga el flujo de trabajo descrito arriba"
+
+#: ../../TRANSLATING.md:265
+msgid "Submit a pull request"
+msgstr "Envíe un pull request"
+
+#: ../../TRANSLATING.md:266
+msgid "Maintainers will review and merge"
+msgstr "Los mantenedores revisarán y harán merge"
+
+#: ../../TRANSLATING.md:268
+msgid "Translation Checklist"
+msgstr "Lista de Verificación de Traducción"
+
+#: ../../TRANSLATING.md:270
+msgid "All `.po` files updated"
+msgstr "Todos los archivos `.po` actualizados"
+
+#: ../../TRANSLATING.md:271
+msgid "No `#, fuzzy` markers remain"
+msgstr "No quedan marcadores `#, fuzzy`"
+
+#: ../../TRANSLATING.md:272
+msgid "Documentation builds without errors"
+msgstr "La documentación compila sin errores"
+
+#: ../../TRANSLATING.md:273
+msgid "Translated pages display correctly"
+msgstr "Las páginas traducidas se muestran correctamente"
+
+#: ../../TRANSLATING.md:274
+msgid "Code examples work as expected"
+msgstr "Los ejemplos de código funcionan como se espera"
+
+#: ../../TRANSLATING.md:275
+msgid "Links and references are functional"
+msgstr "Los enlaces y referencias funcionan"
+
+#: ../../TRANSLATING.md:277
+msgid "Troubleshooting"
+msgstr "Solución de Problemas"
+
+#: ../../TRANSLATING.md:279
+msgid "Build Errors"
+msgstr "Errores de Compilación"
+
+#: ../../TRANSLATING.md:281
+msgid "**Error: `unsupported locale setting`**"
+msgstr "**Error: `unsupported locale setting`**"
+
+#: ../../TRANSLATING.md:282
+msgid ""
+"export LC_ALL=en_US.UTF-8\n"
+"export LANG=en_US.UTF-8\n"
+"make html-lang LANG=es\n"
+msgstr ""
+"export LC_ALL=en_US.UTF-8\n"
+"export LANG=en_US.UTF-8\n"
+"make html-lang LANG=es\n"
+
+#: ../../TRANSLATING.md:288
+msgid "**Error: `sphinx-intl` not found**"
+msgstr "**Error: `sphinx-intl` no encontrado**"
+
+#: ../../TRANSLATING.md:289
+msgid ""
+"uv sync --extra docs\n"
+"# or\n"
+"pip install sphinx-intl\n"
+msgstr ""
+"uv sync --extra docs\n"
+"# o\n"
+"pip install sphinx-intl\n"
+
+#: ../../TRANSLATING.md:295
+msgid "Translation Not Appearing"
+msgstr "La Traducción No Aparece"
+
+#: ../../TRANSLATING.md:297
+msgid "Check `.mo` files were generated:"
+msgstr "Verifique que se generaron los archivos `.mo`:"
+
+#: ../../TRANSLATING.md:298
+msgid "ls locale/es/LC_MESSAGES/*.mo\n"
+msgstr "ls locale/es/LC_MESSAGES/*.mo\n"
+
+#: ../../TRANSLATING.md:302
+msgid "Rebuild from scratch:"
+msgstr "Recompile desde cero:"
+
+#: ../../TRANSLATING.md:303
+msgid ""
+"make clean\n"
+"make html-lang LANG=es\n"
+msgstr ""
+"make clean\n"
+"make html-lang LANG=es\n"
+
+#: ../../TRANSLATING.md:308
+msgid "Verify language code in `msgstr` header"
+msgstr "Verifique el código de idioma en el encabezado `msgstr`"
+
+#: ../../TRANSLATING.md:310
+msgid "Resources"
+msgstr "Recursos"
+
+#: ../../TRANSLATING.md:312
+msgid ""
+"[Sphinx Internationalization](https://www.sphinx-"
+"doc.org/en/master/usage/advanced/intl.html)"
+msgstr ""
+"[Internacionalización de Sphinx](https://www.sphinx-"
+"doc.org/en/master/usage/advanced/intl.html)"
+
+#: ../../TRANSLATING.md:313
+msgid "[GNU gettext Manual](https://www.gnu.org/software/gettext/manual/)"
+msgstr "[Manual de GNU gettext](https://www.gnu.org/software/gettext/manual/)"
+
+#: ../../TRANSLATING.md:314
+msgid "[sphinx-intl Documentation](https://sphinx-intl.readthedocs.io/)"
+msgstr "[Documentación de sphinx-intl](https://sphinx-intl.readthedocs.io/)"
+
+#: ../../TRANSLATING.md:316
+msgid "Questions?"
+msgstr "¿Preguntas?"
+
+#: ../../TRANSLATING.md:318
+msgid "For translation questions or issues:"
+msgstr "Para preguntas o problemas con las traducciones:"
+
+#: ../../TRANSLATING.md:319
+msgid "Open an issue on GitHub"
+msgstr "Abra un issue en GitHub"
+
+#: ../../TRANSLATING.md:320
+msgid "Contact the maintainers"
+msgstr "Contacte a los mantenedores"
+
+#: ../../TRANSLATING.md:321
+msgid "Check existing `.po` files for examples"
+msgstr "Revise los archivos `.po` existentes para ver ejemplos"

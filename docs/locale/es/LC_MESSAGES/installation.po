@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CryptoBot Python 0.1.6\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-18 10:28-0300\n"
-"PO-Revision-Date: 2025-11-18 10:30-0300\n"
+"POT-Creation-Date: 2026-03-18 16:06-0300\n"
+"PO-Revision-Date: 2026-03-18 10:30-0300\n"
 "Last-Translator: Claude <noreply@anthropic.com>\n"
 "Language: es\n"
 "Language-Team: es <LL@li.org>\n"
@@ -17,99 +17,191 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.17.0\n"
+"Generated-By: Babel 2.18.0\n"
 
 #: ../../installation.md:1
 msgid "Installation"
 msgstr "Instalación"
 
 #: ../../installation.md:3
-msgid "Stable release"
-msgstr "Versión estable"
+msgid "Requirements"
+msgstr "Requisitos"
 
 #: ../../installation.md:5
-msgid "To install CryptoBot Python, run this command in your terminal:"
-msgstr "Para instalar CryptoBot Python, ejecuta este comando en tu terminal:"
+msgid "Python 3.10+"
+msgstr "Python 3.10+"
 
-#: ../../installation.md:7
-msgid "$ pip install cryptobot-python\n"
-msgstr "$ pip install cryptobot-python\n"
+#: ../../installation.md:6
+msgid "pip (or [uv](https://docs.astral.sh/uv/) for development)"
+msgstr "pip (o [uv](https://docs.astral.sh/uv/) para desarrollo)"
 
-#: ../../installation.md:11
+#: ../../installation.md:8
+msgid "Install from PyPI"
+msgstr "Instalar desde PyPI"
+
+#: ../../installation.md:10
+msgid "pip install cryptobot-python\n"
+msgstr "pip install cryptobot-python\n"
+
+#: ../../installation.md:14
+msgid "Install optional extras only when needed:"
+msgstr "Instale los extras opcionales solo cuando sea necesario:"
+
+#: ../../installation.md:16
 msgid ""
-"This is the preferred method to install CryptoBot Python, as it will "
-"always install the most recent stable release."
+"pip install \"cryptobot-python[webhook]\"\n"
+"pip install \"cryptobot-python[docs]\"\n"
 msgstr ""
-"Este es el método preferido para instalar CryptoBot Python, ya que siempre "
-"instalará la versión estable más reciente."
-
-#: ../../installation.md:13
-msgid ""
-"If you don't have [pip](https://pip.pypa.io) installed, this [Python "
-"installation guide](http://docs.python-"
-"guide.org/en/latest/starting/installation/) can guide you through the "
-"process."
-msgstr ""
-"Si no tienes [pip](https://pip.pypa.io) instalado, esta [guía de instalación de Python]"
-"(http://docs.python-guide.org/en/latest/starting/installation/) puede guiarte a través "
-"del proceso."
-
-#: ../../installation.md:15
-msgid "From sources"
-msgstr "Desde las fuentes"
-
-#: ../../installation.md:17
-msgid ""
-"The sources for CryptoBot Python can be downloaded from the [Github "
-"repo](https://github.com/ragnarok22/cryptobot_python)."
-msgstr ""
-"Las fuentes de CryptoBot Python se pueden descargar desde el [repositorio de Github]"
-"(https://github.com/ragnarok22/cryptobot_python)."
-
-#: ../../installation.md:19
-msgid "You can either clone the public repository:"
-msgstr "Puedes clonar el repositorio público:"
+"pip install \"cryptobot-python[webhook]\"\n"
+"pip install \"cryptobot-python[docs]\"\n"
 
 #: ../../installation.md:21
-msgid "$ git clone git://github.com/ragnarok22/cryptobot_python\n"
-msgstr "$ git clone git://github.com/ragnarok22/cryptobot_python\n"
+msgid "Verify Installation"
+msgstr "Verificar la Instalación"
 
-#: ../../installation.md:25
+#: ../../installation.md:23
 msgid ""
-"Or download the "
-"[tarball](https://github.com/ragnarok22/cryptobot_python/tarball/master):"
+"from cryptobot import CryptoBotClient\n"
+"print(CryptoBotClient)\n"
 msgstr ""
-"O descargar el "
-"[tarball](https://github.com/ragnarok22/cryptobot_python/tarball/master):"
+"from cryptobot import CryptoBotClient\n"
+"print(CryptoBotClient)\n"
 
-#: ../../installation.md:27
+#: ../../installation.md:28
+msgid "Install from Source"
+msgstr "Instalar desde las Fuentes"
+
+#: ../../installation.md:30
 msgid ""
-"$ curl -OJL https://github.com/ragnarok22/cryptobot_python/tarball/master"
-"\n"
+"git clone https://github.com/ragnarok22/cryptobot_python.git\n"
+"cd cryptobot_python\n"
+"uv sync\n"
 msgstr ""
-"$ curl -OJL https://github.com/ragnarok22/cryptobot_python/tarball/master"
-"\n"
+"git clone https://github.com/ragnarok22/cryptobot_python.git\n"
+"cd cryptobot_python\n"
+"uv sync\n"
 
-#: ../../installation.md:31
-msgid "Once you have a copy of the source, you can install it with Poetry:"
-msgstr "Una vez que tengas una copia de las fuentes, puedes instalarla con Poetry:"
-
-#: ../../installation.md:33
-msgid ""
-"$ cd cryptobot_python\n"
-"$ poetry install\n"
-msgstr ""
-"$ cd cryptobot_python\n"
-"$ poetry install\n"
+#: ../../installation.md:36
+msgid "For documentation tooling:"
+msgstr "Para herramientas de documentación:"
 
 #: ../../installation.md:38
-msgid "Or with pip:"
-msgstr "O con pip:"
+msgid "uv sync --extra docs\n"
+msgstr "uv sync --extra docs\n"
 
-#: ../../installation.md:40
+#: ../../installation.md:42
+msgid "For local webhook development with FastAPI/Uvicorn:"
+msgstr "Para desarrollo local de webhooks con FastAPI/Uvicorn:"
+
+#: ../../installation.md:44
+msgid "uv sync --extra webhook\n"
+msgstr "uv sync --extra webhook\n"
+
+#: ../../installation.md:48
+msgid "Development Setup"
+msgstr "Configuración de Desarrollo"
+
+#: ../../installation.md:50
 msgid ""
-"$ cd cryptobot_python\n"
-"$ pip install .\n"
+"uv sync\n"
+"make lint\n"
+"make test\n"
 msgstr ""
-"$ cd cryptobot_python\n"
-"$ pip install .\n"
+"uv sync\n"
+"make lint\n"
+"make test\n"
+
+#: ../../installation.md:56
+msgid "Common Pitfalls"
+msgstr "Errores Comunes"
+
+#: ../../installation.md:58
+msgid "Use `cryptobot-python` as the package name in `pip install`."
+msgstr "Use `cryptobot-python` como nombre del paquete en `pip install`."
+
+#: ../../installation.md:59
+msgid "Keep mainnet and testnet tokens separate."
+msgstr "Mantenga los tokens de mainnet y testnet separados."
+
+#: ../../installation.md:60
+msgid "Store tokens in environment variables instead of source code."
+msgstr "Almacene los tokens en variables de entorno en lugar de en el código fuente."
+
+#~ msgid "Stable release"
+#~ msgstr "Versión estable"
+
+#~ msgid "To install CryptoBot Python, run this command in your terminal:"
+#~ msgstr "Para instalar CryptoBot Python, ejecuta este comando en tu terminal:"
+
+#~ msgid ""
+#~ "This is the preferred method to "
+#~ "install CryptoBot Python, as it will "
+#~ "always install the most recent stable"
+#~ " release."
+#~ msgstr ""
+#~ "Este es el método preferido para "
+#~ "instalar CryptoBot Python, ya que "
+#~ "siempre instalará la versión estable más"
+#~ " reciente."
+
+#~ msgid ""
+#~ "If you don't have [pip](https://pip.pypa.io)"
+#~ " installed, this [Python installation "
+#~ "guide](http://docs.python-"
+#~ "guide.org/en/latest/starting/installation/) can guide "
+#~ "you through the process."
+#~ msgstr ""
+#~ "Si no tienes [pip](https://pip.pypa.io) "
+#~ "instalado, esta [guía de instalación de"
+#~ " Python](http://docs.python-"
+#~ "guide.org/en/latest/starting/installation/) puede guiarte"
+#~ " a través del proceso."
+
+#~ msgid ""
+#~ "The sources for CryptoBot Python can "
+#~ "be downloaded from the [Github "
+#~ "repo](https://github.com/ragnarok22/cryptobot_python)."
+#~ msgstr ""
+#~ "Las fuentes de CryptoBot Python se "
+#~ "pueden descargar desde el [repositorio "
+#~ "de Github](https://github.com/ragnarok22/cryptobot_python)."
+
+#~ msgid "You can either clone the public repository:"
+#~ msgstr "Puedes clonar el repositorio público:"
+
+#~ msgid ""
+#~ "Or download the "
+#~ "[tarball](https://github.com/ragnarok22/cryptobot_python/tarball/master):"
+#~ msgstr ""
+#~ "O descargar el "
+#~ "[tarball](https://github.com/ragnarok22/cryptobot_python/tarball/master):"
+
+#~ msgid ""
+#~ "$ curl -OJL "
+#~ "https://github.com/ragnarok22/cryptobot_python/tarball/master\n"
+#~ msgstr ""
+#~ "$ curl -OJL "
+#~ "https://github.com/ragnarok22/cryptobot_python/tarball/master\n"
+
+#~ msgid "Once you have a copy of the source, you can install it with Poetry:"
+#~ msgstr ""
+#~ "Una vez que tengas una copia de"
+#~ " las fuentes, puedes instalarla con "
+#~ "Poetry:"
+
+#~ msgid ""
+#~ "$ cd cryptobot_python\n"
+#~ "$ poetry install\n"
+#~ msgstr ""
+#~ "$ cd cryptobot_python\n"
+#~ "$ poetry install\n"
+
+#~ msgid "Or with pip:"
+#~ msgstr "O con pip:"
+
+#~ msgid ""
+#~ "$ cd cryptobot_python\n"
+#~ "$ pip install .\n"
+#~ msgstr ""
+#~ "$ cd cryptobot_python\n"
+#~ "$ pip install .\n"

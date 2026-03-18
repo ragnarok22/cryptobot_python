@@ -516,14 +516,14 @@ class CryptoBotClient:
         Example:
             >>> rates = client.get_exchange_rates()
             >>> for rate in rates:
-            ...     if rate.source == Asset.BTC and rate.target == "USD":
+            ...     if rate.source == "BTC" and rate.target == "USD":
             ...         print(f"1 BTC = ${rate.rate} USD")
             1 BTC = $45000.50 USD
 
             Calculate invoice amount:
                 >>> # Convert $100 USD to TON
                 >>> rates = client.get_exchange_rates()
-                >>> ton_usd_rate = next(r for r in rates if r.source == Asset.TON and r.target == "USD")
+                >>> ton_usd_rate = next(r for r in rates if r.source == "TON" and r.target == "USD")
                 >>> ton_amount = 100 / float(ton_usd_rate.rate)
                 >>> invoice = client.create_invoice(Asset.TON, ton_amount)
         """

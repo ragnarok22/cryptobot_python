@@ -122,7 +122,7 @@ You can also filter for specific currencies:
 
 ```python
 # Find USD exchange rate for Bitcoin
-btc_usd_rate = next((r for r in rates if r.source.name == "BTC" and r.target == "USD"), None)
+btc_usd_rate = next((r for r in rates if r.source == "BTC" and r.target == "USD"), None)
 if btc_usd_rate:
     print(f"1 BTC = ${btc_usd_rate.rate} USD")
 ```
@@ -413,7 +413,6 @@ Asset.TON     # Toncoin
 Asset.ETH     # Ethereum
 Asset.USDT    # Tether
 Asset.USDC    # USD Coin
-Asset.BUSD    # Binance USD
 Asset.BNB     # Binance Coin
 Asset.TRX     # TRON
 ```
@@ -567,9 +566,9 @@ def create_flexible_invoice(client, amount_usd, description):
     print(f"  USDT: ${amount_usd}")
 
     for rate in rates:
-        if rate.target == "USD" and any(a.name == rate.source.name for a in available_assets):
+        if rate.target == "USD" and rate.source in [a.name for a in available_assets]:
             crypto_amount = amount_usd / float(rate.rate)
-            print(f"  {rate.source.name}: {crypto_amount:.8f}")
+            print(f"  {rate.source}: {crypto_amount:.8f}")
 
     return invoice
 

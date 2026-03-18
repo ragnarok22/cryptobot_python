@@ -2,7 +2,7 @@
 
 ## Requirements
 
-- Python 3.9.12+
+- Python 3.10+
 - pip (or [uv](https://docs.astral.sh/uv/) for development)
 
 ## Install from PyPI

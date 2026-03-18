@@ -24,7 +24,7 @@ and synchronous/async clients for invoices, transfers, checks, balances, exchang
 
 ## Installation
 
-CryptoBot Python supports Python `>=3.9.12`.
+CryptoBot Python supports Python `>=3.10`.
 
 ```bash
 pip install cryptobot-python

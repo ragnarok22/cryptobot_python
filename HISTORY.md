@@ -1,5 +1,10 @@
 # History
 
+## 1.1.0 (2026-03-18)
+
+* Dropped Python 3.9 support; minimum version is now 3.10.
+* Fixed `ExchangeRate.source` type from `Asset` enum to `str` to match the API, which can return fiat currency codes.
+
 ## 1.0.0 (2026-03-18)
 
 * First stable release.
@@ -8,7 +13,7 @@
 * Pagination iterators for invoices, transfers, and checks.
 * FastAPI webhook listener with signature verification and replay protection.
 * Typed dataclass models for all API responses.
-* Python 3.9.12 through 3.14 support.
+* Python 3.10 through 3.14 support.
 
 ## 0.5.1 (2026-02-17)
 

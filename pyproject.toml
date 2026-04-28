@@ -42,7 +42,7 @@ docs = [
 ]
 webhook = [
     "fastapi>=0.136.1",
-    "uvicorn>=0.44.0",
+    "uvicorn>=0.46.0",
     "colorama>=0.4.6",
     "python-dotenv>=1.2.2",
 ]

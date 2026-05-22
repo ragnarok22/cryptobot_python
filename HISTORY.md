@@ -1,9 +1,11 @@
 # History
 
-## 1.1.0 (2026-03-18)
+## 1.1.0 (2026-05-22)
 
 * Dropped Python 3.9 support; minimum version is now 3.10.
 * Fixed `ExchangeRate.source` type from `Asset` enum to `str` to match the API, which can return fiat currency codes.
+* Fixed PyPI publishing to use Trusted Publishing/OIDC through the official PyPA publish action.
+* Updated the release workflow to use `astral-sh/setup-uv@v8.1.0`, Python 3.13, and the `pypi` environment.
 
 ## 1.0.0 (2026-03-18)
 

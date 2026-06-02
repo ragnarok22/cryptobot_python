@@ -1,5 +1,9 @@
 # History
 
+## 1.1.1 (2026-06-02)
+
+* Maintenance release.
+
 ## 1.1.0 (2026-05-22)
 
 * Dropped Python 3.9 support; minimum version is now 3.10.

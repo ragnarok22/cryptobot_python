@@ -291,15 +291,17 @@ def transfer_ledger(client: CryptoBotClient, asset: Asset = None):
     """Build a ledger of all outgoing transfers."""
     ledger = []
     for transfer in client.iter_transfers(asset=asset, page_size=200):
-        ledger.append({
-            "id": transfer.transfer_id,
-            "user_id": transfer.user_id,
-            "asset": transfer.asset.name,
-            "amount": transfer.amount,
-            "status": transfer.status.name,
-            "spend_id": transfer.spend_id,
-            "completed_at": transfer.completed_at,
-        })
+        ledger.append(
+            {
+                "id": transfer.transfer_id,
+                "user_id": transfer.user_id,
+                "asset": transfer.asset.name,
+                "amount": transfer.amount,
+                "status": transfer.status.name,
+                "spend_id": transfer.spend_id,
+                "completed_at": transfer.completed_at,
+            }
+        )
 
     total = sum(Decimal(str(t["amount"])) for t in ledger)
     return {"entries": ledger, "total": str(total), "count": len(ledger)}

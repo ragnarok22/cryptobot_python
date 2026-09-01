@@ -52,11 +52,7 @@ print(f"Bot Username: {app.payment_processing_bot_username}")
 Create a simple invoice for cryptocurrency payment:
 
 ```python
-invoice = client.create_invoice(
-    asset=Asset.USDT,
-    amount=5.25,
-    description="Coffee order #42"
-)
+invoice = client.create_invoice(asset=Asset.USDT, amount=5.25, description="Coffee order #42")
 
 print(f"Invoice URL: {invoice.bot_invoice_url}")
 print(f"Invoice ID: {invoice.invoice_id}")
@@ -76,7 +72,7 @@ invoice = client.create_invoice(
     payload="user_123_premium",  # Custom payload for tracking
     allow_comments=True,  # Allow user comments
     allow_anonymous=False,  # Require user identification
-    expires_in=3600  # Expire after 1 hour
+    expires_in=3600,  # Expire after 1 hour
 )
 ```
 
@@ -91,7 +87,7 @@ try:
         asset=Asset.TON,
         amount=0.5,
         spend_id="transfer_001",  # Unique spend ID to prevent duplicates
-        comment="Payment for services"
+        comment="Payment for services",
     )
     print(f"Transfer completed: {transfer.transfer_id}")
 except CryptoBotError as e:
@@ -164,13 +160,7 @@ Retrieve information about existing invoices:
 invoices = client.get_invoices()
 
 # Get invoices with filters
-paid_invoices = client.get_invoices(
-    asset=Asset.USDT,
-    invoice_ids=[123, 456],
-    status=Status.paid,
-    offset=0,
-    count=50
-)
+paid_invoices = client.get_invoices(asset=Asset.USDT, invoice_ids=[123, 456], status=Status.paid, offset=0, count=50)
 ```
 
 `invoice_ids` accepts either a comma-separated string (`"123,456"`) or `list[int]` (`[123, 456]`).
@@ -384,6 +374,7 @@ from fastapi import FastAPI, Request, HTTPException
 app = FastAPI()
 api_token = os.environ["CRYPTOBOT_API_TOKEN"]
 
+
 @app.post("/webhook")
 async def webhook_handler(request: Request):
     # Read the raw body first (required for signature verification)
@@ -408,13 +399,13 @@ The library supports these assets (see {class}`cryptobot.models.Asset` for the c
 from cryptobot.models import Asset
 
 # Available assets
-Asset.BTC     # Bitcoin
-Asset.TON     # Toncoin
-Asset.ETH     # Ethereum
-Asset.USDT    # Tether
-Asset.USDC    # USD Coin
-Asset.BNB     # Binance Coin
-Asset.TRX     # TRON
+Asset.BTC  # Bitcoin
+Asset.TON  # Toncoin
+Asset.ETH  # Ethereum
+Asset.USDT  # Tether
+Asset.USDC  # USD Coin
+Asset.BNB  # Binance Coin
+Asset.TRX  # TRON
 ```
 
 ## Advanced Patterns
@@ -498,6 +489,7 @@ def wait_for_payment(client, invoice_id, max_attempts=60, delay=5):
 
     raise TimeoutError("Payment timeout")
 
+
 # Usage
 invoice = client.create_invoice(asset=Asset.USDT, amount=10)
 print(f"Waiting for payment: {invoice.bot_invoice_url}")
@@ -516,6 +508,7 @@ Calculate total revenue from paid invoices:
 ```python
 from decimal import Decimal
 
+
 def calculate_revenue(client, asset=None):
     """Calculate total revenue from paid invoices"""
     invoices = client.get_invoices(status=Status.paid, asset=asset)
@@ -531,6 +524,7 @@ def calculate_revenue(client, asset=None):
             revenue_by_asset[asset_name] = amount
 
     return revenue_by_asset
+
 
 # Usage
 revenue = calculate_revenue(client)
@@ -557,7 +551,7 @@ def create_flexible_invoice(client, amount_usd, description):
         amount=amount_usd,
         description=description,
         allow_comments=True,
-        expires_in=3600  # 1 hour
+        expires_in=3600,  # 1 hour
     )
 
     # Show equivalent amounts in other currencies
@@ -571,6 +565,7 @@ def create_flexible_invoice(client, amount_usd, description):
             print(f"  {rate.source}: {crypto_amount:.8f}")
 
     return invoice
+
 
 # Usage
 invoice = create_flexible_invoice(client, 50.0, "Premium subscription")

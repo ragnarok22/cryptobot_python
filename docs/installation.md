@@ -22,6 +22,7 @@ pip install "cryptobot-python[docs]"
 
 ```python
 from cryptobot import CryptoBotClient
+
 print(CryptoBotClient)
 ```
 

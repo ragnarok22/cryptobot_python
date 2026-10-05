@@ -1,5 +1,10 @@
 # History
 
+## 1.1.2 (2026-10-05)
+
+* Updated dependencies and development tools.
+* Refreshed documentation examples and installation guidance.
+
 ## 1.1.1 (2026-06-02)
 
 * Maintenance release.

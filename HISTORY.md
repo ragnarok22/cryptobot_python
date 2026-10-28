@@ -1,5 +1,10 @@
 # History
 
+## 1.2.0 (2026-10-28)
+
+* Updated locked dependencies and development tools.
+* Updated Ruff pre-commit hooks for code formatting and linting.
+
 ## 1.1.2 (2026-10-05)
 
 * Updated dependencies and development tools.

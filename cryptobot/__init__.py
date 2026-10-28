@@ -2,7 +2,7 @@
 
 __author__ = """Reinier Hernández"""
 __email__ = "sasuke.reinier@gmail.com"
-__version__ = "1.1.2"
+__version__ = "1.2.0"
 
 from ._sync.client import CryptoBotClient  # noqa: F401
 from .client import AsyncCryptoBotClient  # noqa: F401

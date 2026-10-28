@@ -18,6 +18,7 @@
 
 ## Setup and Development Commands
 - `uv sync` installs the default development environment.
+- Pre-commit tooling requires Python 3.11+ for patched `filelock`; it is skipped on Python 3.10, which remains supported for the library and tests.
 - `uv sync --all-extras` matches the dependency set used in CI.
 - `uv sync --extra webhook` installs FastAPI/Uvicorn extras for webhook work.
 - `uv sync --extra docs` installs documentation tooling.

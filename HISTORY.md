@@ -1,5 +1,9 @@
 # History
 
+## Unreleased
+
+* Security: require patched `filelock>=4.2.1` for development tooling and limit pre-commit to Python 3.11+ while retaining Python 3.10 library support.
+
 ## 1.2.0 (2026-10-28)
 
 * Updated locked dependencies and development tools.

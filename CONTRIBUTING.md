@@ -46,6 +46,8 @@ If you are proposing a feature:
 
 Ready to contribute? Here's how to set up `cryptobot_python` for local development.
 
+Use Python 3.11+ to run pre-commit hooks: their patched `filelock` dependency requires it. Python 3.10 remains supported for the library and tests; `uv sync` skips pre-commit on Python 3.10.
+
 1. Fork the `cryptobot_python` repo on GitHub.
 
 2. Clone your fork locally:
